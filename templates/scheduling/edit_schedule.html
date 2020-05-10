@@ -1,0 +1,65 @@
+{% extends "scheduling/base.html" %}
+
+{% block content %}
+
+<h2 class="mt-3"><span class="text-info">{{schedule.course}}</span></h2>
+
+<form action="{% url 'edit_schedule' semester schedule.id %}" method="POST">
+    {% csrf_token %}
+    <!-- {{ form.as_p }} -->
+
+    <div class="form-row">
+        <div class="form-group col-md-2">
+            {{ form.section.label }} {{ form.section }}
+        </div>
+        <div class="form-group col-md-2">
+            {{ form.instructor.label }} {{ form.instructor }}
+        </div>
+        <div class="form-group col-md-2">
+            {{ form.capacity.label }} {{ form.capacity }}
+        </div>
+        <div class="form-group col-md-2">
+            {{ form.days.label }} {{ form.days }}
+        </div>
+        <div class="form-group col-md-2">
+            {{ form.start_time.label }} {{ form.start_time }}
+            <div class="invalid-feedback">
+                Invalid start time.
+            </div>
+        </div>
+        <div class="form-group col-md-2">
+            {{ form.stop_time.label }} {{ form.stop_time }}
+            <div class="invalid-feedback">
+                Invalid stop time.
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-2">
+            {{ form.status.label }} {{ form.status }}
+        </div>
+        <div class="form-group col-md-2">
+            {{ form.campus.label }} {{ form.campus }}
+            <div class="invalid-feedback">
+                Invalid campus.
+            </div>
+        </div>
+        <div class="form-group col-md-2">
+            {{ form.location.label }} {{ form.location }}
+            <div class="invalid-feedback">
+                Invalid location.
+            </div>
+        </div>
+        <div class="form-group col-md-4">
+            {{ form.notes.label }} {{ form.notes }}
+        </div>
+        <div class="form-group col-md-2">
+            {{ form.course.as_hidden }}
+        </div>
+    </div>
+    <div class="text-center mt-2">
+        <button type="submit" class="btn btn-dark btn-lg ml-5">Save Changes</button>
+    </div>
+</form>
+
+{% endblock content %}

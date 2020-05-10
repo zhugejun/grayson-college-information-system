@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form class="form-signup" method="POST">
+    {% csrf_token %}
+    <!-- {{ form.as_p }} -->
+
+    <div class="form-group">
+        {{ form.email.label }} {{ form.email }}
+    </div>
+
+    <div class="form-group">
+        {{ form.password1.label }} {{ form.password1 }}
+    </div>
+
+    <div class="form-group">
+        {{ form.password2.label }} {{ form.password2 }}
+    </div>
+
+    <button type="submit" class="btn btn-dark btn-block"> Sign Up </button>
+</form>
+
+{% endblock content %}

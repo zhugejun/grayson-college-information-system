@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form class="form-signin" method="POST">
+    {% csrf_token %}
+    <!-- {{ form.as_p }} -->
+
+    <div class="form-group">
+        {{ form.username.label }} {{ form.username }}
+    </div>
+
+    <div class="form-group">
+        {{ form.password.label }} {{ form.password }}
+    </div>
+
+
+    <button type="submit" class="btn btn-dark btn-block mb-3"> Login </button>
+
+    <a href="{% url 'password_reset' %}">Forgot my password?</a>
+
+</form>
+<br>
+{% endblock content %}

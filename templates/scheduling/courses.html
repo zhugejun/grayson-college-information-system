@@ -1,0 +1,42 @@
+{% extends "scheduling/base.html" %}
+
+{% block content %}
+<h1>Courses</h1>
+
+<br />
+
+<table id="courseTable" class="table compact table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Subject</th>
+            <th scope="col">Course Number</th>
+            <th scope="col">Credits</th>
+            <th scope="col">Course Name</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+
+    {% if course_list %}
+    <tbody>
+        {% for course in course_list %}
+        <tr>
+            <td>{{ course.subject.name }}</td>
+            <td>{{ course.number }}</td>
+            <td>{{ course.credit }}</td>
+            <td>{{ course.name }}</td>
+            <td> <a href="{%url 'edit_course' course.id %}">Edit</a> |
+                <a href="{%url 'delete_course' course.id %}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    {% endif %}
+</table>
+
+<div class="text-center mt-2">
+    <form method="GET" action="{% url 'add_course' %}">
+        <button class="btn btn-dark btn-lg" role="button">Add Course</button>
+    </form>
+</div>
+<br />
+{% endblock content %}

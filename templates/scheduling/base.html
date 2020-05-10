@@ -1,0 +1,135 @@
+{% include "includes/header.html" %}
+
+<script>
+    // $(".timepicker").timepicker();
+    $(document).ready(function () {
+        $('.timepicker').timepicker({
+            timeFormat: 'h:mm p',
+            interval: 15,
+            minTime: '7:00AM',
+            maxTime: '10:00PM',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true
+        });
+    });
+
+    $(document).ready(function () {
+        $('#courseTable').DataTable();
+        $('#instructorTable').DataTable();
+        $('#scheduleTable').DataTable();
+        $('#allSchedulesTable').DataTable();
+        $('#scheduleDoneTable').DataTable();
+    });
+
+</script>
+
+
+<body style="padding-bottom: 60px;">
+
+    {% include "includes/navbar.html" %}
+    {% include "includes/messages.html" %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <!-- schedules for current terms -->
+                    <h6
+                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Current Schedules</span>
+                        <a class="d-flex align-items-center text-muted" href="#">
+                            <span data-feather="plus-circle"></span>
+                        </a>
+                    </h6>
+                    {% if curr_semesters %}
+                    <ul class="nav flex-column mb-2">
+                        <!-- <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'home' %}">
+                                        <span data-feather="file-text"></span>
+                                        All Schedules
+                                    </a>
+                                </li> -->
+                        {% for semester in curr_semesters %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'schedules' semester %}">
+                                <span data-feather="file-text"></span>
+                                {{ semester.term }} {{ semester.year }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                    <!-- schedules for past terms -->
+                    <h6
+                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Past Schedules</span>
+                        <a class="d-flex align-items-center text-muted" href="#">
+                            <span data-feather="plus-circle"></span>
+                        </a>
+                    </h6>
+                    {% if past_terms %}
+                    <ul class="nav flex-column mb-2">
+                        {% for semester in past_semesters %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'schedules' semester %}">
+                                <span data-feather="file-text"></span>
+                                {{ semester.term }} {{ semester.year }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                    <!-- quick links for courses and instructors -->
+                    <h6
+                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Quick Links</span>
+                        <a class="d-flex align-items-center text-muted" href="#">
+                            <span data-feather="plus-circle"></span>
+                        </a>
+                    </h6>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'update_subjects' %}">Subjects</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'courses' %}">Courses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'instructors' %}">Instructors</a>
+                        </li>
+                    </ul>
+
+                    <!-- some summary of changes -->
+                    <h6
+                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Summaries</span>
+                        <a class="d-flex align-items-center text-muted" href="#">
+                            <span data-feather="plus-circle"></span>
+                        </a>
+                    </h6>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'schedule_summary' %}">Schedules</a>
+                        </li>
+                    </ul>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'change_summary' %}">Changes</a>
+                        </li>
+                    </ul>
+
+                </div>
+            </nav>
+
+            <div class="container col-md-10 mt-3">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+
+</body>
