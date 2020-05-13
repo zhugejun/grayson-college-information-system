@@ -25,7 +25,7 @@
             <td>{{ course.credit }}</td>
             <td>{{ course.name }}</td>
             <td>
-                <a href="{%url 'add_schedule' semester course.id %}">Schedule</a>
+                <a href="{%url 'add_schedule' term course.id %}">Schedule</a>
             </td>
         </tr>
         {% endfor %}

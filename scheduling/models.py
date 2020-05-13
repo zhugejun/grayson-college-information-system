@@ -60,7 +60,7 @@ class Instructor(models.Model):
         ('P', 'Part-Time'),
     )
 
-    employee_acct = models.CharField(max_length=50, blank=True, null=True)
+    employee_id = models.CharField(max_length=50, blank=True, null=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     hiring_status = models.CharField(max_length=1, choices=HIRE_STATUSES)
@@ -93,7 +93,7 @@ class Schedule(models.Model):
     ]
 
     # term
-    Term = models.ForeignKey(
+    term = models.ForeignKey(
         Term, on_delete=models.SET_NULL, null=True)
 
     # course to schedule

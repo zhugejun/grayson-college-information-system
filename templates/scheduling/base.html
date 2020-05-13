@@ -42,7 +42,7 @@
                             <span data-feather="plus-circle"></span>
                         </a>
                     </h6>
-                    {% if curr_semesters %}
+                    {% if curr_terms %}
                     <ul class="nav flex-column mb-2">
                         <!-- <li class="nav-item">
                                     <a class="nav-link" href="{% url 'home' %}">
@@ -50,11 +50,11 @@
                                         All Schedules
                                     </a>
                                 </li> -->
-                        {% for semester in curr_semesters %}
+                        {% for term in curr_terms %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'schedules' semester %}">
+                            <a class="nav-link" href="{% url 'schedules' term %}">
                                 <span data-feather="file-text"></span>
-                                {{ semester.term }} {{ semester.year }}
+                                {{ term.semester }} {{ term.year }}
                             </a>
                         </li>
                         {% endfor %}
@@ -71,11 +71,11 @@
                     </h6>
                     {% if past_terms %}
                     <ul class="nav flex-column mb-2">
-                        {% for semester in past_semesters %}
+                        {% for term in past_terms %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'schedules' semester %}">
+                            <a class="nav-link" href="{% url 'schedules' term %}">
                                 <span data-feather="file-text"></span>
-                                {{ semester.term }} {{ semester.year }}
+                                {{ term.semester }} {{ term.year }}
                             </a>
                         </li>
                         {% endfor %}
@@ -133,3 +133,4 @@
 
 
 </body>
+{% include "includes/footer.html" %}

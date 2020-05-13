@@ -1,7 +1,7 @@
 {% extends "scheduling/base.html" %} {% block content %}
 <h1>
   Schedules for
-  <span class="text-info">{{ semester.term }} {{ semester.year }}</span>
+  <span class="text-info">{{ term.semester }} {{ term.year }}</span>
 </h1>
 <br />
 
@@ -20,7 +20,7 @@
       <th scope="col">Start</th>
       <th scope="col">Stop</th>
       <th scope="col">Note</th>
-      {% if semester.active == 'T' %}
+      {% if term.active == 'T' %}
       <th scope="col">Action</th>
       {% endif %}
     </tr>
@@ -41,10 +41,10 @@
       <td>{{ schedule.start_time }}</td>
       <td>{{ schedule.stop_time }}</td>
       <td>{{ schedule.notes }}</td>
-      {% if semester.active == 'T' %}
+      {% if term.active == 'T' %}
       <td>
-        <a href="{%url 'edit_schedule' semester schedule.id %}">Edit</a> |
-        <a href="{%url 'delete_schedule' semester schedule.id %}">Delete</a>
+        <a href="{%url 'edit_schedule' term schedule.id %}">Edit</a> |
+        <a href="{%url 'delete_schedule' term schedule.id %}">Delete</a>
       </td>
       {% endif %}
     </tr>
@@ -53,10 +53,10 @@
   {% endif %}
 </table>
 
-{% if semester.active == 'T' %}
+{% if term.active == 'T' %}
 <br />
 <div class="text-center mt-2">
-  <form method="GET" action="{% url 'courses_with_semester' semester %}">
+  <form method="GET" action="{% url 'courses_with_term' term %}">
     <button class="btn btn-dark btn-lg" role="button">Add Schedule</button>
   </form>
 </div>

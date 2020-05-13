@@ -210,7 +210,7 @@ class SubjectForm(forms.ModelForm):
                                          widget=ModelSelect2MultipleWidget(
                                              queryset=Subject.objects.all(),
                                              search_fields=['name__icontains'],
-                                         ))
+                                         ), required=False)
 
     class Meta:
         model = Profile

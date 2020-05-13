@@ -45,11 +45,11 @@ def home(request):
 
     schedule_dict = {}
 
-    for Term in curr_terms:
+    for term in curr_terms:
         schedules = Schedule.objects.filter(
-            Term=Term, course__in=course_list)
+            term=term, course__in=course_list)
         if len(schedules) > 0:
-            schedule_dict[str(Term)] = schedules
+            schedule_dict[str(term)] = schedules
     return render(request, 'scheduling/home.html', {'curr_terms': curr_terms, 'past_terms': past_terms, 'schedule_dict': schedule_dict})
 
 
@@ -302,14 +302,14 @@ def courses(request):
 
 
 @login_required(login_url='/login')
-def courses_with_term(request, Term):
+def courses_with_term(request, term):
 
     past_terms, curr_terms = get_curr_and_past_terms()
 
-    year = int(Term[-4:])  # year
-    term = Term[:-4].upper()  # term
-    Term = get_object_or_404(Term, year__exact=year,
-                             term__exact=term)
+    year = int(term[-4:])  # year
+    semester = term[:-4].upper()  # term
+    term = get_object_or_404(Term, year__exact=year,
+                             semester__exact=semester)
 
     current_user = request.user
     profile = get_object_or_404(Profile, user=current_user)
@@ -322,19 +322,19 @@ def courses_with_term(request, Term):
     course_list = Course.objects.filter(subject__in=subject_list)
 
     return render(request, 'scheduling/courses_with_term.html',
-                  {'course_list': course_list, 'curr_terms': curr_terms, 'past_terms': past_terms, 'Term': Term})
+                  {'course_list': course_list, 'curr_terms': curr_terms, 'past_terms': past_terms, 'term': term})
 
 
 #------------------------ Schedule --------------------------#
 @login_required(login_url='/login')
-def add_schedule(request, Term, pk):
+def add_schedule(request, term, pk):
 
     past_terms, curr_terms = get_curr_and_past_terms()
 
-    year = int(Term[-4:])  # year
-    term = Term[:-4].upper()  # term
-    Term = get_object_or_404(Term, year__exact=year,
-                             term__exact=term)
+    year = int(term[-4:])  # year
+    semester = term[:-4].upper()  # term
+    term = get_object_or_404(Term, year__exact=year,
+                             semester__exact=semester)
 
     course = get_object_or_404(Course, pk=pk)
 
@@ -343,25 +343,24 @@ def add_schedule(request, Term, pk):
 
     try:
         schedule_list = Schedule.objects.filter(
-            Term=Term, course=course)
+            term=term, course=course)
     except Schedule.DoesNotExist:
         schedule_list = []
 
     if request.method == 'POST':
         form = ScheduleForm(request.POST)
-        print(dir(form))
 
         if form.is_valid():
             section = form.cleaned_data['section']
 
             schedule = form.save(commit=False)
             schedule.course_id = course.id
-            schedule.term_id = Term.id
+            schedule.term_id = term.id
             schedule.insert_by = request.user
             schedule.save()
             messages.success(
                 request, f"You've added {schedule.course} {section} successfully!")
-            return redirect('schedules', Term=Term)
+            return redirect('schedules', term=term)
         else:
             for code, error in form._errors.items():
                 if code == 'duplicate':
@@ -369,18 +368,18 @@ def add_schedule(request, Term, pk):
 
     return render(request, 'scheduling/add_schedule.html',
                   {'form': form, 'course': course, 'schedule_list': schedule_list,
-                   'curr_terms': curr_terms, 'past_terms': past_terms, 'Term': Term})
+                   'curr_terms': curr_terms, 'past_terms': past_terms, 'term': term})
 
 
 @login_required(login_url='/login')
-def edit_schedule(request, Term, pk):
+def edit_schedule(request, term, pk):
 
     past_terms, curr_terms = get_curr_and_past_terms()
 
-    year = int(Term[-4:])  # year
-    term = Term[:-4].upper()  # term
-    Term = get_object_or_404(Term, year__exact=year,
-                             term__exact=term)
+    year = int(term[-4:])  # year
+    semester = term[:-4].upper()  # term
+    term = get_object_or_404(Term, year__exact=year,
+                             semester__exact=semester)
 
     schedule = get_object_or_404(Schedule, pk=pk)
     if schedule.days:
@@ -397,23 +396,23 @@ def edit_schedule(request, Term, pk):
             schedule.save()
             messages.success(
                 request, f"You've updated {str(schedule.course).split(' - ')[0]} {form.cleaned_data['section']} successfully!")
-            return redirect('schedules', Term=Term)
+            return redirect('schedules', term=term)
         else:
             for code, error in form._errors.items():
                 if code == 'duplicate':
                     messages.error(request, error)
-    return render(request, 'scheduling/edit_schedule.html', {'form': form, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms, 'Term': Term})
+    return render(request, 'scheduling/edit_schedule.html', {'form': form, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms, 'term': term})
 
 
 @login_required(login_url='/login')
-def delete_schedule(request, Term, pk):
+def delete_schedule(request, term, pk):
 
     past_terms, curr_terms = get_curr_and_past_terms()
 
-    year = int(Term[-4:])  # year
-    term = Term[:-4].upper()  # term
-    Term = get_object_or_404(Term, year__exact=year,
-                             term__exact=term)
+    year = int(term[-4:])  # year
+    semester = term[:-4].upper()  # term
+    term = get_object_or_404(Term, year__exact=year,
+                             semester__exact=semester)
 
     schedule = get_object_or_404(Schedule, pk=pk)
     if schedule.days:
@@ -434,12 +433,12 @@ def delete_schedule(request, Term, pk):
             schedule.delete()
             messages.success(request, f"You've deleted {course.subject}{course.number}\
                     {form.cleaned_data['section']} successfully!")
-            return redirect('schedules', Term=Term)
+            return redirect('schedules', term=term)
     return render(request, 'scheduling/delete_schedule.html', {'form': form, 'course': course, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
 @login_required(login_url='/login')
-def schedules(request, Term):
+def schedules(request, term):
 
     past_terms, curr_terms = get_curr_and_past_terms()
 
@@ -451,14 +450,14 @@ def schedules(request, Term):
         subject_list = []
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    year = int(Term[-4:])  # year
-    term = Term[:-4].upper()  # Term
-    Term = get_object_or_404(Term, year__exact=year,
-                             term__exact=term)
+    year = int(term[-4:])  # year
+    semester = term[:-4].upper()  # Term
+    term = get_object_or_404(Term, year__exact=year,
+                             semester__exact=semester)
     schedule_list = Schedule.objects.filter(
-        Term=Term, course__in=course_list)
+        term=term, course__in=course_list)
 
-    return render(request, 'scheduling/schedules.html', {'schedule_list': schedule_list, 'curr_terms': curr_terms, 'past_terms': past_terms, 'Term': Term})
+    return render(request, 'scheduling/schedules.html', {'schedule_list': schedule_list, 'curr_terms': curr_terms, 'past_terms': past_terms, 'term': term})
 
 
 @login_required(login_url='/login')

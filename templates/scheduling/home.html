@@ -28,7 +28,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for semester, schedule_list in schedule_dict.items %}
+        {% for term, schedule_list in schedule_dict.items %}
         {% for schedule in schedule_list %}
         <tr>
             <td>{{ term }}</td>
@@ -45,8 +45,8 @@
             <td>{{ schedule.stop_time }}</td>
             <td>{{ schedule.notes }}</td>
             <td>
-                <a href="{%url 'edit_schedule' semester schedule.id %}">Edit</a> |
-                <a href="{%url 'delete_schedule' semester schedule.id %}">Delete</a>
+                <a href="{%url 'edit_schedule' term schedule.id %}">Edit</a> |
+                <a href="{%url 'delete_schedule' term schedule.id %}">Delete</a>
             </td>
         </tr>
         {% endfor %}
