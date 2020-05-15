@@ -206,13 +206,13 @@ class InstructorForm(forms.ModelForm):
 
 class SubjectForm(forms.ModelForm):
 
-    # SUBJECT_CHOICES = [(str(s.id), s.name) for s in Subject.objects.all()]
+    SUBJECT_CHOICES = [(str(s.id), s.name) for s in Subject.objects.all()]
 
-    # subjects = forms.MultipleChoiceField(choices=SUBJECT_CHOICES,
-    #                                      widget=ModelSelect2MultipleWidget(
-    #                                          queryset=Subject.objects.all(),
-    #                                          search_fields=['name__icontains'],
-    #                                      ), required=False)
+    subjects = forms.MultipleChoiceField(choices=SUBJECT_CHOICES,
+                                         widget=ModelSelect2MultipleWidget(
+                                             queryset=Subject.objects.all(),
+                                             search_fields=['name__icontains'],
+                                         ), required=False)
 
     class Meta:
         model = Profile
