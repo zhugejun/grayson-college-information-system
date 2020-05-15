@@ -23,10 +23,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'g1beuut1hx2qhmqq1sl+k7l#)33jq1x(62ey75a_knpn^sqo5u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['gcis.herokuapp.com',
-                 'www.grayson.edu/gcis', 'gcis.grayson.edu']
+if DEBUG:
+    ALLOWED_HOSTS = []
+else:
+    ALLOWED_HOSTS = ['gcis.herokuapp.com',
+                     'www.grayson.edu/gcis', 'gcis.grayson.edu']
 
 
 # Application definition
@@ -81,24 +84,25 @@ WSGI_APPLICATION = 'grayson_college_information_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+# if DEBUG:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#         }
 #     }
-# }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dd41lc6j4olljr',
-        'USER': 'cmceqznrctltsa',
-        'PASSWORD': '339e3b44f4d826a69154a084ae9511f8c272e89caa606df3fba734fa7c34eeed',
-        'HOST': 'ec2-3-222-150-253.compute-1.amazonaws.com',
-        'PORT': '5432',
+# else:
+if True:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'dd41lc6j4olljr',
+            'USER': 'cmceqznrctltsa',
+            'PASSWORD': '339e3b44f4d826a69154a084ae9511f8c272e89caa606df3fba734fa7c34eeed',
+            'HOST': 'ec2-3-222-150-253.compute-1.amazonaws.com',
+            'PORT': '5432',
+        }
     }
-}
 
 
 # Password validation
@@ -139,6 +143,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
