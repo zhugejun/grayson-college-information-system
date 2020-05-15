@@ -184,3 +184,6 @@ class Cams(models.Model):
         auto_now=False, auto_now_add=False, blank=True, null=True)
     stop_time = models.TimeField(
         auto_now=False, auto_now_add=False, blank=True, null=True)
+
+    def __str__(self):
+        return self.course.__str__() + self.section
