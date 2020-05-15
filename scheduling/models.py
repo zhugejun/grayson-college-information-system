@@ -107,7 +107,7 @@ class Schedule(models.Model):
 
     # instructor
     instructor = models.ForeignKey(
-        Instructor, on_delete=models.SET_NULL, null=True)
+        Instructor, on_delete=models.SET_NULL, null=True, blank=True)
 
     status = models.CharField(
         max_length=9, choices=STATUS_CHOICES, default='OPEN')
@@ -143,6 +143,8 @@ class Schedule(models.Model):
 
 
 class Cams(models.Model):
+    """Schedule model for cams data
+    """
     STATUS_CHOICES = [
         ('OPEN', 'Open'),
         ('CLOSED', 'Closed'),
@@ -164,7 +166,7 @@ class Cams(models.Model):
 
     # instructor
     instructor = models.ForeignKey(
-        Instructor, on_delete=models.SET_NULL, null=True)
+        Instructor, on_delete=models.SET_NULL, null=True, blank=True)
 
     status = models.CharField(
         max_length=9, choices=STATUS_CHOICES, default='OPEN')

@@ -83,9 +83,10 @@ class ScheduleForm(forms.ModelForm):
 
     class Meta:
         model = Schedule
-        fields = ['course', 'section', 'instructor', 'capacity', 'status', 'campus', 'location', 'days',
+        fields = ['term', 'course', 'section', 'instructor', 'capacity', 'status', 'campus', 'location', 'days',
                   'start_time', 'stop_time', 'notes']
         labels = {
+            'term': 'Term',
             'course': 'Course',
             'section': 'Section',
             'instructor': 'Instructor',
@@ -116,12 +117,13 @@ class ScheduleForm(forms.ModelForm):
         cleaned_data = super(ScheduleForm, self).clean()
         cleaned_data['days'] = ''.join(cleaned_data['days'])
 
+        term = cleaned_data['term']
         course = cleaned_data['course']
         section = cleaned_data['section']
 
-        matching_schedules = Schedule.objects.filter(
-            course=course, section=section
-        )
+        matching_schedules = Schedule.objects.filter(term=term,
+                                                     course=course, section=section
+                                                     )
         if self.instance:
             matching_schedules = matching_schedules.exclude(
                 pk=self.instance.pk)

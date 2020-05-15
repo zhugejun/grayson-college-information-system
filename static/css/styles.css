@@ -22,6 +22,21 @@ select {
     width: 60px;
 }
 
+
+#scheduleAddTable_wrapper select {
+    width: 60px;
+}
+
+
+#scheduleDeleteTable_wrapper select {
+    width: 60px;
+}
+
+#scheduleChangeTable_wrapper select {
+    width: 60px;
+}
+
+
 /* #id_subject,
 #id_instructor,
 #id_status,

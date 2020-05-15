@@ -6,8 +6,10 @@ from django.db.models import Q
 from django.utils import timezone
 from django.db.models.query import EmptyQuerySet
 
+import pandas as pd
+
 from .forms import CourseForm, ScheduleForm, InstructorForm, SubjectForm
-from .models import Course, Schedule, Instructor, Term
+from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
 from main.models import Profile, Subject
 
 from datetime import datetime
@@ -21,6 +23,40 @@ def get_curr_and_past_terms():
     ).year - 2, active__exact="F").order_by('-year', 'semester')
 
     return past_terms, curr_terms
+
+
+def df_to_lists(df):
+
+    obj_list = []
+    notes_list = []
+    source_list = []
+
+    for _, row in df.iterrows():
+        term = Term.objects.get(pk=row['term_id'])
+        course = Course.objects.get(pk=row['course_id'])
+        section = row['section']
+        capacity = row['capacity']
+        instructor = Instructor.objects.get(
+            pk=row['instructor_id']) if row['instructor_id'] else None
+        status = row['status']
+        campus = Campus.objects.get(
+            pk=row['campus_id']) if row['campus_id'] else None
+        location = Location.objects.get(
+            pk=row['location_id']) if row['location_id'] else None
+        days = row['days']
+        start_time = row['start_time']
+        stop_time = row['stop_time']
+
+        notes = row['notes']
+        notes_list.append(notes)
+
+        source = 'GCIS' if row['_merge'] == 'left_only' else 'CAMS'
+        source_list.append(source)
+
+        obj_list.append(Cams(term=term, course=course, section=section, capacity=capacity, instructor=instructor,
+                             status=status, campus=campus, location=location, days=days, start_time=start_time, stop_time=stop_time))
+
+    return obj_list, notes_list, source_list
 
 
 #------------------------ Home --------------------------#
@@ -382,20 +418,26 @@ def edit_schedule(request, term, pk):
                              semester__exact=semester)
 
     schedule = get_object_or_404(Schedule, pk=pk)
+
+    course = schedule.course
     if schedule.days:
         schedule.days = list(schedule.days)
     else:
         schedule.days = []
+
     form = ScheduleForm(instance=schedule)
+
     if request.method == 'POST':
         form = ScheduleForm(request.POST, instance=schedule)
 
         if form.is_valid():
+            section = form.cleaned_data['section']
+
             schedule = form.save(commit=False)
             schedule.update_by = request.user
             schedule.save()
             messages.success(
-                request, f"You've updated {str(schedule.course).split(' - ')[0]} {form.cleaned_data['section']} successfully!")
+                request, f"You've updated {course} {section} successfully!")
             return redirect('schedules', term=term)
         else:
             for code, error in form._errors.items():
@@ -430,9 +472,10 @@ def delete_schedule(request, term, pk):
         for field_name, field in form.fields.items():
             form.fields[field_name].disabled = True
         if form.is_valid():
+            section = form.cleaned_data['section']
             schedule.delete()
-            messages.success(request, f"You've deleted {course.subject}{course.number}\
-                    {form.cleaned_data['section']} successfully!")
+            messages.success(
+                request, f"You've deleted {course} {section} successfully!")
             return redirect('schedules', term=term)
     return render(request, 'scheduling/delete_schedule.html', {'form': form, 'course': course, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
@@ -461,23 +504,17 @@ def schedules(request, term):
 
 
 @login_required(login_url='/login')
-def change_summary(request):
-
-    # selected subjects
-    # by Term
-    # return a schedule list too
-
-    # addition - list
-    # deletion - list
-    # changes - list, two rows for each schedule
+def schedule_summary(request):
 
     past_terms, curr_terms = get_curr_and_past_terms()
 
-    return render(request, 'scheduling/change_summary.html', {'curr_terms': curr_terms, 'past_terms': past_terms})
-
-
-@login_required(login_url='/login')
-def schedule_summary(request):
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.subjects:
+        subject_list = Subject.objects.filter(
+            name__in=[x for x in profile.subjects.split(',')])
+    else:
+        subject_list = []
+    course_list = Course.objects.filter(subject__in=subject_list)
 
     # selected subjects
     # by Term
@@ -490,3 +527,54 @@ def schedule_summary(request):
     past_terms, curr_terms = get_curr_and_past_terms()
 
     return render(request, 'scheduling/schedule_summary.html', {'curr_terms': curr_terms, 'past_terms': past_terms})
+
+
+@login_required(login_url='/login')
+def change_summary(request):
+
+    past_terms, curr_terms = get_curr_and_past_terms()
+
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.subjects:
+        subject_list = Subject.objects.filter(
+            name__in=[x for x in profile.subjects.split(',')])
+    else:
+        subject_list = []
+
+    course_list = Course.objects.filter(subject__in=subject_list)
+
+    schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list).all().values(
+        'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
+
+    schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list).all().values(
+        'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
+
+    # merge two schedules
+    schedules = schedules_gcis.merge(
+        schedules_cams, how='outer', on=['term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'], indicator=True)
+
+    not_in_both = schedules.loc[schedules['_merge'] != 'both']
+    not_in_both.reset_index(drop=True, inplace=True)
+    # change nan to None
+    not_in_both = not_in_both.where(pd.notnull(not_in_both), None)
+
+    # left is GCIS, right is CAMS
+    grouped = not_in_both.groupby(['term_id', 'course_id', 'section'])
+
+    _changed = grouped.filter(lambda x: x['_merge'].count() == 2)
+    changed_schedules, changed_notes, changed_sources = df_to_lists(_changed)
+    changed = zip(changed_schedules, changed_notes, changed_sources)
+
+    added = not_in_both.loc[not_in_both['_merge'] == 'left_only']
+    added = added[~added.index.isin(list(_changed.index))]
+    added_schedules, added_notes, added_sources = df_to_lists(added)
+    added = zip(added_schedules, added_notes, added_sources)
+
+    deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
+    deleted = deleted[~deleted.index.isin(list(_changed.index))]
+    deleted_schedules, deleted_notes, deleted_sources = df_to_lists(deleted)
+    deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
+
+    return render(request, 'scheduling/change_summary.html', {'curr_terms': curr_terms, 'past_terms': past_terms,
+                                                              'changed': changed, 'added': added, 'deleted': deleted
+                                                              })
