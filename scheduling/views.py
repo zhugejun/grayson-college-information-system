@@ -31,30 +31,31 @@ def df_to_lists(df):
     notes_list = []
     source_list = []
 
-    for _, row in df.iterrows():
-        term = Term.objects.get(pk=row['term_id'])
-        course = Course.objects.get(pk=row['course_id'])
-        section = row['section']
-        capacity = row['capacity']
-        instructor = Instructor.objects.get(
-            pk=row['instructor_id']) if row['instructor_id'] else None
-        status = row['status']
-        campus = Campus.objects.get(
-            pk=row['campus_id']) if row['campus_id'] else None
-        location = Location.objects.get(
-            pk=row['location_id']) if row['location_id'] else None
-        days = row['days']
-        start_time = row['start_time']
-        stop_time = row['stop_time']
+    if len(df) > 0:
+        for _, row in df.iterrows():
+            term = Term.objects.get(pk=row['term_id'])
+            course = Course.objects.get(pk=row['course_id'])
+            section = row['section']
+            capacity = row['capacity']
+            instructor = Instructor.objects.get(
+                pk=row['instructor_id']) if row['instructor_id'] else None
+            status = row['status']
+            campus = Campus.objects.get(
+                pk=row['campus_id']) if row['campus_id'] else None
+            location = Location.objects.get(
+                pk=row['location_id']) if row['location_id'] else None
+            days = row['days']
+            start_time = row['start_time']
+            stop_time = row['stop_time']
 
-        notes = row['notes']
-        notes_list.append(notes)
+            notes = row['notes']
+            notes_list.append(notes)
 
-        source = 'GCIS' if row['_merge'] == 'left_only' else 'CAMS'
-        source_list.append(source)
+            source = 'GCIS' if row['_merge'] == 'left_only' else 'CAMS'
+            source_list.append(source)
 
-        obj_list.append(Cams(term=term, course=course, section=section, capacity=capacity, instructor=instructor,
-                             status=status, campus=campus, location=location, days=days, start_time=start_time, stop_time=stop_time))
+            obj_list.append(Cams(term=term, course=course, section=section, capacity=capacity, instructor=instructor,
+                                 status=status, campus=campus, location=location, days=days, start_time=start_time, stop_time=stop_time))
 
     return obj_list, notes_list, source_list
 
