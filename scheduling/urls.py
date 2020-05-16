@@ -31,5 +31,7 @@ urlpatterns = [
 
     path('change-summary/', views.change_summary, name='change_summary'),
     path('schedule-summary/', views.schedule_summary, name='schedule_summary'),
+    path('download-change-summary/', views.download_change_summary,
+         name='download_change_summary'),
 
 ]

@@ -149,4 +149,15 @@
         {% endif %}
     </table>
 
+    <div class="text-center mt-5">
+        <form method="GET" action="{% url 'download_change_summary' %}">
+            {% if total_changes %}
+            <button class="btn btn-dark btn-lg" role="button">Download</button>
+            {% else %}
+            <button class="btn btn-dark btn-lg" role="button" disabled>Download</button>
+            {% endif %}
+
+        </form>
+    </div>
+
     {% endblock content %}

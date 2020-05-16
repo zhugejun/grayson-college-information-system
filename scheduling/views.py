@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.db.models import Q
 from django.utils import timezone
 from django.db.models.query import EmptyQuerySet
 
 import pandas as pd
+import csv
 
 from .forms import CourseForm, ScheduleForm, InstructorForm, SubjectForm
 from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
@@ -25,7 +26,7 @@ def get_curr_and_past_terms():
     return past_terms, curr_terms
 
 
-def df_to_lists(df):
+def df_to_obj_list(df):
 
     obj_list = []
     notes_list = []
@@ -60,8 +61,57 @@ def df_to_lists(df):
     return obj_list, notes_list, source_list
 
 
-#------------------------ Home --------------------------#
+def get_diff_gcis_cams(course_list):
 
+    changed = zip([], [], [])
+    added = zip([], [], [])
+    deleted = zip([], [], [])
+
+    total_changes = 0
+
+    if course_list:
+
+        schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list).all().values(
+            'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
+
+        schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list).all().values(
+            'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
+
+        # merge two schedules
+        schedules = schedules_gcis.merge(
+            schedules_cams, how='outer', on=['term_id', 'course_id', 'section', 'capacity', 'instructor_id',
+                                             'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'], indicator=True)
+
+        not_in_both = schedules.loc[schedules['_merge'] != 'both']
+        not_in_both.reset_index(drop=True, inplace=True)
+        # change nan to None
+        not_in_both = not_in_both.where(pd.notnull(not_in_both), None)
+
+        # left is GCIS, right is CAMS
+        grouped = not_in_both.groupby(['term_id', 'course_id', 'section'])
+
+        _changed = grouped.filter(lambda x: x['_merge'].count() == 2)
+        changed_schedules, changed_notes, changed_sources = df_to_obj_list(
+            _changed)
+        changed = zip(changed_schedules, changed_notes, changed_sources)
+
+        added = not_in_both.loc[not_in_both['_merge'] == 'left_only']
+        added = added[~added.index.isin(list(_changed.index))]
+        added_schedules, added_notes, added_sources = df_to_obj_list(added)
+        added = zip(added_schedules, added_notes, added_sources)
+
+        deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
+        deleted = deleted[~deleted.index.isin(list(_changed.index))]
+        deleted_schedules, deleted_notes, deleted_sources = df_to_obj_list(
+            deleted)
+        deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
+
+        total_changes = len(not_in_both)
+
+    return changed, added, deleted, total_changes
+
+
+#------------------------ Home --------------------------#
 @login_required(login_url='/login')
 def home(request):
     """List all schedules if not login.
@@ -544,46 +594,45 @@ def change_summary(request):
 
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    if course_list:
-
-        schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list).all().values(
-            'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
-
-        schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list).all().values(
-            'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
-
-        # merge two schedules
-        schedules = schedules_gcis.merge(
-            schedules_cams, how='outer', on=['term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'], indicator=True)
-
-        not_in_both = schedules.loc[schedules['_merge'] != 'both']
-        not_in_both.reset_index(drop=True, inplace=True)
-        # change nan to None
-        not_in_both = not_in_both.where(pd.notnull(not_in_both), None)
-
-        # left is GCIS, right is CAMS
-        grouped = not_in_both.groupby(['term_id', 'course_id', 'section'])
-
-        _changed = grouped.filter(lambda x: x['_merge'].count() == 2)
-        changed_schedules, changed_notes, changed_sources = df_to_lists(
-            _changed)
-        changed = zip(changed_schedules, changed_notes, changed_sources)
-
-        added = not_in_both.loc[not_in_both['_merge'] == 'left_only']
-        added = added[~added.index.isin(list(_changed.index))]
-        added_schedules, added_notes, added_sources = df_to_lists(added)
-        added = zip(added_schedules, added_notes, added_sources)
-
-        deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
-        deleted = deleted[~deleted.index.isin(list(_changed.index))]
-        deleted_schedules, deleted_notes, deleted_sources = df_to_lists(
-            deleted)
-        deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
-    else:
-        changed = zip([], [], [])
-        added = zip([], [], [])
-        deleted = zip([], [], [])
+    changed, added, deleted, total_changes = get_diff_gcis_cams(course_list)
 
     return render(request, 'scheduling/change_summary.html', {'curr_terms': curr_terms, 'past_terms': past_terms,
-                                                              'changed': changed, 'added': added, 'deleted': deleted
+                                                              'changed': changed, 'added': added, 'deleted': deleted,
+                                                              'total_changes': total_changes
                                                               })
+
+
+@login_required(login_url='/login')
+def download_change_summary(request):
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="schedule-changes.csv"'
+
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.subjects:
+        subject_list = Subject.objects.filter(
+            name__in=[x for x in profile.subjects.split(',')])
+    else:
+        subject_list = []
+
+    course_list = Course.objects.filter(subject__in=subject_list)
+
+    changed, added, deleted, _ = get_diff_gcis_cams(course_list)
+
+    writer = csv.writer(response)
+
+    writer.writerow(['Term', 'Course', 'Section', 'Status', 'Capacity', 'Instructor',
+                     'Campus', 'Location', 'Days', 'Start', 'Stop', 'Note', 'Source', 'Action'])
+    for s, n, src in added:
+        writer.writerow([s.term, s.course, s.section, s.status, s.capacity, s.instructor,
+                         s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'ADD'])
+
+    for s, n, src in deleted:
+        writer.writerow([s.term, s.course, s.section, s.status, s.capacity, s.instructor,
+                         s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'DELETE'])
+
+    for s, n, src in changed:
+        writer.writerow([s.term, s.course, s.section, s.status, s.capacity, s.instructor,
+                         s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'CHANGE'])
+
+    return response
