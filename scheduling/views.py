@@ -544,37 +544,45 @@ def change_summary(request):
 
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list).all().values(
-        'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
+    if course_list:
 
-    schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list).all().values(
-        'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
+        schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list).all().values(
+            'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
 
-    # merge two schedules
-    schedules = schedules_gcis.merge(
-        schedules_cams, how='outer', on=['term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'], indicator=True)
+        schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list).all().values(
+            'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
 
-    not_in_both = schedules.loc[schedules['_merge'] != 'both']
-    not_in_both.reset_index(drop=True, inplace=True)
-    # change nan to None
-    not_in_both = not_in_both.where(pd.notnull(not_in_both), None)
+        # merge two schedules
+        schedules = schedules_gcis.merge(
+            schedules_cams, how='outer', on=['term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'], indicator=True)
 
-    # left is GCIS, right is CAMS
-    grouped = not_in_both.groupby(['term_id', 'course_id', 'section'])
+        not_in_both = schedules.loc[schedules['_merge'] != 'both']
+        not_in_both.reset_index(drop=True, inplace=True)
+        # change nan to None
+        not_in_both = not_in_both.where(pd.notnull(not_in_both), None)
 
-    _changed = grouped.filter(lambda x: x['_merge'].count() == 2)
-    changed_schedules, changed_notes, changed_sources = df_to_lists(_changed)
-    changed = zip(changed_schedules, changed_notes, changed_sources)
+        # left is GCIS, right is CAMS
+        grouped = not_in_both.groupby(['term_id', 'course_id', 'section'])
 
-    added = not_in_both.loc[not_in_both['_merge'] == 'left_only']
-    added = added[~added.index.isin(list(_changed.index))]
-    added_schedules, added_notes, added_sources = df_to_lists(added)
-    added = zip(added_schedules, added_notes, added_sources)
+        _changed = grouped.filter(lambda x: x['_merge'].count() == 2)
+        changed_schedules, changed_notes, changed_sources = df_to_lists(
+            _changed)
+        changed = zip(changed_schedules, changed_notes, changed_sources)
 
-    deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
-    deleted = deleted[~deleted.index.isin(list(_changed.index))]
-    deleted_schedules, deleted_notes, deleted_sources = df_to_lists(deleted)
-    deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
+        added = not_in_both.loc[not_in_both['_merge'] == 'left_only']
+        added = added[~added.index.isin(list(_changed.index))]
+        added_schedules, added_notes, added_sources = df_to_lists(added)
+        added = zip(added_schedules, added_notes, added_sources)
+
+        deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
+        deleted = deleted[~deleted.index.isin(list(_changed.index))]
+        deleted_schedules, deleted_notes, deleted_sources = df_to_lists(
+            deleted)
+        deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
+    else:
+        changed = zip([], [], [])
+        added = zip([], [], [])
+        deleted = zip([], [], [])
 
     return render(request, 'scheduling/change_summary.html', {'curr_terms': curr_terms, 'past_terms': past_terms,
                                                               'changed': changed, 'added': added, 'deleted': deleted
