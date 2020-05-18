@@ -24,11 +24,11 @@ SECRET_KEY = 'g1beuut1hx2qhmqq1sl+k7l#)33jq1x(62ey75a_knpn^sqo5u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-
-# ALLOWED_HOSTS = []
-
 ALLOWED_HOSTS = ['gcis.herokuapp.com',
                  'www.grayson.edu/gcis', 'gcis.grayson.edu']
+
+# DEBUG = True
+# ALLOWED_HOSTS = []
 
 
 # Application definition
