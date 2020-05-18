@@ -117,18 +117,16 @@ def home(request):
     """List all schedules if not login.
     """
 
-    curr_user = request.user
-
     past_terms, curr_terms = get_curr_and_past_terms()
 
-    profile = get_object_or_404(Profile, user=curr_user)
+    profile = get_object_or_404(Profile, user=request.user)
     if profile.subjects:
-        subject_names = [x for x in profile.subjects.split(',')]
-        subject_ids = [s.id for s in Subject.objects.filter(
-            name__in=subject_names)]
-        course_list = Course.objects.filter(pk__in=subject_ids)
+        subject_list = Subject.objects.filter(
+            name__in=[x for x in profile.subjects.split(',')])
     else:
-        course_list = []
+        subject_list = []
+
+    course_list = Course.objects.filter(subject__in=subject_list)
 
     schedule_dict = {}
 
