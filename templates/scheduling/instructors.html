@@ -11,7 +11,6 @@
             <th scope="col">First Name</th>
             <th scope="col">Last Name</th>
             <th scope="col">Hiring Status</th>
-            <th scope="col">Action</th>
         </tr>
     </thead>
     <tbody>
@@ -20,19 +19,11 @@
             <td>{{ instructor.first_name }}</td>
             <td>{{ instructor.last_name }}</td>
             <td>{{ instructor.hiring_status }}</td>
-            <td> <a href="{%url 'edit_instructor' instructor.id %}">Edit</a> |
-                <a href="{%url 'delete_instructor' instructor.id %}">Delete</a>
-            </td>
+
         </tr>
         {% endfor %}
     </tbody>
 </table>
 {% endif %}
 
-<div class="text-center mt-2">
-    <form method="GET" action="{% url 'add_instructor' %}">
-        <button class="btn btn-dark btn-lg" role="button">Add Instructor</button>
-    </form>
-</div>
-<br />
 {% endblock content %}
