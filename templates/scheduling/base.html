@@ -15,14 +15,14 @@
     });
 
     $(document).ready(function () {
-        $('#courseTable').DataTable();
-        $('#instructorTable').DataTable();
-        $('#scheduleTable').DataTable();
-        $('#allSchedulesTable').DataTable();
-        $('#scheduleDoneTable').DataTable();
-        $('#scheduleAddTable').DataTable();
-        $('#scheduleDeleteTable').DataTable();
-        $('#scheduleChangeTable').DataTable();
+        $('#courseTable').DataTable({ "deferRender": true });
+        $('#instructorTable').DataTable({ "deferRender": true });
+        $('#scheduleTable').DataTable({ "deferRender": true });
+        $('#allSchedulesTable').DataTable({ "deferRender": true });
+        $('#scheduleDoneTable').DataTable({ "deferRender": true });
+        $('#scheduleAddTable').DataTable({ "deferRender": true });
+        $('#scheduleDeleteTable').DataTable({ "deferRender": true });
+        $('#scheduleChangeTable').DataTable({ "deferRender": true });
     });
 
 </script>

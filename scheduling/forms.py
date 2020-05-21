@@ -153,7 +153,7 @@ class ScheduleForm(forms.ModelForm):
                 valid = False
 
         # stop time > start time
-        if self.cleaned_data['start_time'] > self.cleaned_data['stop_time']:
+        if self.cleaned_data['start_time'] and self.cleaned_data['stop_time'] and self.cleaned_data['start_time'] > self.cleaned_data['stop_time']:
             self._errors['Time'] = 'Invalid start and stop time.'
             self.fields['start_time'].widget.attrs['class'] += ' is-invalid'
             self.fields['stop_time'].widget.attrs['class'] += ' is-invalid'

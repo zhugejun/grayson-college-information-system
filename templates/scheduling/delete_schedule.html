@@ -3,7 +3,8 @@
 {% block content %}
 
 <h2>Are you sure to delete <span class="text-danger">{{schedule.course}}
-        {{schedule.section}}</span>?</h2>
+        {{schedule.section}}</span> for <span class="text-info">{{ schedule.term.semester }}
+        {{ schedule.term.year }}</span>?</h2>
 <br />
 
 <form class="mb-2" method="POST">
