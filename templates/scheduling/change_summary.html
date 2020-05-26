@@ -12,6 +12,7 @@
             <th scope="col">Term</th>
             <th scope="col">Course</th>
             <th scope="col">Section</th>
+            <th scope="col">Name</th>
             <th scope="col">Status</th>
             <th scope="col">Capacity</th>
             <th scope="col">Instructor</th>
@@ -29,6 +30,7 @@
         <tr>
             <td>{{ schedule.term }}</td>
             <td>{{ schedule.course }}</td>
+            <td>{{ schedule.course.name }}</td>
             <td>{{ schedule.section }}</td>
             <td>{{ schedule.status }}</td>
             <td>{{ schedule.capacity }}</td>
@@ -53,6 +55,7 @@
         <tr>
             <th scope="col">Term</th>
             <th scope="col">Course</th>
+            <th scope="col">Name</th>
             <th scope="col">Section</th>
             <th scope="col">Status</th>
             <th scope="col">Capacity</th>
@@ -71,6 +74,7 @@
         <tr>
             <td>{{ schedule.term }}</td>
             <td>{{ schedule.course }}</td>
+            <td>{{ schedule.course.name }}</td>
             <td>{{ schedule.section }}</td>
             <td>{{ schedule.status }}</td>
             <td>{{ schedule.capacity }}</td>
@@ -93,6 +97,7 @@
             <tr>
                 <th scope="col">Term</th>
                 <th scope="col">Course</th>
+                <th scope="col">Name</th>
                 <th scope="col">Section</th>
                 <th scope="col">Status</th>
                 <th scope="col">Capacity</th>
@@ -114,6 +119,7 @@
             <tr>
                 <td class="text-muted">{{ schedule.term }}</td>
                 <td class="text-muted">{{ schedule.course }}</td>
+                <td class="text-muted">{{ schedule.course.name }}</td>
                 <td class="text-muted">{{ schedule.section }}</td>
                 <td class="text-muted">{{ schedule.status }}</td>
                 <td class="text-muted">{{ schedule.capacity }}</td>
@@ -130,6 +136,7 @@
             <tr>
                 <td>{{ schedule.term }}</td>
                 <td>{{ schedule.course }}</td>
+                <td>{{ schedule.course.name }}</td>
                 <td>{{ schedule.section }}</td>
                 <td>{{ schedule.status }}</td>
                 <td>{{ schedule.capacity }}</td>
