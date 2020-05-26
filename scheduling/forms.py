@@ -173,7 +173,7 @@ class InstructorForm(forms.ModelForm):
 
     class Meta:
         model = Instructor
-        fields = ['first_name', 'last_name', 'hiring_status']
+        fields = ['first_name', 'last_name']
 
     def __init__(self, *args, **kwargs):
         super(InstructorForm, self).__init__(*args, **kwargs)
@@ -188,10 +188,9 @@ class InstructorForm(forms.ModelForm):
 
         first_name = cleaned_data['first_name']
         last_name = cleaned_data['last_name']
-        hiring_status = cleaned_data['hiring_status']
 
         matching_instructors = Instructor.objects.filter(
-            first_name=first_name, last_name=last_name, hiring_status=hiring_status
+            first_name=first_name, last_name=last_name
         )
         if self.instance:
             matching_instructors = matching_instructors.exclude(

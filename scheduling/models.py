@@ -55,21 +55,14 @@ class Term(models.Model):
 class Instructor(models.Model):
     """Instructor for each schedule"""
 
-    HIRE_STATUSES = (
-        ('F', 'Full-Time'),
-        ('P', 'Part-Time'),
-    )
-
-    employee_id = models.CharField(max_length=50, blank=True, null=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    hiring_status = models.CharField(max_length=1, choices=HIRE_STATUSES)
 
     def __str__(self):
-        if self.last_name and self.first_name:
+        if self.first_name and self.last_name:
             return self.last_name + ", " + self.first_name
         else:
-            return ""
+            return ''
 
 
 class Campus(models.Model):
