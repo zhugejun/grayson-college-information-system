@@ -174,93 +174,11 @@ def update_subjects(request):
 
 
 #------------------------ Instructor --------------------------#
-# @login_required(login_url='/login')
-# def add_instructor(request):
-
-#     past_terms, curr_terms = get_curr_and_past_terms()
-
-#     form = InstructorForm()
-
-#     if request.method == 'POST':
-#         form = InstructorForm(request.POST)
-#         if form.is_valid():
-#             first_name = form.cleaned_data['first_name']
-#             last_name = form.cleaned_data['last_name']
-#             hiring_status = form.cleaned_data['hiring_status']
-
-#             instructor = form.save(commit=False)
-#             instructor.first_name = instructor.first_name.title()
-#             instructor.last_name = instructor.last_name.title()
-#             instructor.save()
-#             messages.success(
-#                 request, f"You've added {first_name} {last_name} successfully!")
-#             return redirect('instructors')
-#         else:
-#             for code, error in form._errors.items():
-#                 if code == 'duplicate':
-#                     messages.error(request, error)
-
-#     return render(request, 'scheduling/add_instructor.html',
-#                   {'form': form, 'curr_terms': curr_terms, 'past_terms': past_terms})
-
-
-# @login_required(login_url='/login')
-# def edit_instructor(request, pk):
-
-#     past_terms, curr_terms = get_curr_and_past_terms()
-
-#     instructor = get_object_or_404(Instructor, pk=pk)
-#     form = InstructorForm(instance=instructor)
-#     if request.method == 'POST':
-#         form = InstructorForm(request.POST, instance=instructor)
-#         if form.is_valid():
-#             first_name = form.cleaned_data['first_name']
-#             last_name = form.cleaned_data['last_name']
-#             hiring_status = form.cleaned_data['hiring_status']
-
-#             form.save()
-#             messages.success(
-#                 request, f"You've updated {first_name} {last_name} successfully!")
-#             return redirect('instructors')
-#         else:
-#             for code, error in form._errors.items():
-#                 if code == 'duplicate':
-#                     messages.error(request, error)
-
-#     return render(request, 'scheduling/edit_instructor.html',
-#                   {'form': form, 'instructor': instructor, 'curr_terms': curr_terms, 'past_terms': past_terms})
-
-
-# @login_required(login_url='/login')
-# def delete_instructor(request, pk):
-
-#     past_terms, curr_terms = get_curr_and_past_terms()
-
-#     instructor = get_object_or_404(Instructor, pk=pk)
-#     form = InstructorForm(instance=instructor)
-#     for field_name, field in form.fields.items():
-#         form.fields[field_name].disabled = True
-
-#     if request.method == 'POST':
-#         form = InstructorForm(request.POST, instance=instructor)
-#         for field_name, field in form.fields.items():
-#             form.fields[field_name].disabled = True
-#         if form.is_valid():
-#             instructor.delete()
-#             messages.success(request, f"You've deleted {form.cleaned_data['first_name']} \
-#                     {form.cleaned_data['last_name']} successfully!")
-#             return redirect('instructors')
-#     return render(request, 'scheduling/delete_instructor.html',
-#                   {'form': form, 'instructor': instructor, 'curr_terms': curr_terms, 'past_terms': past_terms})
-
-
 def instructors(request):
 
     instructor_list = Instructor.objects.all()
-    curr_terms = Term.objects.filter(
-        active__exact="T").order_by('-year', 'semester')
-    past_terms = Term.objects.filter(year__gte=datetime.now(
-    ).year - 2, active__exact="F").order_by('-year', 'semester')
+
+    past_terms, curr_terms = get_curr_and_past_terms()
 
     return render(request, 'scheduling/instructors.html',
                   {'instructor_list': instructor_list, 'curr_terms': curr_terms, 'past_terms': past_terms})
@@ -312,59 +230,35 @@ def add_course(request):
                   {'form': form, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
-@login_required(login_url='/login')
-def edit_course(request, pk):
-
-    past_terms, curr_terms = get_curr_and_past_terms()
-
-    course = get_object_or_404(Course, pk=pk)
-    form = CourseForm(instance=course)
-    if request.method == 'POST':
-        form = CourseForm(request.POST, instance=course)
-        if form.is_valid():
-            subject = form.cleaned_data['subject']
-            number = form.cleaned_data['number']
-            credit = form.cleaned_data['credit']
-            name = form.cleaned_data['name']
-
-            course = form.save(commit=False)
-            course.subject = subject
-            course.number = number
-            course.credit = credit
-            course.name = name.upper()
-            course.save()
-            messages.success(
-                request, f"You've updated {subject}{number} successfully!")
-            return redirect('courses')
-        else:
-            for code, error in form._errors.items():
-                if code == 'duplicate':
-                    messages.error(request, error)
-    return render(request, 'scheduling/edit_course.html',
-                  {'form': form, 'course': course, 'curr_terms': curr_terms, 'past_terms': past_terms})
-
-
 # @login_required(login_url='/login')
-# def delete_course(request, pk):
+# def edit_course(request, pk):
 
 #     past_terms, curr_terms = get_curr_and_past_terms()
 
 #     course = get_object_or_404(Course, pk=pk)
 #     form = CourseForm(instance=course)
-#     for field_name, field in form.fields.items():
-#         form.fields[field_name].disabled = True
-
 #     if request.method == 'POST':
 #         form = CourseForm(request.POST, instance=course)
-#         for field_name, field in form.fields.items():
-#             form.fields[field_name].disabled = True
 #         if form.is_valid():
-#             course.delete()
-#             messages.success(request, f"You've deleted {form.cleaned_data['subject']}\
-#                     {form.cleaned_data['number']}\
-#                     {form.cleaned_data['name']} successfully!")
+#             subject = form.cleaned_data['subject']
+#             number = form.cleaned_data['number']
+#             credit = form.cleaned_data['credit']
+#             name = form.cleaned_data['name']
+
+#             course = form.save(commit=False)
+#             course.subject = subject
+#             course.number = number
+#             course.credit = credit
+#             course.name = name.upper()
+#             course.save()
+#             messages.success(
+#                 request, f"You've updated {subject}{number} successfully!")
 #             return redirect('courses')
-#     return render(request, 'scheduling/delete_course.html',
+#         else:
+#             for code, error in form._errors.items():
+#                 if code == 'duplicate':
+#                     messages.error(request, error)
+#     return render(request, 'scheduling/edit_course.html',
 #                   {'form': form, 'course': course, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
@@ -569,10 +463,6 @@ def schedule_summary(request):
     # by Term
     # return a schedule list too
 
-    # addition - list
-    # deletion - list
-    # changes - list, two rows for each schedule
-
     past_terms, curr_terms = get_curr_and_past_terms()
 
     return render(request, 'scheduling/schedule_summary.html', {'curr_terms': curr_terms, 'past_terms': past_terms})
@@ -617,20 +507,21 @@ def download_change_summary(request):
 
     changed, added, deleted, _ = get_diff_gcis_cams(course_list)
 
+    # write data to csv file so that user can download
     writer = csv.writer(response)
 
-    writer.writerow(['Term', 'Course', 'Section', 'Status', 'Capacity', 'Instructor',
+    writer.writerow(['Term', 'Course', 'Name', 'Section', 'Status', 'Capacity', 'Instructor',
                      'Campus', 'Location', 'Days', 'Start', 'Stop', 'Note', 'Source', 'Action'])
     for s, n, src in added:
-        writer.writerow([s.term, s.course, s.section, s.status, s.capacity, s.instructor,
+        writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
                          s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'ADD'])
 
     for s, n, src in deleted:
-        writer.writerow([s.term, s.course, s.section, s.status, s.capacity, s.instructor,
+        writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
                          s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'DELETE'])
 
     for s, n, src in changed:
-        writer.writerow([s.term, s.course, s.section, s.status, s.capacity, s.instructor,
+        writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
                          s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'CHANGE'])
 
     return response

@@ -12,7 +12,6 @@
             <th scope="col">Course Number</th>
             <th scope="col">Credits</th>
             <th scope="col">Course Name</th>
-            <th scope="col">Action</th>
         </tr>
     </thead>
 
@@ -24,7 +23,6 @@
             <td>{{ course.number }}</td>
             <td>{{ course.credit }}</td>
             <td>{{ course.name }}</td>
-            <td> <a href="{%url 'edit_course' course.id %}">Edit</a>
             </td>
         </tr>
         {% endfor %}
