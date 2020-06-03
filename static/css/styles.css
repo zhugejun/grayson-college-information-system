@@ -2,6 +2,16 @@ select {
     width: 600px;
 }
 
+
+#courseTable_wrapper,
+#instructorTable_wrapper,
+#scheduleTable_wrapper,
+#allSchedulesTable_wrapper,
+#scheduleDoneTable_wrapper {
+  padding-bottom: 20px;
+}
+
+
 #courseTable_wrapper select {
     width: 60px;
 }

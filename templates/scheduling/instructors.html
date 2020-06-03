@@ -4,7 +4,6 @@
 <h1>Instructors</h1>
 <br />
 
-{% if instructor_list %}
 <table id="instructorTable" class="table table-striped compact">
     <thead>
         <tr>
@@ -12,6 +11,7 @@
             <th scope="col">Last Name</th>
         </tr>
     </thead>
+    {% if instructor_list %}
     <tbody>
         {% for instructor in instructor_list %}
         <tr>
@@ -20,7 +20,8 @@
         </tr>
         {% endfor %}
     </tbody>
+    {% endif %}
 </table>
-{% endif %}
+
 
 {% endblock content %}
