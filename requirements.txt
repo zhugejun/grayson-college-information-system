@@ -1,6 +1,6 @@
 astroid==2.3.3
 autopep8==1.5.2
-Django==2.2
+Django==2.2.13
 django-appconf==1.0.4
 django-select2==7.2.3
 gunicorn==20.0.4

@@ -25,11 +25,12 @@ SECRET_KEY = 'g1beuut1hx2qhmqq1sl+k7l#)33jq1x(62ey75a_knpn^sqo5u'
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = False
-ALLOWED_HOSTS = ['gcis.herokuapp.com',
-                 'www.grayson.edu/gcis', 'gcis.grayson.edu']
 
-# DEBUG = True
-# ALLOWED_HOSTS = []
+if DEBUG:
+    ALLOWED_HOSTS = []
+else:
+    ALLOWED_HOSTS = ['gcis.herokuapp.com',
+                     'www.grayson.edu/gcis', 'gcis.grayson.edu']
 
 
 # Application definition
@@ -84,15 +85,18 @@ WSGI_APPLICATION = 'grayson_college_information_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-# if DEBUG:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#         }
-#     }
-# else:
-if True:
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'grayson',
+            'USER': 'zhua',
+            'PASSWORD': 'p1234',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
+else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
