@@ -319,6 +319,7 @@ def add_schedule(request, term, pk):
 
     form = ScheduleForm()
     form.fields['course'].initial = course
+    form.fields['term'].initial = term
 
     try:
         schedule_list = Schedule.objects.filter(
