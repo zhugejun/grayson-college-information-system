@@ -119,23 +119,23 @@ def home(request):
 
     past_terms, curr_terms = get_curr_and_past_terms()
 
-    profile = get_object_or_404(Profile, user=request.user)
-    if profile.subjects:
-        subject_list = Subject.objects.filter(
-            name__in=[x for x in profile.subjects.split(',')])
-    else:
-        subject_list = []
+    # profile = get_object_or_404(Profile, user=request.user)
+    # if profile.subjects:
+    #     subject_list = Subject.objects.filter(
+    #         name__in=[x for x in profile.subjects.split(',')])
+    # else:
+    #     subject_list = []
 
-    course_list = Course.objects.filter(subject__in=subject_list)
+    # course_list = Course.objects.filter(subject__in=subject_list)
 
-    schedule_dict = {}
+    # schedule_dict = {}
 
-    for term in curr_terms:
-        schedules = Schedule.objects.filter(
-            term=term, course__in=course_list)
-        if len(schedules) > 0:
-            schedule_dict[str(term)] = schedules
-    return render(request, 'scheduling/home.html', {'curr_terms': curr_terms, 'past_terms': past_terms, 'schedule_dict': schedule_dict})
+    # for term in curr_terms:
+    #     schedules = Schedule.objects.filter(
+    #         term=term, course__in=course_list)
+    #     if len(schedules) > 0:
+    #         schedule_dict[str(term)] = schedules
+    return render(request, 'scheduling/home.html', {'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
 @login_required(login_url='/login')
