@@ -98,16 +98,21 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'update_subjects' %}">Subjects</a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link" href="{% url 'courses' %}">Courses</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'instructors' %}">Instructors</a>
-                        </li>
+                        </li> -->
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'change_summary' %}">Changes</a>
+                            </li>
+                        </ul>
                     </ul>
 
                     <!-- some summary of changes -->
-                    <h6
+                    <!-- <h6
                         class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                         <span>Summaries</span>
                         <a class="d-flex align-items-center text-muted" href="#">
@@ -123,7 +128,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'change_summary' %}">Changes</a>
                         </li>
-                    </ul>
+                    </ul> -->
 
                 </div>
             </nav>

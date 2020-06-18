@@ -168,7 +168,7 @@ def update_subjects(request):
             form.save()
             messages.success(request,
                              'You have successfully updated your subjects for scheduling.')
-            return redirect('scheduling')
+            return redirect('update_subjects')
     return render(request, 'scheduling/update_subjects.html',
                   {'form': form, 'curr_terms': curr_terms, 'past_terms': past_terms})
 

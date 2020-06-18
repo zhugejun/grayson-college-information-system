@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    subjects = models.CharField(max_length=100, null=True, blank=True)
+    subjects = models.CharField(max_length=512, null=True, blank=True)
 
     def __str__(self):
         return f'<Profile {self.user.username}>'
