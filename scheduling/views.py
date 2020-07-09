@@ -74,9 +74,11 @@ def get_diff_gcis_cams(course_list):
 
         schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
+        schedules_gcis = schedules_gcis.replace(r'^\s*$', None, regex=True)
 
         schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
+        schedules_cams = schedules_cams.replace(r'^\s*$', None, regex=True)
 
         # merge two schedules
         schedules = schedules_gcis.merge(
@@ -102,12 +104,14 @@ def get_diff_gcis_cams(course_list):
             _changed)
         changed = zip(changed_schedules, changed_notes, changed_sources)
 
+        # added
         added = not_in_both.loc[not_in_both['_merge'] == 'left_only']
         added = added[~added.index.isin(
             list(_changed.index) + list(_both_canceled.index))]
         added_schedules, added_notes, added_sources = df_to_obj_list(added)
         added = zip(added_schedules, added_notes, added_sources)
 
+        # deleted
         deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
         deleted = deleted[~deleted.index.isin(
             list(_changed.index) + list(_both_canceled.index))]
