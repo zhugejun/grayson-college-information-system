@@ -103,12 +103,14 @@ def get_diff_gcis_cams(course_list):
         changed = zip(changed_schedules, changed_notes, changed_sources)
 
         added = not_in_both.loc[not_in_both['_merge'] == 'left_only']
-        added = added[~added.index.isin(list(_changed.index))]
+        added = added[~added.index.isin(
+            list(_changed.index) + list(_both_canceled.index))]
         added_schedules, added_notes, added_sources = df_to_obj_list(added)
         added = zip(added_schedules, added_notes, added_sources)
 
         deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
-        deleted = deleted[~deleted.index.isin(list(_changed.index))]
+        deleted = deleted[~deleted.index.isin(
+            list(_changed.index) + list(_both_canceled.index))]
         deleted_schedules, deleted_notes, deleted_sources = df_to_obj_list(
             deleted)
         deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
