@@ -2,10 +2,13 @@ astroid==2.3.3
 autopep8==1.5.2
 Django==2.2.13
 django-appconf==1.0.4
+django-filter==2.3.0
 django-select2==7.2.3
+djangorestframework==3.11.0
 gunicorn==20.0.4
 isort==4.3.21
 lazy-object-proxy==1.4.3
+Markdown==3.2.2
 mccabe==0.6.1
 numpy==1.18.3
 pandas==1.0.3
