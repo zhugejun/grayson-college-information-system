@@ -11,7 +11,7 @@ import csv
 
 from .forms import CourseForm, ScheduleForm, InstructorForm, SubjectForm
 from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
-from .filters import ScheduleFilter
+# from .filters import ScheduleFilter
 from main.models import Profile, Subject
 
 from datetime import datetime
@@ -126,7 +126,7 @@ def home(request):
 
     past_terms, curr_terms = get_curr_and_past_terms()
 
-    schedule_filter = ScheduleFilter()
+    # schedule_filter = ScheduleFilter()
 
     # profile = get_object_or_404(Profile, user=request.user)
     # if profile.subjects:
@@ -144,8 +144,7 @@ def home(request):
     #         term=term, course__in=course_list)
     #     if len(schedules) > 0:
     #         schedule_dict[str(term)] = schedules
-    return render(request, 'scheduling/home.html', {'curr_terms': curr_terms, 'past_terms': past_terms,
-                                                    'schedule_filter': schedule_filter})
+    return render(request, 'scheduling/home.html', {'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
 @login_required(login_url='/login')
