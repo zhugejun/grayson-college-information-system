@@ -11,6 +11,7 @@ import csv
 
 from .forms import CourseForm, ScheduleForm, InstructorForm, SubjectForm
 from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
+from .filters import ScheduleFilter
 from main.models import Profile, Subject
 
 from datetime import datetime
@@ -45,7 +46,7 @@ def df_to_obj_list(df):
                 pk=row['campus_id']) if row['campus_id'] else None
             location = Location.objects.get(
                 pk=row['location_id']) if row['location_id'] else None
-            days = row['days']
+            days = row['days'] if row['days'] else None
             start_time = row['start_time']
             stop_time = row['stop_time']
 
@@ -91,6 +92,12 @@ def get_diff_gcis_cams(course_list):
         grouped = not_in_both.groupby(['term_id', 'course_id', 'section'])
 
         _changed = grouped.filter(lambda x: x['_merge'].count() == 2)
+
+        # if both canceled, these is no need to compare the rest
+        _both_canceled = _changed.loc[_changed['status'] == 'CANCELED'].groupby([
+            'term_id', 'course_id', 'section']).filter(lambda x: x['section'].count() == 2)
+        _changed = _changed[~_changed.index.isin(list(_both_canceled.index))]
+
         changed_schedules, changed_notes, changed_sources = df_to_obj_list(
             _changed)
         changed = zip(changed_schedules, changed_notes, changed_sources)
@@ -119,6 +126,8 @@ def home(request):
 
     past_terms, curr_terms = get_curr_and_past_terms()
 
+    schedule_filter = ScheduleFilter()
+
     # profile = get_object_or_404(Profile, user=request.user)
     # if profile.subjects:
     #     subject_list = Subject.objects.filter(
@@ -135,7 +144,8 @@ def home(request):
     #         term=term, course__in=course_list)
     #     if len(schedules) > 0:
     #         schedule_dict[str(term)] = schedules
-    return render(request, 'scheduling/home.html', {'curr_terms': curr_terms, 'past_terms': past_terms})
+    return render(request, 'scheduling/home.html', {'curr_terms': curr_terms, 'past_terms': past_terms,
+                                                    'schedule_filter': schedule_filter})
 
 
 @login_required(login_url='/login')
