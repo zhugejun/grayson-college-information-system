@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.db.models.query import EmptyQuerySet
 
 import pandas as pd
+import numpy as np
 import csv
 
 from .forms import CourseForm, ScheduleForm, InstructorForm, SubjectForm
@@ -72,13 +73,17 @@ def get_diff_gcis_cams(course_list):
 
     if course_list:
 
+        unique_cols = ['term_id', 'course_id', 'section', 'capacity', 'instructor_id',
+                       'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time']
+
         schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
-        schedules_gcis = schedules_gcis.replace(r'^\s*$', None, regex=True)
+        schedules_gcis.replace('', np.nan, inplace=True)
+        schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
 
         schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
-        schedules_cams = schedules_cams.replace(r'^\s*$', None, regex=True)
+        schedules_cams = schedules_cams.where(pd.notnull(schedules_cams), None)
 
         # merge two schedules
         schedules = schedules_gcis.merge(
@@ -87,6 +92,7 @@ def get_diff_gcis_cams(course_list):
 
         not_in_both = schedules.loc[schedules['_merge'] != 'both']
         not_in_both.reset_index(drop=True, inplace=True)
+
         # change nan to None
         not_in_both = not_in_both.where(pd.notnull(not_in_both), None)
 
