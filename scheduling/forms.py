@@ -148,7 +148,7 @@ class ScheduleForm(forms.ModelForm):
             if self.cleaned_data['location'] != Location.objects.get(building='Inter', room='net'):
                 self.fields['location'].widget.attrs['class'] += ' is-invalid'
                 valid = False
-            if self.cleaned_data['campus'] != Campus.objects.get(name='Internet'):
+            if self.cleaned_data['campus'] not in Campus.objects.filter(name__contains='Internet'):
                 self.fields['campus'].widget.attrs['class'] += ' is-invalid'
                 valid = False
 
