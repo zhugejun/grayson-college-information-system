@@ -85,6 +85,10 @@ def get_diff_gcis_cams(course_list):
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
         schedules_cams = schedules_cams.where(pd.notnull(schedules_cams), None)
 
+        for col in ['term_id', 'course_id', 'capacity', 'instructor_id', 'campus_id', 'location_id']:
+            schedules_cams[col] = schedules_cams[col].astype("Int64")
+            schedules_gcis[col] = schedules_gcis[col].astype("Int64")
+
         # merge two schedules
         schedules = schedules_gcis.merge(
             schedules_cams, how='outer', on=['term_id', 'course_id', 'section', 'capacity', 'instructor_id',
