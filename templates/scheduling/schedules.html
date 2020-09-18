@@ -43,8 +43,7 @@
       <td>{{ schedule.notes }}</td>
       {% if term.active == 'T' %}
       <td>
-        <a href="{%url 'edit_schedule' term schedule.id %}">Edit</a> |
-        <a href="{%url 'delete_schedule' term schedule.id %}">Delete</a>
+        <a href="{%url 'edit_schedule' term schedule.id %}">Edit</a>
       </td>
       {% endif %}
     </tr>
