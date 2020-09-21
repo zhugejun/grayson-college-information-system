@@ -41,12 +41,12 @@ def df_to_obj_list(df):
             section = row['section']
             capacity = row['capacity']
             instructor = Instructor.objects.get(
-                pk=row['instructor_id']) if row['instructor_id'] else None
+                pk=row['instructor_id']) if pd.notnull(row['instructor_id']) else None
             status = row['status']
             campus = Campus.objects.get(
-                pk=row['campus_id']) if row['campus_id'] else None
+                pk=row['campus_id']) if pd.notnull(row['campus_id']) else None
             location = Location.objects.get(
-                pk=row['location_id']) if row['location_id'] else None
+                pk=row['location_id']) if pd.notnull(row['location_id']) else None
             days = row['days'] if row['days'] else None
             start_time = row['start_time']
             stop_time = row['stop_time']
@@ -79,15 +79,19 @@ def get_diff_gcis_cams(course_list):
         schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
         schedules_gcis.replace('', np.nan, inplace=True)
-        schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
 
         schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
+
+        schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
         schedules_cams = schedules_cams.where(pd.notnull(schedules_cams), None)
 
         for col in ['term_id', 'course_id', 'capacity', 'instructor_id', 'campus_id', 'location_id']:
             schedules_cams[col] = schedules_cams[col].astype("Int64")
             schedules_gcis[col] = schedules_gcis[col].astype("Int64")
+
+        print(schedules_gcis)
+        print(schedules_cams)
 
         # merge two schedules
         schedules = schedules_gcis.merge(

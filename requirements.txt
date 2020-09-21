@@ -1,5 +1,6 @@
 astroid==2.3.3
 autopep8==1.5.2
+certifi==2020.6.20
 Django==2.2.13
 django-appconf==1.0.4
 django-filter==2.3.0
@@ -10,8 +11,8 @@ isort==4.3.21
 lazy-object-proxy==1.4.3
 Markdown==3.2.2
 mccabe==0.6.1
-numpy==1.18.3
-pandas==1.0.3
+numpy==1.19.2
+pandas==1.1.2
 psycopg2-binary==2.8.5
 pycodestyle==2.5.0
 pylint==2.4.4
