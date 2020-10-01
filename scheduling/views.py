@@ -76,11 +76,13 @@ def get_diff_gcis_cams(course_list):
         unique_cols = ['term_id', 'course_id', 'section', 'capacity', 'instructor_id',
                        'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time']
 
-        schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list).all().values(
+        active_terms = Term.objects.filter(active='T')
+
+        schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list, term__in=active_terms).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
         schedules_gcis.replace('', np.nan, inplace=True)
 
-        schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list).all().values(
+        schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list, term__in=active_terms).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
 
         schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
@@ -89,9 +91,6 @@ def get_diff_gcis_cams(course_list):
         for col in ['term_id', 'course_id', 'capacity', 'instructor_id', 'campus_id', 'location_id']:
             schedules_cams[col] = schedules_cams[col].astype("Int64")
             schedules_gcis[col] = schedules_gcis[col].astype("Int64")
-
-        print(schedules_gcis)
-        print(schedules_cams)
 
         # merge two schedules
         schedules = schedules_gcis.merge(
