@@ -88,6 +88,7 @@ def get_diff_gcis_cams(course_list):
         schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
         schedules_cams = schedules_cams.where(pd.notnull(schedules_cams), None)
 
+        # fix the error casused by N/A in a character column
         for col in ['term_id', 'course_id', 'capacity', 'instructor_id', 'campus_id', 'location_id']:
             schedules_cams[col] = schedules_cams[col].astype("Int64")
             schedules_gcis[col] = schedules_gcis[col].astype("Int64")
@@ -111,7 +112,10 @@ def get_diff_gcis_cams(course_list):
         # if both canceled, these is no need to compare the rest
         _both_canceled = _changed.loc[_changed['status'] == 'CANCELED'].groupby([
             'term_id', 'course_id', 'section']).filter(lambda x: x['section'].count() == 2)
+        _both_closed = _changed.loc[_changed['status'] == 'CLOSED'].groupby([
+            'term_id', 'course_id', 'section']).filter(lambda x: x['section'].count() == 2)
         _changed = _changed[~_changed.index.isin(list(_both_canceled.index))]
+        _changed = _changed[~_changed.index.isin(list(_both_closed.index))]
 
         changed_schedules, changed_notes, changed_sources = df_to_obj_list(
             _changed)
