@@ -47,6 +47,16 @@ select {
 }
 
 
+#id_days li {
+  display: inline-block;
+  list-style: none;
+  padding-right: 8px;
+}
+
+
+#id_days {
+  padding-inline-start: 10px;
+}
 /* #id_subject,
 #id_instructor,
 #id_status,
