@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.admin import widgets
-from django.utils.encoding import force_text
 from django.forms import ValidationError
 
 from django_select2.forms import ModelSelect2MultipleWidget, ModelSelect2Widget
@@ -71,15 +70,16 @@ class CourseForm(forms.ModelForm):
 class ScheduleForm(forms.ModelForm):
 
     DAYS_CHOICES = [
-        ('M', 'Monday'),
-        ('T', 'Tuesday'),
-        ('W', 'Wednesday'),
-        ('R', 'Thursday'),
-        ('F', 'Friday'),
-        ('S', 'Saturday'),
+        ('M', 'M'),
+        ('T', 'T'),
+        ('W', 'W'),
+        ('R', 'R'),
+        ('F', 'F'),
+        ('S', 'S'),
     ]
 
-    days = forms.MultipleChoiceField(choices=DAYS_CHOICES, required=False)
+    days = forms.MultipleChoiceField(
+        choices=DAYS_CHOICES, required=False, widget=forms.CheckboxSelectMultiple)
 
     class Meta:
         model = Schedule
@@ -110,7 +110,10 @@ class ScheduleForm(forms.ModelForm):
             if field.widget.attrs.get('class'):
                 field.widget.attrs['class'] += ' form-control'
             else:
-                field.widget.attrs['class'] = 'form-control'
+                if field_name == 'days':
+                    field.widget.attrs['class'] = ''
+                else:
+                    field.widget.attrs['class'] = 'form-control'
 
     def clean(self):
 

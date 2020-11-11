@@ -67,7 +67,7 @@ def get_diff_gcis_cams(course_list):
 
     changed = zip([], [], [])
     added = zip([], [], [])
-    deleted = zip([], [], [])
+    # deleted = zip([], [], [])
 
     total_changes = 0
 
@@ -124,21 +124,21 @@ def get_diff_gcis_cams(course_list):
         # added
         added = not_in_both.loc[not_in_both['_merge'] == 'left_only']
         added = added[~added.index.isin(
-            list(_changed.index) + list(_both_canceled.index))]
+            list(_changed.index) + list(_both_canceled.index) + list(_both_closed.index))]
         added_schedules, added_notes, added_sources = df_to_obj_list(added)
         added = zip(added_schedules, added_notes, added_sources)
 
         # deleted
-        deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
-        deleted = deleted[~deleted.index.isin(
-            list(_changed.index) + list(_both_canceled.index))]
-        deleted_schedules, deleted_notes, deleted_sources = df_to_obj_list(
-            deleted)
-        deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
+        # deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
+        # deleted = deleted[~deleted.index.isin(
+        #     list(_changed.index) + list(_both_canceled.index) + list(_both_closed.index))]
+        # deleted_schedules, deleted_notes, deleted_sources = df_to_obj_list(
+        #     deleted)
+        # deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
 
         total_changes = len(not_in_both)
 
-    return changed, added, deleted, total_changes
+    return changed, added, total_changes
 
 
 #------------------------ Home --------------------------#
@@ -422,38 +422,38 @@ def edit_schedule(request, term, pk):
     return render(request, 'scheduling/edit_schedule.html', {'form': form, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms, 'term': term})
 
 
-@login_required(login_url='/login')
-def delete_schedule(request, term, pk):
+# @login_required(login_url='/login')
+# def delete_schedule(request, term, pk):
 
-    past_terms, curr_terms = get_curr_and_past_terms()
+#     past_terms, curr_terms = get_curr_and_past_terms()
 
-    year = int(term[-4:])  # year
-    semester = term[:-4].upper()  # term
-    term = get_object_or_404(Term, year__exact=year,
-                             semester__exact=semester)
+#     year = int(term[-4:])  # year
+#     semester = term[:-4].upper()  # term
+#     term = get_object_or_404(Term, year__exact=year,
+#                              semester__exact=semester)
 
-    schedule = get_object_or_404(Schedule, pk=pk)
-    if schedule.days:
-        schedule.days = list(schedule.days)
-    else:
-        schedule.days = []
-    course = get_object_or_404(Course, pk=schedule.course_id)
+#     schedule = get_object_or_404(Schedule, pk=pk)
+#     if schedule.days:
+#         schedule.days = list(schedule.days)
+#     else:
+#         schedule.days = []
+#     course = get_object_or_404(Course, pk=schedule.course_id)
 
-    form = ScheduleForm(instance=schedule)
-    for field_name, field in form.fields.items():
-        form.fields[field_name].disabled = True
+#     form = ScheduleForm(instance=schedule)
+#     for field_name, field in form.fields.items():
+#         form.fields[field_name].disabled = True
 
-    if request.method == 'POST':
-        form = ScheduleForm(request.POST, instance=schedule)
-        for field_name, field in form.fields.items():
-            form.fields[field_name].disabled = True
-        if form.is_valid():
-            section = form.cleaned_data['section']
-            schedule.delete()
-            messages.success(
-                request, f"You've deleted {course} {section} successfully!")
-            return redirect('schedules', term=term)
-    return render(request, 'scheduling/delete_schedule.html', {'form': form, 'course': course, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms})
+#     if request.method == 'POST':
+#         form = ScheduleForm(request.POST, instance=schedule)
+#         for field_name, field in form.fields.items():
+#             form.fields[field_name].disabled = True
+#         if form.is_valid():
+#             section = form.cleaned_data['section']
+#             schedule.delete()
+#             messages.success(
+#                 request, f"You've deleted {course} {section} successfully!")
+#             return redirect('schedules', term=term)
+#     return render(request, 'scheduling/delete_schedule.html', {'form': form, 'course': course, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
 @login_required(login_url='/login')
@@ -515,10 +515,10 @@ def change_summary(request):
 
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    changed, added, deleted, total_changes = get_diff_gcis_cams(course_list)
+    changed, added, total_changes = get_diff_gcis_cams(course_list)
 
     return render(request, 'scheduling/change_summary.html', {'curr_terms': curr_terms, 'past_terms': past_terms,
-                                                              'changed': changed, 'added': added, 'deleted': deleted,
+                                                              'changed': changed, 'added': added,
                                                               'total_changes': total_changes
                                                               })
 
@@ -538,7 +538,7 @@ def download_change_summary(request):
 
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    changed, added, deleted, _ = get_diff_gcis_cams(course_list)
+    changed, added, _ = get_diff_gcis_cams(course_list)
 
     # write data to csv file so that user can download
     writer = csv.writer(response)
@@ -549,9 +549,9 @@ def download_change_summary(request):
         writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
                          s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'ADD'])
 
-    for s, n, src in deleted:
-        writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
-                         s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'DELETE'])
+    # for s, n, src in deleted:
+    #     writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
+    #                      s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'DELETE'])
 
     for s, n, src in changed:
         writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
