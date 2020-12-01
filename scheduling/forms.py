@@ -76,6 +76,7 @@ class ScheduleForm(forms.ModelForm):
         ('R', 'R'),
         ('F', 'F'),
         ('S', 'S'),
+        ('U', 'U'),
     ]
 
     days = forms.MultipleChoiceField(
