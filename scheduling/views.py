@@ -63,7 +63,7 @@ def df_to_obj_list(df):
     return obj_list, notes_list, source_list
 
 
-def get_diff_gcis_cams(course_list):
+def get_diff_gcis_cams(term, course_list):
 
     changed = zip([], [], [])
     added = zip([], [], [])
@@ -76,13 +76,11 @@ def get_diff_gcis_cams(course_list):
         unique_cols = ['term_id', 'course_id', 'section', 'capacity', 'instructor_id',
                        'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time']
 
-        active_terms = Term.objects.filter(active='T')
-
-        schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list, term__in=active_terms).all().values(
+        schedules_gcis = pd.DataFrame.from_records(Schedule.objects.filter(course__in=course_list, term=term).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time', 'notes'))
         schedules_gcis.replace('', np.nan, inplace=True)
 
-        schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list, term__in=active_terms).all().values(
+        schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list, term=term).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
 
         schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
@@ -504,6 +502,14 @@ def schedule_summary(request):
 @login_required(login_url='/login')
 def change_summary(request):
 
+    _, curr_terms = get_curr_and_past_terms()
+
+    return render(request, 'scheduling/change_summary.html', {'curr_terms': curr_terms})
+
+
+@login_required(login_url='/login')
+def change_summary_by_term(request, term):
+
     past_terms, curr_terms = get_curr_and_past_terms()
 
     profile = get_object_or_404(Profile, user=request.user)
@@ -513,18 +519,23 @@ def change_summary(request):
     else:
         subject_list = []
 
+    year = int(term[-4:])  # year
+    semester = term[:-4].upper()  # Term
+    term = get_object_or_404(Term, year__exact=year,
+                             semester__exact=semester)
+
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    changed, added, total_changes = get_diff_gcis_cams(course_list)
+    changed, added, total_changes = get_diff_gcis_cams(term, course_list)
 
-    return render(request, 'scheduling/change_summary.html', {'curr_terms': curr_terms, 'past_terms': past_terms,
-                                                              'changed': changed, 'added': added,
-                                                              'total_changes': total_changes
-                                                              })
+    return render(request, 'scheduling/change_summary_by_term.html', {'curr_terms': curr_terms, 'past_terms': past_terms,
+                                                                      'term': term, 'changed': changed, 'added': added,
+                                                                      'total_changes': total_changes
+                                                                      })
 
 
 @login_required(login_url='/login')
-def download_change_summary(request):
+def download_change_summary_by_term(request, term):
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="schedule-changes.csv"'
@@ -536,9 +547,14 @@ def download_change_summary(request):
     else:
         subject_list = []
 
+    year = int(term[-4:])  # year
+    semester = term[:-4].upper()  # Term
+    term = get_object_or_404(Term, year__exact=year,
+                             semester__exact=semester)
+
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    changed, added, _ = get_diff_gcis_cams(course_list)
+    changed, added, _ = get_diff_gcis_cams(term, course_list)
 
     # write data to csv file so that user can download
     writer = csv.writer(response)
