@@ -67,7 +67,7 @@ def get_diff_gcis_cams(term, course_list):
 
     changed = zip([], [], [])
     added = zip([], [], [])
-    # deleted = zip([], [], [])
+    deleted = zip([], [], [])
 
     total_changes = 0
 
@@ -127,16 +127,16 @@ def get_diff_gcis_cams(term, course_list):
         added = zip(added_schedules, added_notes, added_sources)
 
         # deleted
-        # deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
-        # deleted = deleted[~deleted.index.isin(
-        #     list(_changed.index) + list(_both_canceled.index) + list(_both_closed.index))]
-        # deleted_schedules, deleted_notes, deleted_sources = df_to_obj_list(
-        #     deleted)
-        # deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
+        deleted = not_in_both.loc[not_in_both['_merge'] == 'right_only']
+        deleted = deleted[~deleted.index.isin(
+            list(_changed.index) + list(_both_canceled.index) + list(_both_closed.index))]
+        deleted_schedules, deleted_notes, deleted_sources = df_to_obj_list(
+            deleted)
+        deleted = zip(deleted_schedules, deleted_notes, deleted_sources)
 
         total_changes = len(not_in_both)
 
-    return changed, added, total_changes
+    return changed, added, deleted, total_changes
 
 
 #------------------------ Home --------------------------#
@@ -526,10 +526,11 @@ def change_summary_by_term(request, term):
 
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    changed, added, total_changes = get_diff_gcis_cams(term, course_list)
+    changed, added, deleted, total_changes = get_diff_gcis_cams(
+        term, course_list)
 
     return render(request, 'scheduling/change_summary_by_term.html', {'curr_terms': curr_terms, 'past_terms': past_terms,
-                                                                      'term': term, 'changed': changed, 'added': added,
+                                                                      'term': term, 'changed': changed, 'added': added, 'deleted': deleted,
                                                                       'total_changes': total_changes
                                                                       })
 
@@ -554,7 +555,7 @@ def download_change_summary_by_term(request, term):
 
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    changed, added, _ = get_diff_gcis_cams(term, course_list)
+    changed, added, deleted, _ = get_diff_gcis_cams(term, course_list)
 
     # write data to csv file so that user can download
     writer = csv.writer(response)
@@ -565,9 +566,9 @@ def download_change_summary_by_term(request, term):
         writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
                          s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'ADD'])
 
-    # for s, n, src in deleted:
-    #     writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
-    #                      s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'DELETE'])
+    for s, n, src in deleted:
+        writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
+                         s.campus, s.location, s.days, s.start_time, s.stop_time, n, src, 'DELETE'])
 
     for s, n, src in changed:
         writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
