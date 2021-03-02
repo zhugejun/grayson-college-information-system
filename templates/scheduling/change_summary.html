@@ -8,7 +8,7 @@
     <ul>
         {% for term in curr_terms %}
             <li> 
-                <a href="{% url 'change_summary_by_term' term %}">
+                <a href="{% url 'download_change_summary_by_term' term %}">
                     {{ term.semester }} {{ term.year }}
                 </a>
             </li>
