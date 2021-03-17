@@ -83,6 +83,9 @@ def get_diff_gcis_cams(term, course_list):
         schedules_cams = pd.DataFrame.from_records(Cams.objects.filter(course__in=course_list, term=term).all().values(
             'term_id', 'course_id', 'section', 'capacity', 'instructor_id', 'status', 'campus_id', 'location_id', 'days', 'start_time', 'stop_time'))
 
+        if schedules_gcis.empty and schedules_cams.empty:
+            return changed, added, deleted, total_changes
+
         schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
         schedules_cams = schedules_cams.where(pd.notnull(schedules_cams), None)
 

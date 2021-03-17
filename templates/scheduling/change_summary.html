@@ -3,14 +3,20 @@
 {% block content %}
 <h1>Summary of Changes</h1>
 <br>
+<div class="alert alert-warning">
+    <strong>Warning!</strong> Please click <i class="fa fa-download" aria-hidden="true"></i> to download the summary of changes if the term link takes long time to load.
+</div>
 
 {% if curr_terms %}
     <ul>
         {% for term in curr_terms %}
             <li> 
-                <a href="{% url 'download_change_summary_by_term' term %}">
+                <a href="{% url 'change_summary_by_term' term %}">
                     {{ term.semester }} {{ term.year }}
-                </a>
+                </a> &nbsp;
+                [<a href="{% url 'download_change_summary_by_term' term %}">
+                    <i class="fa fa-download" aria-hidden="true"></i>
+                </a>]
             </li>
         {% endfor %}
     </ul>
