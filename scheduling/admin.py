@@ -13,8 +13,14 @@ class CourseAdmin(admin.ModelAdmin):
     ordering = ('subject', 'number')
 
 
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ('course', 'section', 'update_date', 'update_by',)
+    list_filter = ('update_date', 'update_by', )
+    ordering = ('-update_date',)
+
+
 admin.site.register(Location)
 admin.site.register(Instructor)
 admin.site.register(Campus)
 
-admin.site.register(Schedule)
