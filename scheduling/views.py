@@ -580,7 +580,7 @@ def download_change_summary_by_term(request, term):
     writer = csv.writer(response)
 
     writer.writerow(['Term', 'Course', 'Name', 'Section', 'Status', 'Capacity', 'Instructor',
-                     'Campus', 'Location', 'Days', 'Start', 'Stop', 'Note', 'Updated_by', 'Updated_date', 'Source', 'Action'])
+                     'Campus', 'Location', 'Days', 'Start', 'Stop', 'Note', 'source', 'Updated_by', 'Updated_date', 'Action'])
     for s, n, src, by, dt in added:
         dt = '' if pd.isnull(dt) else str(dt)[:19]
         writer.writerow([s.term, s.course, s.course.name, s.section, s.status, s.capacity, s.instructor,
