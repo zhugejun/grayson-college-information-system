@@ -21,6 +21,11 @@ class ScheduleAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Location)
-admin.site.register(Instructor)
+@admin.register(Instructor)
+class InstructorAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name')
+    ordering = ('last_name',)
+    search_fields = ('first_name', 'last_name')
+
 admin.site.register(Campus)
 
