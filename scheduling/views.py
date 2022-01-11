@@ -439,38 +439,38 @@ def edit_schedule(request, term, pk):
     return render(request, 'scheduling/edit_schedule.html', {'form': form, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms, 'term': term})
 
 
-# @login_required(login_url='/login')
-# def delete_schedule(request, term, pk):
+@login_required(login_url='/login')
+def delete_schedule(request, term, pk):
 
-#     past_terms, curr_terms = get_curr_and_past_terms()
+    past_terms, curr_terms = get_curr_and_past_terms()
 
-#     year = int(term[-4:])  # year
-#     semester = term[:-4].upper()  # term
-#     term = get_object_or_404(Term, year__exact=year,
-#                              semester__exact=semester)
+    year = int(term[-4:])  # year
+    semester = term[:-4].upper()  # term
+    term = get_object_or_404(Term, year__exact=year,
+                             semester__exact=semester)
 
-#     schedule = get_object_or_404(Schedule, pk=pk)
-#     if schedule.days:
-#         schedule.days = list(schedule.days)
-#     else:
-#         schedule.days = []
-#     course = get_object_or_404(Course, pk=schedule.course_id)
+    schedule = get_object_or_404(Schedule, pk=pk)
+    if schedule.days:
+        schedule.days = list(schedule.days)
+    else:
+        schedule.days = []
+    course = get_object_or_404(Course, pk=schedule.course_id)
 
-#     form = ScheduleForm(instance=schedule)
-#     for field_name, field in form.fields.items():
-#         form.fields[field_name].disabled = True
+    form = ScheduleForm(instance=schedule)
+    for field_name, field in form.fields.items():
+        form.fields[field_name].disabled = True
 
-#     if request.method == 'POST':
-#         form = ScheduleForm(request.POST, instance=schedule)
-#         for field_name, field in form.fields.items():
-#             form.fields[field_name].disabled = True
-#         if form.is_valid():
-#             section = form.cleaned_data['section']
-#             schedule.delete()
-#             messages.success(
-#                 request, f"You've deleted {course} {section} successfully!")
-#             return redirect('schedules', term=term)
-#     return render(request, 'scheduling/delete_schedule.html', {'form': form, 'course': course, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms})
+    if request.method == 'POST':
+        form = ScheduleForm(request.POST, instance=schedule)
+        for field_name, field in form.fields.items():
+            form.fields[field_name].disabled = True
+        if form.is_valid():
+            section = form.cleaned_data['section']
+            schedule.delete()
+            messages.success(
+                request, f"You've deleted {course} {section} successfully!")
+            return redirect('schedules', term=term)
+    return render(request, 'scheduling/delete_schedule.html', {'form': form, 'course': course, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
 @login_required(login_url='/login')

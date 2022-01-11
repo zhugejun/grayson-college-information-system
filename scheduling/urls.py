@@ -19,8 +19,8 @@ urlpatterns = [
          views.add_schedule, name="add_schedule"),
     path('schedules/<term>/<int:pk>/edit/',
          views.edit_schedule, name="edit_schedule"),
-    #     path('schedules/<term>/<int:pk>/delete/',
-    #          views.delete_schedule, name="delete_schedule"),
+     path('schedules/<term>/<int:pk>/delete/',
+          views.delete_schedule, name="delete_schedule"),
 
     path('instructors/', views.instructors, name="instructors"),
 
