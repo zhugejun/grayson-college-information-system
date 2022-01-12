@@ -18,7 +18,6 @@ class ScheduleAdmin(admin.ModelAdmin):
     list_display = ('course', 'section', 'term', 'update_date', 'update_by',)
     list_filter = ('update_date', 'update_by', )
     ordering = ('-update_date',)
-    search_fields = ('course',)
 
 
 admin.site.register(Location)
