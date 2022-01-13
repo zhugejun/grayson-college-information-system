@@ -11,6 +11,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ('subject', 'number', 'credit', 'name')
     list_filter = ('subject', )
     ordering = ('subject', 'number')
+    search_fields = ('subject', 'number')
 
 
 @admin.register(Schedule)
