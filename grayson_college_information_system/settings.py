@@ -166,6 +166,7 @@ DATETIME_INPUT_FORMATS = ['%Y-%m-%d %H:%M:%S', ]
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+LOGIN_URL = '/login/'
 
 # Email setting for sending emails
 EMAIL_HOST = 'smtp.gmail.com'

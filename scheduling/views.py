@@ -159,7 +159,7 @@ def get_diff_gcis_cams(term, course_list):
 
 
 #------------------------ Home --------------------------#
-@login_required(login_url='/login')
+@login_required
 def home(request):
     """List all schedules if not login.
     """
@@ -187,7 +187,7 @@ def home(request):
     return render(request, 'scheduling/home.html', {'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
-@login_required(login_url='/login')
+@login_required
 def update_subjects(request):
 
     past_terms, curr_terms = get_curr_and_past_terms()
@@ -234,7 +234,7 @@ def instructors(request):
 
 
 #------------------- Course ---------------------#
-@login_required(login_url='/login')
+@login_required
 def add_course(request):
     """Courses to be scheduled
     """
@@ -279,7 +279,7 @@ def add_course(request):
                   {'form': form, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
-# @login_required(login_url='/login')
+# @login_required
 # def edit_course(request, pk):
 
 #     past_terms, curr_terms = get_curr_and_past_terms()
@@ -311,7 +311,7 @@ def add_course(request):
 #                   {'form': form, 'course': course, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
-@login_required(login_url='/login')
+@login_required
 def courses(request):
 
     past_terms, curr_terms = get_curr_and_past_terms()
@@ -329,7 +329,7 @@ def courses(request):
                   {'course_list': course_list, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
-@login_required(login_url='/login')
+@login_required
 def courses_with_term(request, term):
 
     past_terms, curr_terms = get_curr_and_past_terms()
@@ -354,7 +354,7 @@ def courses_with_term(request, term):
 
 
 #------------------------ Schedule --------------------------#
-@login_required(login_url='/login')
+@login_required
 def add_schedule(request, term, pk):
 
     past_terms, curr_terms = get_curr_and_past_terms()
@@ -400,7 +400,7 @@ def add_schedule(request, term, pk):
                    'curr_terms': curr_terms, 'past_terms': past_terms, 'term': term})
 
 
-@login_required(login_url='/login')
+@login_required
 def edit_schedule(request, term, pk):
 
     past_terms, curr_terms = get_curr_and_past_terms()
@@ -439,7 +439,7 @@ def edit_schedule(request, term, pk):
     return render(request, 'scheduling/edit_schedule.html', {'form': form, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms, 'term': term})
 
 
-@login_required(login_url='/login')
+@login_required
 def delete_schedule(request, term, pk):
 
     past_terms, curr_terms = get_curr_and_past_terms()
@@ -473,7 +473,7 @@ def delete_schedule(request, term, pk):
     return render(request, 'scheduling/delete_schedule.html', {'form': form, 'course': course, 'schedule': schedule, 'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
-@login_required(login_url='/login')
+@login_required
 def schedules(request, term):
 
     past_terms, curr_terms = get_curr_and_past_terms()
@@ -496,7 +496,7 @@ def schedules(request, term):
     return render(request, 'scheduling/schedules.html', {'schedule_list': schedule_list, 'curr_terms': curr_terms, 'past_terms': past_terms, 'term': term})
 
 
-@login_required(login_url='/login')
+@login_required
 def schedule_summary(request):
 
     past_terms, curr_terms = get_curr_and_past_terms()
@@ -518,7 +518,7 @@ def schedule_summary(request):
     return render(request, 'scheduling/schedule_summary.html', {'curr_terms': curr_terms, 'past_terms': past_terms})
 
 
-@login_required(login_url='/login')
+@login_required
 def change_summary(request):
 
     _, curr_terms = get_curr_and_past_terms()
@@ -526,7 +526,7 @@ def change_summary(request):
     return render(request, 'scheduling/change_summary.html', {'curr_terms': curr_terms})
 
 
-@login_required(login_url='/login')
+@login_required
 def change_summary_by_term(request, term):
 
     past_terms, curr_terms = get_curr_and_past_terms()
@@ -554,7 +554,7 @@ def change_summary_by_term(request, term):
                                                                       })
 
 
-@login_required(login_url='/login')
+@login_required
 def download_change_summary_by_term(request, term):
 
     response = HttpResponse(content_type='text/csv')
