@@ -121,22 +121,22 @@ class ScheduleForm(forms.ModelForm):
         cleaned_data = super(ScheduleForm, self).clean()
         cleaned_data['days'] = ''.join(cleaned_data['days'])
 
-        term = cleaned_data['term']
-        course = cleaned_data['course']
-        section = cleaned_data['section']
+        # term = cleaned_data['term']
+        # course = cleaned_data['course']
+        # section = cleaned_data['section']
 
-        matching_schedules = Schedule.objects.filter(term=term,
-                                                     course=course, section=section
-                                                     )
-        if self.instance:
-            matching_schedules = matching_schedules.exclude(
-                pk=self.instance.pk)
-        if matching_schedules:
-            msg = f'Schedule {course} {section} already exists.'
-            self._errors['duplicate'] = msg
-            raise ValidationError(msg)
-        else:
-            return cleaned_data
+        # matching_schedules = Schedule.objects.filter(term=term,
+        #                                              course=course, section=section
+        #                                              )
+        # if self.instance:
+        #     matching_schedules = matching_schedules.exclude(
+        #         pk=self.instance.pk)
+        # if matching_schedules:
+        #     msg = f'Schedule {course} {section} already exists.'
+        #     self._errors['duplicate'] = msg
+        #     raise ValidationError(msg)
+        # else:
+        #     return cleaned_data
 
         return cleaned_data
 
