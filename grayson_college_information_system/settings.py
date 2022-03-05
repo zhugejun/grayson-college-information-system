@@ -43,13 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'django_select2',
+    'select2',
 
     'main',
     'scheduling',
 
-    'rest_framework',
-    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -181,12 +179,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 60 * 60 * 3
 SESSION_SAVE_EVERY_REQUEST = True
 
-# django restframework pagination
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
-}
-
 
 LOGGING = {
     'version': 1,
@@ -226,3 +218,6 @@ LOGGING = {
         },
     }
 }
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
