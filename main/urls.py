@@ -20,5 +20,5 @@ urlpatterns = [
     path('logout/', views.logout_request, name="logout"),
     path('account/', views.account, name="account"),
 
-    path('select2/', include('django_select2.urls')),
+    path('select2/', include('select2.urls')),
 ]

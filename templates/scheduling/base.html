@@ -1,145 +1,115 @@
 {% include "includes/header.html" %}
 
-<script>
-    // $(".timepicker").timepicker();
-    $(document).ready(function () {
-        $('.timepicker').timepicker({
-            timeFormat: 'h:mm p',
-            interval: 15,
-            minTime: '7:00AM',
-            maxTime: '10:00PM',
-            dynamic: false,
-            dropdown: true,
-            scrollbar: true
-        });
-    });
-
-    $(document).ready(function () {
-        $('#courseTable').DataTable({ "deferRender": true });
-        $('#instructorTable').DataTable({ "deferRender": true });
-        $('#scheduleTable').DataTable({ "deferRender": true });
-        $('#allSchedulesTable').DataTable({ "deferRender": true });
-        $('#scheduleDoneTable').DataTable({ "deferRender": true });
-        $('#scheduleAddTable').DataTable({ "deferRender": true });
-        $('#scheduleDeleteTable').DataTable({ "deferRender": true });
-        $('#scheduleChangeTable').DataTable({ "deferRender": true });
-    });
-
-</script>
-
-<!--  style="padding-bottom: 60px;" -->
-
 <body>
 
     {% include "includes/navbar.html" %}
-    {% include "includes/messages.html" %}
 
     <div class="container-fluid">
         <div class="row">
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="sidebar-sticky">
-                    <!-- schedules for current terms -->
-                    <h6
-                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>Current Schedules</span>
-                        <a class="d-flex align-items-center text-muted" href="#">
-                            <span data-feather="plus-circle"></span>
-                        </a>
-                    </h6>
-                    {% if curr_terms %}
-                    <ul class="nav flex-column mb-2">
-                        <!-- <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'home' %}">
-                                        <span data-feather="file-text"></span>
-                                        All Schedules
-                                    </a>
-                                </li> -->
-                        {% for term in curr_terms %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'schedules' term %}">
-                                <span data-feather="file-text"></span>
-                                {{ term.semester }} {{ term.year }}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
+          <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'scheduling' %}">
+                    Home
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'update_subjects' %}">
+                    Department
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'change_summary' %}">
+                    Changes
+                  </a>
+                </li>
+              </ul>
+      
+              <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Recently Edited</span>
+                <a class="link-secondary" href="#" aria-label="Add a new report">
+                </a>
+              </h6>
+              <ul class="nav flex-column mb-2">
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    MATH1314A01
+                  </a>
+                </li>
+              </ul>
 
-                    <!-- schedules for past terms -->
-                    <h6
-                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>Past Schedules</span>
-                        <a class="d-flex align-items-center text-muted" href="#">
-                            <span data-feather="plus-circle"></span>
-                        </a>
-                    </h6>
-                    {% if past_terms %}
-                    <ul class="nav flex-column mb-2">
-                        {% for term in past_terms %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'schedules' term %}">
-                                <span data-feather="file-text"></span>
-                                {{ term.semester }} {{ term.year }}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-
-                    <!-- quick links for courses and instructors -->
-                    <h6
-                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>Quick Links</span>
-                        <a class="d-flex align-items-center text-muted" href="#">
-                            <span data-feather="plus-circle"></span>
-                        </a>
-                    </h6>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'update_subjects' %}">Subjects</a>
-                        </li>
-                        <!-- <li class="nav-item">
-                            <a class="nav-link" href="{% url 'courses' %}">Courses</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'instructors' %}">Instructors</a>
-                        </li> -->
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'change_summary' %}">Changes</a>
-                            </li>
-                        </ul>
-                    </ul>
-
-                    <!-- some summary of changes -->
-                    <!-- <h6
-                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>Summaries</span>
-                        <a class="d-flex align-items-center text-muted" href="#">
-                            <span data-feather="plus-circle"></span>
-                        </a>
-                    </h6>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'schedule_summary' %}">Schedules</a>
-                        </li>
-                    </ul>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'change_summary' %}">Changes</a>
-                        </li>
-                    </ul> -->
-
-                </div>
-            </nav>
-
-            <div class="container col-md-10 mt-3">
-                {% block content %}
-                {% endblock %}
+              <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Recently Edited</span>
+                <a class="link-secondary" href="#" aria-label="Add a new report">
+                  <span data-feather="plus-circle"></span>
+                </a>
+              </h6>
+ 
+              <ul class="nav flex-column mb-2">
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    MATH1342A02
+                  </a>
+                </li>
+              </ul>
             </div>
+          </nav>
+      
+          <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
+                <!-- messages showing as toast -->
+            {% if messages %}
+              {% for message in messages %}
+                {% if message.tags == 'success' %}
+                  <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 10; right: 0;">
+                    <div class="d-flex">
+                      <div class="toast-body">
+                      {{ message }}
+                      </div>
+                      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                  </div>
+                {% elif message.tags == 'warning' %}
+                  <div class="toast align-items-center text-white bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 10; right: 0;">
+                    <div class="d-flex">
+                      <div class="toast-body">
+                      {{ message }}
+                      </div>
+                      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                  </div>
+                {% else %}
+                <div class="toast align-items-center text-white bg-error border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 10; right: 0;">
+                  <div class="d-flex">
+                    <div class="toast-body">
+                    {{ message }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+
+
+
+            <!-- content for schedules -->
+            {% block content %}
+            {% endblock %}
+          </main>
         </div>
     </div>
-
-
+    
+    <script>
+      option = {
+          animation: true,
+          autohide: true,
+          delay: 2000
+      };
+      var toastElement = document.querySelector('.toast');
+      var t = new bootstrap.Toast(toastElement, option);
+      t.show();
+  </script>
 </body>
 {% include "includes/footer.html" %}
+

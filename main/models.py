@@ -18,14 +18,3 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
     else:
         instance.profile.save()
-
-
-class Subject(models.Model):
-
-    name = models.CharField(max_length=4)
-
-    class Meta:
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name

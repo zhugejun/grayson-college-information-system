@@ -2,28 +2,17 @@
 
 {% block content %}
 
-<h1>Subjects</h1>
-<br />
+<h1>Department</h1>
+Please select your departments to start scheduling.
 
+<form class="mt-2" method="POST">
+    {% csrf_token %} 
 
-<form method="POST">
-    {% csrf_token %} {{ form }}
-    <button type="submit" class="btn btn-dark">Go</button>
+    <div class="form-group">
+        {{ form.subjects}}
+    </div>
+    <button type="submit" class="btn btn-dark">Submit</button>
 </form>
 <br />
 
-<!-- {% if subjects %}
-<h6><em>Subjects you are working on:</em></h6>
-<ul>
-    {% for subject in subjects %}
-    <li>{{ subject }}</li>
-    {% endfor %}
-</ul>
-{% else %}
-<h6><em>You are not working on any subjects.</em></h6>
-{% endif %}
-<br /> -->
-{{ form.media.js }}
-
-<br />
 {% endblock content %}

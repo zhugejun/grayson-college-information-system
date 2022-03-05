@@ -1,21 +1,27 @@
-<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 bg-dark border-bottom shadow-sm">
-    <h5 class="my-0 mr-md-auto font-weight-normal text-white">Grayson College Apps</h5>
-    <nav class="my-2 my-md-0 mr-md-3">
-        <a class="p-2 text-white" href="/">Home</a>
-        <a class="p-2 text-white" href="/scheduling">Scheduling</a>
-        {% if user.is_authenticated %}
-        <a class="p-2 text-white" href="/account">{{ user.username }}</a>
-        {% endif %}
-    </nav>
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/">Grayson College Apps</a>
+  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="navbar-nav">
+
+    <div class="nav-item text-nowrap">    
     {% if user.is_authenticated %}
-    <span class="nav-bar text">
-        <a href="/logout" role="button" class="btn btn-dark">Logout</a>
-    </span>
-    {% else %}
-    <span class="nav-bar text">
-        <a href="/login" role="button" class="btn btn-dark mr-1">Login</a>
-        <a href="/signup" role="button" class="btn btn-light ml-1 my-sm-0">Sign Up</a>
-    </span>
+        <span class="p-2 text-white">{{ user.username }}</span>
     {% endif %}
 
-</div>
+    {% if user.is_authenticated %}
+      <span class="nav-bar text">
+          <a href="/logout" role="button" class="btn btn-dark">Logout</a>
+      </span>
+    {% else %}
+      <span class="nav-bar text">
+          <a href="/login" role="button" class="btn btn-dark mr-1">Login</a>
+          <a href="/signup" role="button" class="btn btn-light ml-1 my-sm-0">Sign Up</a>
+      </span>
+    {% endif %}
+    </div>
+  </div>
+</header>
+

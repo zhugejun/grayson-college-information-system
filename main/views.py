@@ -12,7 +12,6 @@ from django.http import HttpResponseRedirect
 
 
 from .forms import NewUserForm, LoginForm
-from .models import Profile, Subject
 
 
 def home(request):

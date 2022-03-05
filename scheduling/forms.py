@@ -1,11 +1,8 @@
 from django import forms
-from django.contrib.admin import widgets
 from django.forms import ValidationError
 
-from django_select2.forms import ModelSelect2MultipleWidget, ModelSelect2Widget
-
 from .models import Course, Schedule, Instructor, Campus, Location
-from main.models import Profile, Subject
+from main.models import Profile
 
 
 class CourseForm(forms.ModelForm):
@@ -22,7 +19,7 @@ class CourseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
+        for _, field in self.fields.items():
             if field.widget.attrs.get('class'):
                 field.widget.attrs['class'] += ' form-control'
             else:
@@ -209,14 +206,44 @@ class InstructorForm(forms.ModelForm):
 
 class SubjectForm(forms.ModelForm):
 
-    SUBJECT_CHOICES = [(str(s.id), s.name) for s in Subject.objects.all()]
+    SUBJECTS = ["ABDR", "ACCT", "ACNT", "AGMG", "AGRI", "ARTS", "BCIS", "BIOL",
+                "BMGT", "BNKG", "BUSG", "BUSI", "CDEC", "CHEF", "CHEM", "CJLE",
+                "CJSA", "COLL", "COSC", "CPMT", "CRIJ", "CSME", "DFTG", "DNTA",
+                "DRAM", "ECON", "EDUC", "EECT", "ELPT", "ELTN", "EMSP", "ENGL",
+                "ENGR", "FDST", "GEOG", "GEOL", "GOVT", "HAMG", "HART", "HIST",
+                "HITT", "HPRS", "HRPO", "HUMA", "IFWA", "IMED", "INMT", "INRW",
+                "INSR", "ITNW", "ITSC", "ITSE", "ITSW", "ITSY", "MATH", "MCHN",
+                "MLAB", "MRKG", "MUAP", "MUEN", "MUSB", "MUSC", "MUSI", "MUSP",
+                "NURS", "OSHT", "PHED", "PHIL", "PHYS", "PLAB", "POFI", "POFM",
+                "POFT", "PSTR", "PSYC", "PTAC", "QCTC", "RADR", "RNSG", "RSTO",
+                "SOCI", "SPAN", "SPCH", "TECA", "TECM", "TRVM", "VNSG", "WLDG"]
 
-    subjects = forms.MultipleChoiceField(choices=SUBJECT_CHOICES,
-                                         widget=ModelSelect2MultipleWidget(
-                                             queryset=Subject.objects.all(),
-                                             search_fields=['name__icontains'],
-                                         ), required=False)
+    SUBJECT_CHOICES = [(subject, subject) for subject in SUBJECTS]
 
     class Meta:
         model = Profile
-        fields = ('subjects',)
+        fields = ['subjects']
+
+    # TODO: use select2 to enable search
+    subjects = forms.MultipleChoiceField(
+        choices=SUBJECT_CHOICES, required=False)
+
+    def clean(self):
+        cleaned_data = super(SubjectForm, self).clean()
+        cleaned_data['subjects'] = ','.join(cleaned_data['subjects'])
+        return cleaned_data
+
+
+class SearchForm(forms.ModelForm):
+
+    class Meta:
+        model = Schedule
+        fields = ['term', 'course', 'section']
+
+    def __init__(self, *args, **kwargs):
+        super(SearchForm, self).__init__(*args, **kwargs)
+        for _, field in self.fields.items():
+            if field.widget.attrs.get('class'):
+                field.widget.attrs['class'] += ' form-control'
+            else:
+                field.widget.attrs['class'] = 'form-control'

@@ -4,13 +4,56 @@
 
     {% include "includes/navbar.html" %}
     <br>
-    {% include "includes/messages.html" %}
+
 
     <div class="container">
+
+        {% if messages %}
+        {% for message in messages %}
+          {% if message.tags == 'success' %}
+            <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 10; right: 0;">
+              <div class="d-flex">
+                <div class="toast-body">
+                {{ message }}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>
+            </div>
+          {% elif message.tags == 'warning' %}
+            <div class="toast align-items-center text-white bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 10; right: 0;">
+              <div class="d-flex">
+                <div class="toast-body">
+                {{ message }}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>
+            </div>
+          {% else %}
+          <div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 10; right: 0;">
+            <div class="d-flex">
+              <div class="toast-body">
+              {{ message }}
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
         {% block content %}
         {% endblock %}
     </div>
-
+    <script>
+        option = {
+            animation: true,
+            autohide: true,
+            delay: 2000
+        };
+        var toastElement = document.querySelector('.toast');
+        var t = new bootstrap.Toast(toastElement, option);
+        t.show();
+    </script>
 </body>
 
 {% include "includes/footer.html" %}

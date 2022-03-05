@@ -5,19 +5,16 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from main.models import Subject
-
 
 class Course(models.Model):
 
-    subject = models.ForeignKey(
-        Subject, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=4)
     number = models.CharField(max_length=4)
     credit = models.IntegerField()
     name = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.subject.name + self.number
+        return self.subject + self.number
 
 
 class Location(models.Model):

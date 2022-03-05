@@ -3,10 +3,6 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.db import models
 
-from django_select2.forms import ModelSelect2MultipleWidget
-
-from .models import Subject, Profile
-
 
 class NewUserForm(UserCreationForm):
 
@@ -89,14 +85,3 @@ class LoginForm(AuthenticationForm):
                 field.widget.attrs['placeholder'] = 'Enter your grayson username'
             if field_name == 'password':
                 field.widget.attrs['placeholder'] = 'Enter your password'
-
-
-# class ProfileForm(forms.ModelForm):
-
-#     class Meta:
-#         model = Profile
-#         fields = ('subjects',)
-#         widgets = {'subjects': ModelSelect2MultipleWidget(
-#             queryset=Subject.objects.all(),
-#             search_fields=['name__icontains'],
-#         )}

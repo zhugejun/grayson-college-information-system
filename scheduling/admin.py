@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Course, Campus, Instructor, Location, Term, Schedule
+from .models import Course, Campus, Instructor, Location, Term, Schedule, Cams
 
 admin.site.register(Term)
 
@@ -28,5 +28,7 @@ class InstructorAdmin(admin.ModelAdmin):
     ordering = ('last_name',)
     search_fields = ('first_name', 'last_name')
 
+
 admin.site.register(Campus)
 
+admin.site.register(Cams)
