@@ -23,3 +23,5 @@ media
 *.sql
 
 *.sh
+
+target/
