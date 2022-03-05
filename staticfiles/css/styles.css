@@ -1,7 +1,6 @@
 select {
-    width: 600px;
+  width: 600px;
 }
-
 
 #courseTable_wrapper,
 #instructorTable_wrapper,
@@ -11,48 +10,43 @@ select {
   padding-bottom: 50px;
 }
 
-
 #courseTable_wrapper select {
-    width: 60px;
+  width: 60px;
 }
 
 #instructorTable_wrapper select {
-    width: 60px;
+  width: 60px;
 }
 
 #scheduleTable_wrapper select {
-    width: 60px;
+  width: 60px;
 }
 
 #allSchedulesTable_wrapper select {
-    width: 60px;
+  width: 60px;
 }
 
 #scheduleDoneTable_wrapper select {
-    width: 60px;
+  width: 60px;
 }
-
 
 #scheduleAddTable_wrapper select {
-    width: 60px;
+  width: 60px;
 }
 
-
 #scheduleDeleteTable_wrapper select {
-    width: 60px;
+  width: 60px;
 }
 
 #scheduleChangeTable_wrapper select {
-    width: 60px;
+  width: 60px;
 }
-
 
 #id_days li {
   display: inline-block;
   list-style: none;
   padding-right: 8px;
 }
-
 
 #id_days {
   padding-inline-start: 10px;
@@ -66,149 +60,157 @@ select {
     width: auto;
 } */
 
-
-
-
 /* form signin */
 .form-signin {
-    width: 100%;
-    max-width: 330px;
-    padding: 15px;
-    margin: auto;
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
 }
 
 .form-signin .form-control {
-    position: relative;
-    box-sizing: border-box;
-    height: auto;
-    padding: 10px;
-    font-size: 16px;
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
 }
 
 .form-signin .form-control:focus {
-    z-index: 2;
+  z-index: 2;
 }
 
 .form-signin input[type="username"] {
-    margin-bottom: -1px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .form-signin input[type="password"] {
-    margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
-
 
 /* form signup */
 .form-signup {
-    width: 100%;
-    max-width: 500px;
-    padding: 15px;
-    margin: auto;
+  width: 100%;
+  max-width: 500px;
+  padding: 15px;
+  margin: auto;
 }
 
 .form-signup .form-control {
-    position: relative;
-    box-sizing: border-box;
-    height: auto;
-    padding: 10px;
-    font-size: 16px;
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
 }
 
 .form-signup .form-control:focus {
-    z-index: 2;
+  z-index: 2;
 }
 
 .form-signup input[type="email"] {
-    margin-bottom: -1px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .form-signup input[type="password"] {
-    margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
-
-
 
 /*
  * Sidebar
  */
 
- .sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 100; /* Behind the navbar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  /* rtl:raw:
+  right: 0;
+  */
+  bottom: 0;
+  /* rtl:remove */
+  left: 0;
+  z-index: 100; /* Behind the navbar */
+  padding: 48px 0 0; /* Height of navbar */
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
+}
 
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+@media (max-width: 767.98px) {
+  .sidebar {
+    top: 5rem;
   }
+}
 
-  @media (max-width: 767.98px) {
-    .sidebar {
-      top: 5rem;
-    }
-  }
-  
-  .sidebar-sticky {
-    position: relative;
-    top: 0;
-    height: calc(100vh - 48px);
-    padding-top: .5rem;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-  }
-  
-  @supports ((position: -webkit-sticky) or (position: sticky)) {
-    .sidebar-sticky {
-      position: -webkit-sticky;
-      position: sticky;
-    }
-  }
-  
- 
+.sidebar-sticky {
+  position: relative;
+  top: 0;
+  height: calc(100vh - 48px);
+  padding-top: 0.5rem;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}
+
+.sidebar .nav-link {
+  font-weight: 500;
+  color: #333;
+}
+
+.sidebar .nav-link .feather {
+  margin-right: 4px;
+  color: #727272;
+}
+
+.sidebar .nav-link.active {
+  color: #2470dc;
+}
+
+.sidebar .nav-link:hover .feather,
+.sidebar .nav-link.active .feather {
+  color: inherit;
+}
+
 .sidebar-heading {
-    font-size: .75rem;
-    text-transform: uppercase;
-  }
-
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
 
 /*
  * Navbar
  */
 
 .navbar-brand {
-  padding-top: .75rem;
-  padding-bottom: .75rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
   font-size: 1rem;
-  background-color: rgba(0, 0, 0, .25);
-  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.25);
 }
 
 .navbar .navbar-toggler {
-  top: .25rem;
+  top: 0.25rem;
   right: 1rem;
 }
 
 .navbar .form-control {
-  padding: .75rem 1rem;
+  padding: 0.75rem 1rem;
   border-width: 0;
   border-radius: 0;
 }
 
 .form-control-dark {
   color: #fff;
-  background-color: rgba(255, 255, 255, .1);
-  border-color: rgba(255, 255, 255, .1);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .form-control-dark:focus {
   border-color: transparent;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
 }
