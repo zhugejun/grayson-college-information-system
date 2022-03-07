@@ -237,6 +237,7 @@ class SubjectForm(forms.ModelForm):
         "AGMG",
         "AGRI",
         "ARTS",
+        "BARB",
         "BCIS",
         "BIOL",
         "BMGT",
