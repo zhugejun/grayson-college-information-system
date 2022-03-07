@@ -7,22 +7,67 @@
 <form method="POST">
     {% csrf_token %}
 
-    <div class="row">
-        <div class="form-group col-auto">
-            {{ form.term.label }} {{ form.term}}
+    <div class="d-flex justify-content-center">
+        <div class="row">
+            <div class="form-group col-auto">
+                {{ form.term.label }} {{ form.term}}
+            </div>
+            <div class="form-group col-auto">
+                {{ form.course.label }} {{ form.course}}
+            </div>
+            <div class="form-group col-auto">
+                {{ form.section.label }} {{ form.section}}
+            </div>
+            <div class="form-group text-center col-auto mt-4">
+                <button type="submit" class="btn btn-dark ml-5"><i class="fa fa-search"></i></button>
+            </div>
         </div>
-        <div class="form-group col-auto">
-            {{ form.course.label }} {{ form.course}}
-        </div>
-        <div class="form-group col-auto">
-            {{ form.section.label }} {{ form.section}}
-        </div>
-        <div class="form-group text-center col-auto mt-4">
-        <button type="submit" class="btn btn-dark ml-5"><i class="fa fa-search"></i></button>
-    </div>
     </div>
 
-
+    {% if not_found %}
+        <div class="table-responsive mt-4">
+            <table id="searchResultTable" class="table table-striped compact">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Section</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Capacity</th>
+                        <th scope="col">Instructor</th>
+                        <th scope="col">Campus</th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Days</th>
+                        <th scope="col">Start</th>
+                        <th scope="col">Stop</th>
+                        <!-- make the note hoverable -->
+                        <th scope="col">Note</th> 
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+            {% if schedule_list %}
+                <tbody>
+                    {% for schedule in schedule_list %}
+                    <tr>
+                        <td>{{ schedule.section }}</td>
+                        <td>{{ schedule.status }}</td>
+                        <td>{{ schedule.capacity }}</td>
+                        <td>{{ schedule.instructor }}</td>
+                        <td>{{ schedule.campus }}</td>
+                        <td>{{ schedule.location }}</td>
+                        <td>{{ schedule.days }}</td>
+                        <td>{{ schedule.start_time }}</td>
+                        <td>{{ schedule.stop_time }}</td>
+                        <td>{{ schedule.notes }}</td>
+                        <td>
+                            <a href="{% url 'edit_schedule' schedule.id %}"><i class="fa-solid fa-pen-to-square"></i></a> | 
+                            <a href="{% url 'add_schedule' schedule.id %}"><i class="fa-solid fa-copy"></i></a> | 
+                            <a href="{% url 'delete_schedule' schedule.id %}"><i class="fa-solid fa-trash-can"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            {% endif %}
+            </table>
+        </div>
+    {% endif %}
 </form>
-
 {% endblock content %}

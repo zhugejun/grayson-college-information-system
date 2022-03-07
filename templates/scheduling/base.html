@@ -3,6 +3,32 @@
 <body>
 
     {% include "includes/navbar.html" %}
+    <script>
+    // $(".timepicker").timepicker();
+    $(document).ready(function () {
+        $('.timepicker').timepicker({
+            timeFormat: 'h:mm p',
+            interval: 15,
+            minTime: '7:00AM',
+            maxTime: '10:00PM',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true
+        });
+    });
+
+    $(document).ready(function () {
+        $('#courseTable').DataTable();
+        $('#instructorTable').DataTable();
+        $('#scheduleTable').DataTable();
+        $('#allSchedulesTable').DataTable();
+        $('#scheduleAddTable').DataTable();
+        $('#scheduleDeleteTable').DataTable();
+        $('#scheduleChangeTable').DataTable();
+        $('#searchResultTable').DataTable(); 
+    });
+
+</script>
 
     <div class="container-fluid">
         <div class="row">
@@ -10,7 +36,7 @@
             <div class="position-sticky pt-3">
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'scheduling' %}">
+                  <a class="nav-link" href="{% url 'scheduling_home' %}">
                     Home
                   </a>
                 </li>

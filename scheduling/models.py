@@ -30,18 +30,20 @@ class Location(models.Model):
 class Term(models.Model):
 
     SEMESTER_CHOICES = [
-        ('FALL', 'Fall'),
-        ('SPRING', 'Spring'),
-        ('SUMMER', 'Summer'),
+        ("FALL", "Fall"),
+        ("SPRING", "Spring"),
+        ("SUMMER", "Summer"),
     ]
 
-    ACTIVE_CHOICES = [
-        ('T', 'True'),
-        ('F', 'False')
-    ]
+    ACTIVE_CHOICES = [("T", "True"), ("F", "False")]
 
-    year = models.IntegerField(default=int(datetime.now().year), validators=[
-                               MinValueValidator(datetime.now().year - 2), MaxValueValidator(datetime.now().year + 2)])
+    year = models.IntegerField(
+        default=int(datetime.now().year),
+        validators=[
+            MinValueValidator(datetime.now().year - 2),
+            MaxValueValidator(datetime.now().year + 2),
+        ],
+    )
     semester = models.CharField(max_length=6, choices=SEMESTER_CHOICES)
     active = models.CharField(max_length=1, choices=ACTIVE_CHOICES)
 
@@ -59,7 +61,7 @@ class Instructor(models.Model):
         if self.first_name and self.last_name:
             return self.last_name + ", " + self.first_name
         else:
-            return ''
+            return ""
 
 
 class Campus(models.Model):
@@ -76,15 +78,10 @@ class Campus(models.Model):
 
 class Schedule(models.Model):
 
-    STATUS_CHOICES = [
-        ('OPEN', 'Open'),
-        ('CLOSED', 'Closed'),
-        ('CANCELED', 'Canceled')
-    ]
+    STATUS_CHOICES = [("OPEN", "Open"), ("CLOSED", "Closed"), ("CANCELED", "Canceled")]
 
     # term
-    term = models.ForeignKey(
-        Term, on_delete=models.SET_NULL, null=True)
+    term = models.ForeignKey(Term, on_delete=models.SET_NULL, null=True)
 
     # course to schedule
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -97,36 +94,40 @@ class Schedule(models.Model):
 
     # instructor
     instructor = models.ForeignKey(
-        Instructor, on_delete=models.SET_NULL, null=True, blank=True)
+        Instructor, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
-    status = models.CharField(
-        max_length=9, choices=STATUS_CHOICES, default='OPEN')
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES, default="OPEN")
 
     # Main, south, high school
-    campus = models.ForeignKey(
-        Campus, on_delete=models.SET_NULL, null=True, blank=True)
+    campus = models.ForeignKey(Campus, on_delete=models.SET_NULL, null=True, blank=True)
 
     location = models.ForeignKey(
-        Location, on_delete=models.SET_NULL, blank=True, null=True)
+        Location, on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     days = models.CharField(max_length=7, null=True, blank=True)
 
     start_time = models.TimeField(
-        auto_now=False, auto_now_add=False, blank=True, null=True)
+        auto_now=False, auto_now_add=False, blank=True, null=True
+    )
     stop_time = models.TimeField(
-        auto_now=False, auto_now_add=False, blank=True, null=True)
+        auto_now=False, auto_now_add=False, blank=True, null=True
+    )
 
     # insert by who and when
     insert_date = models.DateTimeField(auto_now=False, auto_now_add=True)
     insert_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='insert')
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="insert"
+    )
 
     # update by who and when
     update_date = models.DateTimeField(auto_now=True, auto_now_add=False)
     update_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='update')
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="update"
+    )
 
-    notes = models.CharField(default='', max_length=100, blank=True, null=True)
+    notes = models.CharField(default="", max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.course.__str__() + self.section
@@ -135,15 +136,11 @@ class Schedule(models.Model):
 class Cams(models.Model):
     """Schedule model for cams data
     """
-    STATUS_CHOICES = [
-        ('OPEN', 'Open'),
-        ('CLOSED', 'Closed'),
-        ('CANCELED', 'Canceled')
-    ]
+
+    STATUS_CHOICES = [("OPEN", "Open"), ("CLOSED", "Closed"), ("CANCELED", "Canceled")]
 
     # term
-    term = models.ForeignKey(
-        Term, on_delete=models.SET_NULL, null=True)
+    term = models.ForeignKey(Term, on_delete=models.SET_NULL, null=True)
 
     # course to schedule
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -156,24 +153,26 @@ class Cams(models.Model):
 
     # instructor
     instructor = models.ForeignKey(
-        Instructor, on_delete=models.SET_NULL, null=True, blank=True)
+        Instructor, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
-    status = models.CharField(
-        max_length=9, choices=STATUS_CHOICES, default='OPEN')
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES, default="OPEN")
 
     # Main, south, high school
-    campus = models.ForeignKey(
-        Campus, on_delete=models.SET_NULL, null=True, blank=True)
+    campus = models.ForeignKey(Campus, on_delete=models.SET_NULL, null=True, blank=True)
 
     location = models.ForeignKey(
-        Location, on_delete=models.SET_NULL, blank=True, null=True)
+        Location, on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     days = models.CharField(max_length=7, null=True, blank=True)
 
     start_time = models.TimeField(
-        auto_now=False, auto_now_add=False, blank=True, null=True)
+        auto_now=False, auto_now_add=False, blank=True, null=True
+    )
     stop_time = models.TimeField(
-        auto_now=False, auto_now_add=False, blank=True, null=True)
+        auto_now=False, auto_now_add=False, blank=True, null=True
+    )
 
     def __str__(self):
         return self.course.__str__() + self.section

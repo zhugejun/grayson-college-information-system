@@ -2,27 +2,20 @@ select {
   width: 600px;
 }
 
-#courseTable_wrapper,
-#instructorTable_wrapper,
-#scheduleTable_wrapper,
-#allSchedulesTable_wrapper,
-#scheduleDoneTable_wrapper {
-  padding-bottom: 50px;
+#courseTable_filter,
+#instructorTable_filter,
+#scheduleTable_filter,
+#allSchedulesTable_filter,
+#scheduleDoneTable_filter,
+#searchResultTable_filter {
+  padding-bottom: 5px;
 }
 
 #courseTable_wrapper select {
   width: 60px;
 }
 
-#instructorTable_wrapper select {
-  width: 60px;
-}
-
 #scheduleTable_wrapper select {
-  width: 60px;
-}
-
-#allSchedulesTable_wrapper select {
   width: 60px;
 }
 
@@ -38,11 +31,16 @@ select {
   width: 60px;
 }
 
-#scheduleChangeTable_wrapper select {
+#searchResultTable_wrapper select {
   width: 60px;
+  margin-bottom: 5px;
 }
 
-#id_days li {
+.dataTables_filter {
+  display: none;
+}
+
+#id_days div {
   display: inline-block;
   list-style: none;
   padding-right: 8px;

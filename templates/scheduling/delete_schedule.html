@@ -2,16 +2,14 @@
 
 {% block content %}
 
-<h2>Are you sure to delete <span class="text-danger">{{schedule.course}}
-        {{schedule.section}}</span> for <span class="text-info">{{ schedule.term.semester }}
+<h2>Are you sure to delete <span class="text-danger">{{schedule}} </span> for <span class="text-info">{{ schedule.term.semester }}
         {{ schedule.term.year }}</span>?</h2>
 <br />
 
 <form class="mb-2" method="POST">
     {% csrf_token %}
-    <!-- {{ form.as_p }} -->
 
-    <div class="form-row">
+    <div class="row">
         <div class="form-group col-md-2">
             {{ form.section.label }} {{ form.section }}
         </div>
@@ -31,7 +29,7 @@
             {{ form.stop_time.label }} {{ form.stop_time }}
         </div>
     </div>
-    <div class="form-row">
+    <div class="row">
         <div class="form-group col-md-2">
             {{ form.status.label }} {{ form.status }}
         </div>
