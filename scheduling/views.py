@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -290,11 +291,21 @@ def home(request):
     context = {}
     form = SearchForm()
 
+    # TODO: get 5 latest edited and 5 latest added
+
     not_found = False
     context["form"] = form
 
     # get method
     schedule_list = Schedule.objects.none()
+
+    latest_edited_5 = Schedule.objects.filter(update_by=request.user)
+    latest_edited_5 = latest_edited_5.order_by("-update_date")[:5]
+    context["latest_edited_5"] = latest_edited_5
+
+    latest_added_5 = Schedule.objects.filter(insert_by=request.user)
+    latest_added_5 = latest_added_5.order_by("-insert_date")[:5]
+    context["latest_added_5"] = latest_added_5
 
     # post method
     if request.method == "POST":
@@ -389,8 +400,9 @@ def add_schedule(request, pk):
         if form.is_valid():
             schedule = form.save(commit=False)
             schedule.insert_by = request.user
+            schedule.update_by = None
             schedule.save()
-            messages.success(request, f"{schedule} added successfully.")
+            messages.success(request, f"{schedule}-{schedule.term} added.")
             return redirect("scheduling_home")
         else:
             for _, error in form._errors.items():
@@ -422,7 +434,7 @@ def edit_schedule(request, pk):
             schedule = form.save(commit=False)
             schedule.update_by = request.user
             schedule.save()
-            messages.success(request, f"{schedule} updated successfully.")
+            messages.success(request, f"{schedule}-{schedule.term} updated.")
             # TODO: get searched form and return results
             return redirect("scheduling_home")
         else:
@@ -454,7 +466,7 @@ def delete_schedule(request, pk):
             form.fields[field_name].disabled = True
         if form.is_valid():
             schedule.delete()
-            messages.success(request, f"{schedule} deleted successfully.")
+            messages.success(request, f"{schedule}-{schedule.term} deleted.")
             return redirect("scheduling_home")
     return render(request, "scheduling/delete_schedule.html", context)
 

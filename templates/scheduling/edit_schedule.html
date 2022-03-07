@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h2 class="mt-3"><span class="text-info">{{schedule.course}}</span> {{schedule.term}}</h2>
+<h1 class="mt-3"><span class="text-primary">{{schedule.course}}</span> {{schedule.term}}</h1>
 
 <form class="row" action="{% url 'edit_schedule' schedule.id %}" method="POST">
     {% csrf_token %}
