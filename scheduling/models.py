@@ -132,6 +132,9 @@ class Schedule(models.Model):
     def __str__(self):
         return self.course.__str__() + self.section
 
+    class Meta:
+        ordering = ["term", "course", "section"]
+
 
 class Cams(models.Model):
     """Schedule model for cams data

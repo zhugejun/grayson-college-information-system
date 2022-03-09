@@ -3,13 +3,17 @@ from . import views
 
 
 urlpatterns = [
-    path("", views.home, name="scheduling_home"),
-    path("subjects/", views.update_subjects, name="update_subjects"),
-    path("schedules/<term>", views.schedules_by_term, name="schedules"),
+    path("home", views.home, name="scheduling_home"),
+    path("update_subjects/", views.update_subjects, name="update_subjects"),
+    path("schedules/search/", views.search, name="search"),
     path(
-        "schedules/<term>/courses/", views.courses_with_term, name="courses_with_term"
+        "schedules/term/<int:term_pk>/course/<int:crs_pk>/add/",
+        views.add_new_schedule,
+        name="add_new_schedule",
     ),
-    path("schedules/<int:pk>/add/", views.add_schedule, name="add_schedule"),
+    path(
+        "schedules/<int:pk>/add/", views.duplicate_schedule, name="duplicate_schedule"
+    ),
     path("schedules/<int:pk>/edit/", views.edit_schedule, name="edit_schedule"),
     path("schedules/<int:pk>/delete/", views.delete_schedule, name="delete_schedule",),
     path("change-summary/", views.change_summary, name="change_summary"),

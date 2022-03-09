@@ -1,0 +1,88 @@
+
+{% extends "scheduling/base.html" %}
+
+{% block content %}
+<h2>Search results for <span class="text-info"> {{ term }} </span> <span class="text-primary">{{ course }} {{ section }}</span></h3>
+
+<div class="table-responsive mt-4">
+    <table class="table table-striped compact">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Section</th>
+                <th scope="col">Status</th>
+                <th scope="col">Capacity</th>
+                <th scope="col">Instructor</th>
+                <th scope="col">Campus</th>
+                <th scope="col">Location</th>
+                <th scope="col">Days</th>
+                <th scope="col">Start</th>
+                <th scope="col">Stop</th>
+                <!-- make the note hoverable -->
+                <th scope="col">Note</th> 
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+    {% if page %}
+        <tbody>
+            {% for schedule in page %}
+            <tr>
+                <td>{{ schedule.section }}</td>
+                <td>{{ schedule.status }}</td>
+                <td>{{ schedule.capacity }}</td>
+                <td>{{ schedule.instructor }}</td>
+                <td>{{ schedule.campus }}</td>
+                <td>{{ schedule.location }}</td>
+                <td>{{ schedule.days }}</td>
+                <td>{{ schedule.start_time }}</td>
+                <td>{{ schedule.stop_time }}</td>
+                <td>{{ schedule.notes }}</td>
+                <td>
+                    <a href="{% url 'edit_schedule' schedule.id %}"><i class="fa-solid fa-pen-to-square"></i></a> | 
+                    <a href="{% url 'duplicate_schedule' schedule.id %}"><i class="fa-solid fa-copy"></i></a> | 
+                    <a href="{% url 'delete_schedule' schedule.id %}"><i class="fa-solid fa-trash-can"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    {% endif %}
+    </table>
+</div>
+
+
+<nav aria-label="All schedules pagination">
+    <ul class="pagination justify-content-end">
+
+        {% if page.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">Previous</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Previous</a></li>
+        {% endif %}
+
+        {% for p in page.paginator.page_range %}
+
+            {% if p == page.number %}
+                <li class="page-item active" aria-current="page"><a class="page-link" href="?page={{ p }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">{{ p }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ p }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">{{ p }}</a></li>
+            {% endif %}
+
+        {% endfor %}
+
+        {% if page.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">Next</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Next</a></li>
+        {% endif %}
+
+
+
+    </ul>
+</nav>
+
+<div class="text-center mt-2">
+    <form method="GET" action="{% url 'add_new_schedule' term.id course.id %}">
+        <button class="btn btn-dark btn-lg" role="button">Add New Section</button>
+    </form>
+</div>
+
+{% endblock content %}
