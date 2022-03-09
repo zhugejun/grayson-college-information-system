@@ -328,7 +328,6 @@ class SubjectForm(forms.ModelForm):
         model = Profile
         fields = ["subjects"]
 
-    # TODO: use select2 to enable search
     subjects = forms.MultipleChoiceField(choices=SUBJECT_CHOICES, required=False)
 
     def clean(self):
