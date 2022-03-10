@@ -7,13 +7,13 @@
 
   <div class="d-flex justify-content-center">
     <div class="row">
-      <div class="form-group col-auto">
+      <div class="form-group col-3">
         {{ form.term.label }} {{ form.term}}
       </div>
-      <div class="form-group col-auto">
+      <div class="form-group col-3">
         {{ form.course.label }} {{ form.course}}
       </div>
-      <div class="form-group col-auto">
+      <div class="form-group col-3">
         {{ form.section.label }} {{ form.section}}
       </div>
       <div class="form-group text-center col-auto mt-4">
@@ -29,6 +29,7 @@
   class="col-md-9 col-lg-10 mb-5 pr-5"
   style="position: absolute; bottom: 5%; padding-right: 3%"
 >
+  {% if latest_edited_5 %}
   <h4 class="mt-5 pt-5">Recently Edited</h4>
   <div class="table-responsive">
     <table class="table table-striped compact">
@@ -50,7 +51,6 @@
           <th scope="col">Action</th>
         </tr>
       </thead>
-      {% if latest_edited_5 %}
       <tbody>
         {% for schedule in latest_edited_5 %}
         <tr>
@@ -88,6 +88,7 @@
     </table>
   </div>
 
+  {% if latest_added_5 %}
   <h4 class="mt-5">Recently Added</h4>
   <div class="table-responsive">
     <table class="table table-striped compact">
@@ -109,7 +110,6 @@
           <th scope="col">Action</th>
         </tr>
       </thead>
-      {% if latest_added_5 %}
       <tbody>
         {% for schedule in latest_added_5 %}
         <tr>

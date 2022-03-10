@@ -2,7 +2,7 @@
 {% extends "scheduling/base.html" %}
 
 {% block content %}
-<h2>Search results for <span class="text-info"> {{ term }} </span> <span class="text-primary">{{ course }} {{ section }}</span></h3>
+<p><span class="fs-4">Search results for </span> <span class="text-info fs-1"> {{ term }} </span> <span class="text-primary fs-1">{{ course }} {{ section }}</span></p>
 
 <div class="table-responsive mt-4">
     <table class="table table-striped compact">
@@ -37,9 +37,19 @@
                 <td>{{ schedule.stop_time }}</td>
                 <td>{{ schedule.notes }}</td>
                 <td>
-                    <a href="{% url 'edit_schedule' schedule.id %}"><i class="fa-solid fa-pen-to-square"></i></a> | 
-                    <a href="{% url 'duplicate_schedule' schedule.id %}"><i class="fa-solid fa-copy"></i></a> | 
-                    <a href="{% url 'delete_schedule' schedule.id %}"><i class="fa-solid fa-trash-can"></i></a>
+                <a
+                    href="{% url 'edit_schedule' schedule.id %}"
+                        style="padding-right: 10%"
+                    ><i class="fa-solid fa-pen-to-square"></i
+                ></a>
+                <a
+                    href="{% url 'duplicate_schedule' schedule.id %}"
+                        style="padding-right: 10%"
+                    ><i class="fa-solid fa-copy"></i
+                ></a>
+                <a href="{% url 'delete_schedule' schedule.id %}" 
+                    ><i class="fa-solid fa-trash-can"></i
+                ></a>
                 </td>
             </tr>
             {% endfor %}
