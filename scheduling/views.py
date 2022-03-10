@@ -18,6 +18,8 @@ from main.models import Profile
 def df_to_obj_list(df):
 
     obj_list = []
+    insert_by_list = []
+    insert_date_list = []
     updated_by_list = []
     updated_date_list = []
     notes_list = []
@@ -49,15 +51,15 @@ def df_to_obj_list(df):
             start_time = row["start_time"]
             stop_time = row["stop_time"]
 
-            user_id = row["update_by"]
-            if user_id:
-                updated_by = User.objects.get(pk=user_id)
-            else:
-                updated_by = ""
-            updated_by_list.append(updated_by)
+            user_id = row["insert_by"]
+            insert_by = User.objects.get(pk=user_id) if not pd.isna(user_id) else ""
+            insert_by_list.append(insert_by)
+            insert_date_list.append(row["insert_date"])
 
-            updated_date = row["update_date"]
-            updated_date_list.append(updated_date)
+            user_id = row["update_by"]
+            updated_by = User.objects.get(pk=user_id) if not pd.isna(user_id) else ""
+            updated_by_list.append(updated_by)
+            updated_date_list.append(row["update_date"])
 
             notes = row["notes"]
             notes_list.append(notes)
@@ -81,7 +83,15 @@ def df_to_obj_list(df):
                 )
             )
 
-    return obj_list, notes_list, source_list, updated_by_list, updated_date_list
+    return (
+        obj_list,
+        notes_list,
+        source_list,
+        insert_by_list,
+        insert_date_list,
+        updated_by_list,
+        updated_date_list,
+    )
 
 
 def get_diff_gcis_cams(term, course_list):
@@ -123,6 +133,8 @@ def get_diff_gcis_cams(term, course_list):
                 "days",
                 "start_time",
                 "stop_time",
+                "insert_by",
+                "insert_date",
                 "update_by",
                 "update_date",
                 "notes",
@@ -164,6 +176,9 @@ def get_diff_gcis_cams(term, course_list):
             "location_id",
         ]:
             schedules_cams[col] = schedules_cams[col].astype("Int64")
+            schedules_gcis[col] = schedules_gcis[col].astype("Int64")
+
+        for col in ["update_by", "insert_by"]:
             schedules_gcis[col] = schedules_gcis[col].astype("Int64")
 
         # merge two schedules
@@ -215,6 +230,8 @@ def get_diff_gcis_cams(term, course_list):
             changed_schedules,
             changed_notes,
             changed_sources,
+            insert_by_list,
+            insert_date_list,
             updated_by_list,
             updated_date_list,
         ) = df_to_obj_list(_changed)
@@ -242,6 +259,8 @@ def get_diff_gcis_cams(term, course_list):
             added_schedules,
             added_notes,
             added_sources,
+            insert_by_list,
+            insert_date_list,
             updated_by_list,
             updated_date_list,
         ) = df_to_obj_list(added)
@@ -266,6 +285,8 @@ def get_diff_gcis_cams(term, course_list):
             deleted_schedules,
             deleted_notes,
             deleted_sources,
+            insert_by_list,
+            insert_date_list,
             updated_by_list,
             updated_date_list,
         ) = df_to_obj_list(deleted)
@@ -666,12 +687,14 @@ def download_change_summary_by_term(request, term):
             "Stop",
             "Note",
             "source",
+            "Insert_by",
+            "Insert_date",
             "Updated_by",
             "Updated_date",
             "Action",
         ]
     )
-    for s, n, src, by, dt in added:
+    for s, n, src, inb, ind, udy, udd in added:
         dt = "" if pd.isnull(dt) else str(dt)[:19]
         writer.writerow(
             [
@@ -689,13 +712,15 @@ def download_change_summary_by_term(request, term):
                 s.stop_time,
                 n,
                 src,
-                by,
-                dt,
+                inb,
+                ind,
+                udy,
+                udd,
                 "ADD",
             ]
         )
 
-    for s, n, src, by, dt in deleted:
+    for s, n, src, inb, ind, udy, udd in deleted:
         dt = "" if pd.isnull(dt) else str(dt)[:19]
         writer.writerow(
             [
@@ -713,13 +738,15 @@ def download_change_summary_by_term(request, term):
                 s.stop_time,
                 n,
                 src,
-                by,
-                dt,
+                inb,
+                ind,
+                udy,
+                udd,
                 "DELETE",
             ]
         )
 
-    for s, n, src, by, dt in changed:
+    for s, n, src, inb, ind, udy, udd in changed:
         dt = "" if pd.isnull(dt) else str(dt)[:19]
         writer.writerow(
             [
@@ -737,8 +764,10 @@ def download_change_summary_by_term(request, term):
                 s.stop_time,
                 n,
                 src,
-                by,
-                dt,
+                inb,
+                ind,
+                udy,
+                udd,
                 "CHANGE",
             ]
         )
