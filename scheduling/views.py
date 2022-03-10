@@ -239,6 +239,8 @@ def get_diff_gcis_cams(term, course_list):
             changed_schedules,
             changed_notes,
             changed_sources,
+            insert_by_list,
+            insert_date_list,
             updated_by_list,
             updated_date_list,
         )
@@ -268,6 +270,8 @@ def get_diff_gcis_cams(term, course_list):
             added_schedules,
             added_notes,
             added_sources,
+            insert_by_list,
+            insert_date_list,
             updated_by_list,
             updated_date_list,
         )
@@ -294,6 +298,8 @@ def get_diff_gcis_cams(term, course_list):
             deleted_schedules,
             deleted_notes,
             deleted_sources,
+            insert_by_list,
+            insert_date_list,
             updated_by_list,
             updated_date_list,
         )
@@ -695,7 +701,8 @@ def download_change_summary_by_term(request, term):
         ]
     )
     for s, n, src, inb, ind, udy, udd in added:
-        dt = "" if pd.isnull(dt) else str(dt)[:19]
+        ind = "" if pd.isnull(ind) else str(ind)[:19]
+        udd = "" if pd.isnull(udd) else str(udd)[:19]
         writer.writerow(
             [
                 s.term,
@@ -721,7 +728,8 @@ def download_change_summary_by_term(request, term):
         )
 
     for s, n, src, inb, ind, udy, udd in deleted:
-        dt = "" if pd.isnull(dt) else str(dt)[:19]
+        ind = "" if pd.isnull(ind) else str(ind)[:19]
+        udd = "" if pd.isnull(udd) else str(udd)[:19]
         writer.writerow(
             [
                 s.term,
@@ -747,7 +755,8 @@ def download_change_summary_by_term(request, term):
         )
 
     for s, n, src, inb, ind, udy, udd in changed:
-        dt = "" if pd.isnull(dt) else str(dt)[:19]
+        ind = "" if pd.isnull(ind) else str(ind)[:19]
+        udd = "" if pd.isnull(udd) else str(udd)[:19]
         writer.writerow(
             [
                 s.term,
