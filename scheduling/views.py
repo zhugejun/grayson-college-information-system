@@ -2,8 +2,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
-from django.db.models import Q
+from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.urls import reverse
 
@@ -288,17 +287,31 @@ def get_diff_gcis_cams(term, course_list):
 def home(request):
     """List all schedules if not login.
     """
-    # TODO: use ?q in path so that it will be easy to return it back
     context = {}
     form = SearchForm()
 
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.subjects:
+        subject_list = profile.subjects.split(",")
+    else:
+        subject_list = []
+
+    course_list = Course.objects.filter(subject__in=subject_list)
+
+    form.fields["term"].queryset = Term.objects.filter(active="T")
+    form.fields["course"].queryset = course_list
+
     context["form"] = form
 
-    latest_edited_5 = Schedule.objects.filter(update_by=request.user)
+    latest_edited_5 = Schedule.objects.filter(
+        update_by=request.user, course__in=course_list
+    )
     latest_edited_5 = latest_edited_5.order_by("-update_date")[:5]
     context["latest_edited_5"] = latest_edited_5
 
-    latest_added_5 = Schedule.objects.filter(insert_by=request.user)
+    latest_added_5 = Schedule.objects.filter(
+        insert_by=request.user, course__in=course_list
+    )
     latest_added_5 = latest_added_5.order_by("-insert_date")[:5]
     context["latest_added_5"] = latest_added_5
 
@@ -362,7 +375,7 @@ def update_subjects(request):
             profile.user_id = request.user.id
             form.save()
             messages.success(request, "Subjects updated successfully.")
-            return redirect("scheduling")
+            return redirect("scheduling_home")
     return render(request, "scheduling/update_subjects.html", {"form": form})
 
 
