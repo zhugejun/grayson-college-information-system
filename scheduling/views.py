@@ -330,17 +330,20 @@ def home(request):
 
     context["form"] = form
 
-    latest_edited_5 = Schedule.objects.filter(
+    latest_edited = Schedule.objects.filter(
         update_by=request.user, course__in=course_list
     )
-    latest_edited_5 = latest_edited_5.order_by("-update_date")[:5]
-    context["latest_edited_5"] = latest_edited_5
 
-    latest_added_5 = Schedule.objects.filter(
+    n_edited = min(len(latest_edited), 5)
+    latest_edited = latest_edited.order_by("-update_date")[:n_edited]
+    context["latest_edited"] = latest_edited
+
+    latest_added = Schedule.objects.filter(
         insert_by=request.user, course__in=course_list
     )
-    latest_added_5 = latest_added_5.order_by("-insert_date")[:5]
-    context["latest_added_5"] = latest_added_5
+    n_added = min(len(latest_added), 5)
+    latest_added = latest_added.order_by("-insert_date")[:n_added]
+    context["latest_added"] = latest_added
 
     return render(request, "scheduling/home.html", context)
 
