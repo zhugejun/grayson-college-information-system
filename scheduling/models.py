@@ -179,3 +179,7 @@ class Cams(models.Model):
 
     def __str__(self):
         return self.course.__str__() + self.section
+
+    class Meta:
+        verbose_name = "CAMS"
+        verbose_name_plural = "CAMS"
