@@ -27,7 +27,7 @@
         </thead>
         {% if added %}
         <tbody>
-            {% for schedule, notes, source, _, _ in added %}
+            {% for schedule, notes, source, _, _, _, _ in added %}
             <tr>
                 <td>{{ schedule.term }}</td>
                 <td>{{ schedule.course }}</td>
@@ -70,7 +70,7 @@
         </thead>
         {% if deleted %}
         <tbody>
-            {% for schedule, notes, source, _, _ in deleted %}
+            {% for schedule, notes, source, _, _, _, _ in deleted %}
             <tr>
                 <td>{{ schedule.term }}</td>
                 <td>{{ schedule.course }}</td>
@@ -115,7 +115,7 @@
         </thead>
         {% if changed %}
         <tbody>
-            {% for schedule, notes, source, _, _ in changed %}
+            {% for schedule, notes, source, _, _, _, _ in changed %}
             {% if source == 'CAMS' %}
             <tr>
                 <td class="text-muted">{{ schedule.term }}</td>
