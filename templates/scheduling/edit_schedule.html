@@ -69,5 +69,12 @@
     $("#id_instructor").html($("#id_instructor option").sort(function (a, b) {
         return a.text == b.text ? 0 : a.text < b.text ? -1 : 1
     }))
+
+    $(document).ready(function() {
+        $("#id_instructor").select2({theme: 'bootstrap-5'});
+        $("#id_status").select2({theme: 'bootstrap-5'});
+        $("#id_campus").select2({theme: 'bootstrap-5'});
+        $("#id_location").select2({theme: 'bootstrap-5'});
+    })
 </script>
 {% endblock content %}
