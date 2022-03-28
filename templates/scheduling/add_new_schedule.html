@@ -1,9 +1,9 @@
 {% extends "scheduling/base.html" %}
 
 {% block content %}
-<h2>
+<h1>
     <span class="text-primary"> {{ course }} </span>
-</h2>
+</h1>
 <hr />
 
 <form method="POST">
@@ -66,5 +66,15 @@
         <button type="submit" class="btn btn-dark btn-lg ml-5">Submit</button>
     </div>
 </form>
+
+
+<script>
+    $(document).ready(function() {
+        $("#id_term").select2({theme: 'bootstrap-5'});
+        $("#id_instructor").select2({theme: 'bootstrap-5'});
+        $("#id_campus").select2({theme: 'bootstrap-5'});
+        $("#id_location").select2({theme: 'bootstrap-5'});
+    })
+</script>
 
 {% endblock content %}

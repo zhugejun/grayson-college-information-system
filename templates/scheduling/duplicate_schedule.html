@@ -67,4 +67,12 @@
     </div>
 </form>
 
+<script>
+    $(document).ready(function() {
+        $("#id_term").select2({theme: 'bootstrap-5'});
+        $("#id_instructor").select2({theme: 'bootstrap-5'});
+        $("#id_campus").select2({theme: 'bootstrap-5'});
+        $("#id_location").select2({theme: 'bootstrap-5'});
+    })
+</script>
 {% endblock content %}
