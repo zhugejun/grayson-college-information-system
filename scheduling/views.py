@@ -459,6 +459,7 @@ def duplicate_schedule(request, pk):
             schedule = form.save(commit=False)
             schedule.insert_by = request.user
             schedule.update_by = None
+            term_pk = schedule.term.id
             schedule.save()
             messages.success(request, f"{schedule}-{schedule.term} added.")
             return redirect(
@@ -493,6 +494,7 @@ def add_new_schedule(request, term_pk, crs_pk):
         form = ScheduleForm(request.POST)
         if form.is_valid():
             schedule = form.save(commit=False)
+            term_pk = schedule.term.id
             schedule.insert_by = request.user
             schedule.save()
             messages.success(request, f"{schedule}-{schedule.term} added.")
