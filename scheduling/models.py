@@ -11,7 +11,7 @@ class Course(models.Model):
     subject = models.CharField(max_length=4)
     number = models.CharField(max_length=4)
     credit = models.IntegerField()
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.subject + self.number
