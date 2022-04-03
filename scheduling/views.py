@@ -433,7 +433,6 @@ def courses_with_term(request, term):
 @login_required
 def duplicate_schedule(request, pk):
 
-    context = {}
     search_url = reverse("search")
 
     schedule = get_object_or_404(Schedule, pk=pk)
@@ -444,13 +443,12 @@ def duplicate_schedule(request, pk):
     else:
         schedule.days = []
 
-    context["schedule"] = new_schedule
+    schedule = new_schedule
 
-    term_pk = new_schedule.term.id
-    course_pk = new_schedule.course.id
+    term_pk = schedule.term.id
+    course_pk = schedule.course.id
 
     form = ScheduleForm(instance=new_schedule)
-    context["form"] = form
 
     if request.method == "POST":
         form = ScheduleForm(request.POST, instance=new_schedule)
@@ -466,22 +464,23 @@ def duplicate_schedule(request, pk):
                 search_url + f"?page=1&term={term_pk}&course={course_pk}&section="
             )
         else:
-            for _, error in form._errors.items():
-                messages.error(request, error)
+            for field_name, _ in form.errors.items():
+                form.fields[field_name].widget.attrs["class"] += " is-invalid"
 
-    return render(request, "scheduling/duplicate_schedule.html", context)
+    return render(
+        request,
+        "scheduling/duplicate_schedule.html",
+        context={"schedule": schedule, "form": form},
+    )
 
 
 @login_required
 def add_new_schedule(request, term_pk, crs_pk):
-    context = {}
 
     search_url = reverse("search")
 
     term = get_object_or_404(Term, pk=term_pk)
     course = get_object_or_404(Course, pk=crs_pk)
-    context["term"] = term
-    context["course"] = course
 
     form = ScheduleForm()
     form.fields["term"].initial = term
@@ -489,7 +488,6 @@ def add_new_schedule(request, term_pk, crs_pk):
     form.fields["days"].initial = []
     form.fields["capacity"].initial = 1
 
-    context["form"] = form
     if request.method == "POST":
         form = ScheduleForm(request.POST)
         if form.is_valid():
@@ -502,25 +500,25 @@ def add_new_schedule(request, term_pk, crs_pk):
                 search_url + f"?page=1&term={term_pk}&course={crs_pk}&section="
             )
         else:
-            for _, error in form._errors.items():
-                messages.error(request, error)
+            for field_name, _ in form.errors.items():
+                form.fields[field_name].widget.attrs["class"] += " is-invalid"
 
-    return render(request, "scheduling/add_new_schedule.html", context)
+    return render(
+        request,
+        "scheduling/add_new_schedule.html",
+        context={"term": term, "course": course, "form": form},
+    )
 
 
 @login_required
 def edit_schedule(request, pk):
 
-    context = {}
-
     schedule = get_object_or_404(Schedule, pk=pk)
-    context["schedule"] = schedule
+    # context["schedule"] = schedule
     term_pk = schedule.term.id
     course_pk = schedule.course.id
 
     search_url = reverse("search")
-    source = request.GET.get("source")
-    print(source)
 
     if schedule.days:
         schedule.days = list(schedule.days)
@@ -528,7 +526,6 @@ def edit_schedule(request, pk):
         schedule.days = []
 
     form = ScheduleForm(instance=schedule)
-    context["form"] = form
 
     if request.method == "POST":
         form = ScheduleForm(request.POST, instance=schedule)
@@ -542,9 +539,13 @@ def edit_schedule(request, pk):
                 search_url + f"?page=1&term={term_pk}&course={course_pk}&section="
             )
         else:
-            for _, error in form._errors.items():
-                messages.error(request, error)
-    return render(request, "scheduling/edit_schedule.html", context)
+            for field_name, _ in form.errors.items():
+                form.fields[field_name].widget.attrs["class"] += " is-invalid"
+    return render(
+        request,
+        "scheduling/edit_schedule.html",
+        context={"schedule": schedule, "form": form},
+    )
 
 
 @login_required

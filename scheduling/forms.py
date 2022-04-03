@@ -4,8 +4,6 @@ from django.forms import ValidationError
 from .models import Course, Schedule, Instructor, Campus, Location
 from main.models import Profile
 
-from dal import autocomplete
-
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -52,12 +50,12 @@ class CourseForm(forms.ModelForm):
             return valid
 
         if len(self.cleaned_data["number"]) != 4:
-            self._errors["number"] = "Invalid course number."
+            self.add_error("number", "Invalid course number.")
             self.fields["number"].widget.attrs["class"] += " is-invalid"
             valid = False
 
         if self.cleaned_data["credit"] < 0 or self.cleaned_data["credit"] > 6:
-            self._errors["credit"] = "Invalid course credit."
+            self.add_error("credit", "Invalid course credit.")
             self.fields["credit"].widget.attrs["class"] += " is-invalid"
             valid = False
 
@@ -65,6 +63,8 @@ class CourseForm(forms.ModelForm):
 
 
 class ScheduleForm(forms.ModelForm):
+
+    error_css_class = "is-invalid"
 
     DAYS_CHOICES = [
         ("M", "M"),
@@ -77,7 +77,9 @@ class ScheduleForm(forms.ModelForm):
     ]
 
     days = forms.MultipleChoiceField(
-        choices=DAYS_CHOICES, required=False, widget=forms.CheckboxSelectMultiple
+        choices=DAYS_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={"display": "inline-block"}),
     )
 
     class Meta:
@@ -131,62 +133,37 @@ class ScheduleForm(forms.ModelForm):
                 else:
                     field.widget.attrs["class"] = "form-control"
 
+    def clean_days(self):
+        days = "".join(self.cleaned_data.get("days"))
+        return days
+
     def clean(self):
-
         cleaned_data = super(ScheduleForm, self).clean()
-        cleaned_data["days"] = "".join(cleaned_data["days"])
-
-        # term = cleaned_data['term']
-        # course = cleaned_data['course']
-        # section = cleaned_data['section']
-
-        # matching_schedules = Schedule.objects.filter(term=term,
-        #                                              course=course, section=section
-        #                                              )
-        # if self.instance:
-        #     matching_schedules = matching_schedules.exclude(
-        #         pk=self.instance.pk)
-        # if matching_schedules:
-        #     msg = f'Schedule {course} {section} already exists.'
-        #     self._errors['duplicate'] = msg
-        #     raise ValidationError(msg)
-        # else:
-        #     return cleaned_data
-
-        return cleaned_data
-
-    def is_valid(self):
-
-        valid = super(ScheduleForm, self).is_valid()
-
-        if not valid:
-            return valid
 
         # section with NT, location will be blank, campus will be internet
         if "NT" in self.cleaned_data["section"]:
             if self.cleaned_data["location"] != Location.objects.get(
                 building="Inter", room="net"
             ):
-                self.fields["location"].widget.attrs["class"] += " is-invalid"
-                valid = False
+                self.add_error("location", "Location should be Internet.")
             if self.cleaned_data["campus"] not in Campus.objects.filter(
                 name__contains="Internet"
             ):
-                self.fields["campus"].widget.attrs["class"] += " is-invalid"
-                valid = False
+                self.add_error("campus", "Campus should be Internet.")
 
         # stop time > start time
         if (
             self.cleaned_data["start_time"]
             and self.cleaned_data["stop_time"]
             and self.cleaned_data["start_time"] > self.cleaned_data["stop_time"]
+        ) or (
+            bool(self.cleaned_data["start_time"])
+            != bool(self.cleaned_data["stop_time"])
         ):
-            self._errors["Time"] = "Invalid start and stop time."
-            self.fields["start_time"].widget.attrs["class"] += " is-invalid"
-            self.fields["stop_time"].widget.attrs["class"] += " is-invalid"
-            valid = False
+            self.add_error("start_time", "Invalid start time.")
+            self.add_error("stop_time", "Invalid stop time.")
 
-        return valid
+        return cleaned_data
 
     def save(self, commit=True):
         schedule = super(ScheduleForm, self).save(commit=False)
