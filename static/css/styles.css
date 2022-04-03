@@ -44,7 +44,7 @@
   display: none;
 }
 
-#id_days div {
+#id_days li {
   display: inline-block;
   list-style: none;
   padding-right: 8px;
