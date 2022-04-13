@@ -4,6 +4,100 @@ from django.forms import ValidationError
 from .models import Course, Schedule, Instructor, Campus, Location
 from main.models import Profile
 
+SUBJECTS = [
+    "ABDR",
+    "ACCT",
+    "ACNT",
+    "AGMG",
+    "AGRI",
+    "ARTS",
+    "BARB",
+    "BCIS",
+    "BIOL",
+    "BMGT",
+    "BNKG",
+    "BUSG",
+    "BUSI",
+    "CDEC",
+    "CHEF",
+    "CHEM",
+    "CJLE",
+    "CJSA",
+    "COLL",
+    "COSC",
+    "CPMT",
+    "CRIJ",
+    "CSME",
+    "DFTG",
+    "DNTA",
+    "DRAM",
+    "ECON",
+    "EDUC",
+    "EECT",
+    "ELPT",
+    "ELTN",
+    "EMSP",
+    "ENGL",
+    "ENGR",
+    "FDST",
+    "GEOG",
+    "GEOL",
+    "GOVT",
+    "HAMG",
+    "HART",
+    "HIST",
+    "HITT",
+    "HPRS",
+    "HRPO",
+    "HUMA",
+    "IFWA",
+    "IMED",
+    "INMT",
+    "INRW",
+    "INSR",
+    "ITNW",
+    "ITSC",
+    "ITSE",
+    "ITSW",
+    "ITSY",
+    "MATH",
+    "MCHN",
+    "MLAB",
+    "MRKG",
+    "MUAP",
+    "MUEN",
+    "MUSB",
+    "MUSC",
+    "MUSI",
+    "MUSP",
+    "NURS",
+    "OSHT",
+    "PHED",
+    "PHIL",
+    "PHYS",
+    "PLAB",
+    "POFI",
+    "POFM",
+    "POFT",
+    "PSTR",
+    "PSYC",
+    "PTAC",
+    "QCTC",
+    "RADR",
+    "RNSG",
+    "RSTO",
+    "SOCI",
+    "SPAN",
+    "SPCH",
+    "TECA",
+    "TECM",
+    "TRVM",
+    "VNSG",
+    "WLDG",
+]
+
+SUBJECT_CHOICES = [(subject, subject) for subject in SUBJECTS]
+
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -206,101 +300,6 @@ class InstructorForm(forms.ModelForm):
 
 
 class SubjectForm(forms.ModelForm):
-
-    SUBJECTS = [
-        "ABDR",
-        "ACCT",
-        "ACNT",
-        "AGMG",
-        "AGRI",
-        "ARTS",
-        "BARB",
-        "BCIS",
-        "BIOL",
-        "BMGT",
-        "BNKG",
-        "BUSG",
-        "BUSI",
-        "CDEC",
-        "CHEF",
-        "CHEM",
-        "CJLE",
-        "CJSA",
-        "COLL",
-        "COSC",
-        "CPMT",
-        "CRIJ",
-        "CSME",
-        "DFTG",
-        "DNTA",
-        "DRAM",
-        "ECON",
-        "EDUC",
-        "EECT",
-        "ELPT",
-        "ELTN",
-        "EMSP",
-        "ENGL",
-        "ENGR",
-        "FDST",
-        "GEOG",
-        "GEOL",
-        "GOVT",
-        "HAMG",
-        "HART",
-        "HIST",
-        "HITT",
-        "HPRS",
-        "HRPO",
-        "HUMA",
-        "IFWA",
-        "IMED",
-        "INMT",
-        "INRW",
-        "INSR",
-        "ITNW",
-        "ITSC",
-        "ITSE",
-        "ITSW",
-        "ITSY",
-        "MATH",
-        "MCHN",
-        "MLAB",
-        "MRKG",
-        "MUAP",
-        "MUEN",
-        "MUSB",
-        "MUSC",
-        "MUSI",
-        "MUSP",
-        "NURS",
-        "OSHT",
-        "PHED",
-        "PHIL",
-        "PHYS",
-        "PLAB",
-        "POFI",
-        "POFM",
-        "POFT",
-        "PSTR",
-        "PSYC",
-        "PTAC",
-        "QCTC",
-        "RADR",
-        "RNSG",
-        "RSTO",
-        "SOCI",
-        "SPAN",
-        "SPCH",
-        "TECA",
-        "TECM",
-        "TRVM",
-        "VNSG",
-        "WLDG",
-    ]
-
-    SUBJECT_CHOICES = [(subject, subject) for subject in SUBJECTS]
-
     class Meta:
         model = Profile
         fields = ["subjects"]
@@ -321,6 +320,7 @@ class SearchForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
         self.fields["section"].required = False
+        self.fields["section"].widget.attrs["placeholder"] = "<Optional>"
 
         for _, field in self.fields.items():
             if field.widget.attrs.get("class"):
@@ -328,3 +328,19 @@ class SearchForm(forms.ModelForm):
             else:
                 field.widget.attrs["class"] = "form-control"
 
+
+class SearchBySubjectForm(forms.ModelForm):
+    class Meta:
+        model = Schedule
+        fields = ["term"]
+
+    def __init__(self, choices, *args, **kwargs):
+        super(SearchBySubjectForm, self).__init__(*args, **kwargs)
+        self.fields["subject"] = forms.ChoiceField(choices=choices, required=True)
+        self.fields["term"].widget.attrs["id"] = "id_term_1"
+
+        for _, field in self.fields.items():
+            if field.widget.attrs.get("class"):
+                field.widget.attrs["class"] += " form-control"
+            else:
+                field.widget.attrs["class"] = "form-control"

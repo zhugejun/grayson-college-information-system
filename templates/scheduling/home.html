@@ -2,156 +2,79 @@
 <h3>Welcome to the Course Scheduling App!</h3>
 <hr class="mb-3" />
 
-<form class="mb-5 mt-5 pt-5" action="{% url 'search' %}" method="GET">
-  <!-- {% csrf_token %} -->
-
-  <div class="d-flex justify-content-center">
-    <div class="row">
-      <div class="form-group col-4">
-        {{ form.term.label }} {{ form.term}}
-      </div>
-      <div class="form-group col-4">
-        {{ form.course.label }} {{ form.course}}
-      </div>
-      <div class="form-group col-2">
-        {{ form.section.label }} {{ form.section}}
-      </div>
-      <div class="form-group text-center col-auto mt-4">
-        <button type="submit" class="btn btn-dark ml-5">
-          <i class="fa fa-search"></i>
-        </button>
-      </div>
+<div class="container mb-5 mt-5 pt-5">
+  <div class="row justify-content-center">
+    <h4 class="text-center mb-3">Search by Department or Course</h4>
+    <div class="col-5 d-flex justify-content-center">
+      <form class="" action="{% url 'search' %}" method="GET">
+            <div class="form-group">
+              <div class="mb-3">
+                {{ form1.term.label }}{{ form1.term }}
+              </div>
+              <div class="mb-3">
+                {{ form1.subject.label }} {{ form1.subject }}
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-dark">
+                  Search
+                </button>
+          </div>
+        </div>
+      </form>
     </div>
-  </div>
-</form>
 
-<div
-  class="col-md-9 col-lg-10 mb-5 pr-5"
-  style="position: absolute; bottom: 5%; padding-right: 3%"
->
-  {% if latest_edited %}
-  <h4 class="mt-5 pt-5">Recently Edited</h4>
-  <div class="table-responsive">
-    <table class="table table-sm table-striped compact">
-      <thead class="table-dark">
-        <tr>
-          <th scope="col">Term</th>
-          <th scope="col">Course</th>
-          <th scope="col">Section</th>
-          <th scope="col">Status</th>
-          <th scope="col">Capacity</th>
-          <th scope="col">Instructor</th>
-          <th scope="col">Campus</th>
-          <th scope="col">Location</th>
-          <th scope="col">Days</th>
-          <th scope="col">Start</th>
-          <th scope="col">Stop</th>
-          <!-- make the note hoverable -->
-          <th scope="col">Note</th>
-          <th scope="col">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for schedule in latest_edited %}
-        <tr>
-          <td>{{ schedule.term }}</td>
-          <td>{{ schedule.course }}</td>
-          <td>{{ schedule.section }}</td>
-          <td>{{ schedule.status }}</td>
-          <td>{{ schedule.capacity }}</td>
-          <td>{{ schedule.instructor }}</td>
-          <td>{{ schedule.campus }}</td>
-          <td>{{ schedule.location }}</td>
-          <td>{{ schedule.days }}</td>
-          <td>{{ schedule.start_time }}</td>
-          <td>{{ schedule.stop_time }}</td>
-          <td>{{ schedule.notes }}</td>
-          <td>
-            <a
-              href="{% url 'edit_schedule' schedule.id %}"
-              style="padding-right: 10%"
-              ><i class="fa-solid fa-pen-to-square"></i
-            ></a>
-            <a
-              href="{% url 'duplicate_schedule' schedule.id %}"
-              style="padding-right: 10%"
-              ><i class="fa-solid fa-copy"></i
-            ></a>
-            <a href="{% url 'delete_schedule' schedule.id %}"
-              ><i class="fa-solid fa-trash-can"></i
-            ></a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      {% endif %}
-    </table>
-  </div>
+    <div class="col-1 d-flex justify-content-center">
+      <div class="v-divider"></div>
+    </div>
 
-  {% if latest_added %}
-  <h4 class="mt-5">Recently Added</h4>
-  <div class="table-responsive">
-    <table class="table table-sm table-striped compact">
-      <thead class="table-dark">
-        <tr>
-          <th scope="col">Term</th>
-          <th scope="col">Course</th>
-          <th scope="col">Section</th>
-          <th scope="col">Status</th>
-          <th scope="col">Capacity</th>
-          <th scope="col">Instructor</th>
-          <th scope="col">Campus</th>
-          <th scope="col">Location</th>
-          <th scope="col">Days</th>
-          <th scope="col">Start</th>
-          <th scope="col">Stop</th>
-          <!-- make the note hoverable -->
-          <th scope="col">Note</th>
-          <th scope="col">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for schedule in latest_added %}
-        <tr>
-          <td>{{ schedule.term }}</td>
-          <td>{{ schedule.course }}</td>
-          <td>{{ schedule.section }}</td>
-          <td>{{ schedule.status }}</td>
-          <td>{{ schedule.capacity }}</td>
-          <td>{{ schedule.instructor }}</td>
-          <td>{{ schedule.campus }}</td>
-          <td>{{ schedule.location }}</td>
-          <td>{{ schedule.days }}</td>
-          <td>{{ schedule.start_time }}</td>
-          <td>{{ schedule.stop_time }}</td>
-          <td>{{ schedule.notes }}</td>
-          <td>
-            <a
-              href="{% url 'edit_schedule' schedule.id %}"
-              style="padding-right: 10%"
-              ><i class="fa-solid fa-pen-to-square"></i
-            ></a>
-            <a
-              href="{% url 'duplicate_schedule' schedule.id %}"
-              style="padding-right: 10%"
-              ><i class="fa-solid fa-copy"></i
-            ></a>
-            <a href="{% url 'delete_schedule' schedule.id %}"
-              ><i class="fa-solid fa-trash-can"></i
-            ></a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      {% endif %}
-    </table>
-  </div>
+    <div class="col-5 d-flex justify-content-center">
+      <form  action="{% url 'search' %}" method="GET">
+            <div class="form-group">
+              <div class="mb-3">
+                {{ form.term.label }}{{ form.term}}
+              </div>
+              <div class="mb-3">
+                {{ form.course.label }} {{ form.course}}
+              </div>
+              <div class="mb-3">
+                {{ form.section.label }} {{ form.section}}
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-dark">
+                  Search
+                </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
 </div>
+
+</div>
+
+<style>
+
+#id_term_1 {
+  width: 250px;
+}
+
+
+.v-divider{
+  margin-top: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  width: 1px;
+  height: 100%;
+  border-left: 2px solid gray;
+}
+</style>
 
 <script>
     $(document).ready(function() {
         $("#id_term").select2({theme: 'bootstrap-5'});
+        $("#id_term_1").select2({theme: 'bootstrap-5'});
         $("#id_course").select2({theme: 'bootstrap-5'});
+        $("#id_subject").select2({theme: 'bootstrap-5'});
     })
 </script>
 

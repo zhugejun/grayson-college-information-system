@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 import csv
 
-from .forms import ScheduleForm, SubjectForm, SearchForm
+from .forms import ScheduleForm, SubjectForm, SearchForm, SearchBySubjectForm
 from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
 from main.models import Profile
 
@@ -323,6 +323,9 @@ def home(request):
     else:
         subject_list = []
 
+    subject_choices = [(subject, subject) for subject in subject_list]
+    form1 = SearchBySubjectForm(subject_choices)
+
     course_list = Course.objects.filter(subject__in=subject_list)
 
     form.fields["term"].queryset = Term.objects.filter(active="T")
@@ -330,48 +333,62 @@ def home(request):
 
     context["form"] = form
 
-    latest_edited = Schedule.objects.filter(
-        update_by=request.user, course__in=course_list
-    )
+    context["form1"] = form1
+    # latest_edited = Schedule.objects.filter(
+    #     update_by=request.user, course__in=course_list
+    # )
 
-    n_edited = min(len(latest_edited), 5)
-    latest_edited = latest_edited.order_by("-update_date")[:n_edited]
-    context["latest_edited"] = latest_edited
+    # n_edited = min(len(latest_edited), 5)
+    # latest_edited = latest_edited.order_by("-update_date")[:n_edited]
+    # context["latest_edited"] = latest_edited
 
-    latest_added = Schedule.objects.filter(
-        insert_by=request.user, course__in=course_list
-    )
-    n_added = min(len(latest_added), 5)
-    latest_added = latest_added.order_by("-insert_date")[:n_added]
-    context["latest_added"] = latest_added
+    # latest_added = Schedule.objects.filter(
+    #     insert_by=request.user, course__in=course_list
+    # )
+    # n_added = min(len(latest_added), 5)
+    # latest_added = latest_added.order_by("-insert_date")[:n_added]
+    # context["latest_added"] = latest_added
 
     return render(request, "scheduling/home.html", context)
 
 
 @login_required
 def search(request):
-    # scheduling/schedules/search/?term=?&course=1&section=A01&page=1
+    # scheduling/schedules/search/?term=1&course=1&section=A01&page=1
 
+    hide_add_button = False
+    show_course = False
     context = {}
 
     term_pk = request.GET.get("term")
     term = get_object_or_404(Term, pk=term_pk)
     context["term_pk"] = term_pk
 
-    course_pk = request.GET.get("course")
-    course = get_object_or_404(Course, pk=course_pk)
-    context["course_pk"] = course_pk
+    subject = request.GET.get("subject")
+    if subject:
+        context["subject"] = subject
+        context["term"] = term
+        hide_add_button = True
+        show_course = True
+        schedule_list = Schedule.objects.filter(course__subject=subject)
+    else:
+        course_pk = request.GET.get("course")
+        course = get_object_or_404(Course, pk=course_pk)
+        context["course_pk"] = course_pk
 
-    section = request.GET.get("section")
+        section = request.GET.get("section")
+        context["course"] = course
+        context["section"] = section
+
+        schedule_list = Schedule.objects.filter(term=term, course=course)
+        if section:
+            schedule_list = schedule_list.filter(section__startswith=section)
+
     context["term"] = term
-    context["course"] = course
-    context["section"] = section
+    context["hide_add_button"] = hide_add_button
+    context["show_course"] = show_course
 
-    schedule_list = Schedule.objects.filter(term=term, course=course)
-    if section:
-        schedule_list = schedule_list.filter(section__startswith=section)
-
-    paginator = Paginator(schedule_list, 25)
+    paginator = Paginator(schedule_list, 5)
     page_number = request.GET.get("page")
 
     if not page_number and schedule_list:

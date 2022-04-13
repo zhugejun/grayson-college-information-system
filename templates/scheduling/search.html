@@ -2,12 +2,21 @@
 {% extends "scheduling/base.html" %}
 
 {% block content %}
-<p><span class="fs-4">Search results for </span> <span class="text-info fs-1"> {{ term }} </span> <span class="text-primary fs-1">{{ course }} {{ section }}</span></p>
+<p><span class="fs-4">Search results for </span> <span class="text-info fs-1"> {{ term }} </span> 
+    {% if subject %}
+        <span class="text-primary fs-1">{{ subject }}</span>
+    {% else %}
+        <span class="text-primary fs-1">{{ course }} {{ section }}</span>
+    {% endif %}
+</p>
 
 <div class="table-responsive mt-4">
     <table class="table table-sm table-striped compact">
         <thead class="table-dark">
             <tr>
+                {% if show_course %}
+                    <th scope="col">Course</th>
+                {% endif %}
                 <th scope="col">Section</th>
                 <th scope="col">Status</th>
                 <th scope="col">Capacity</th>
@@ -26,6 +35,9 @@
         <tbody>
             {% for schedule in page %}
             <tr>
+                {% if show_course %}
+                    <td>{{ schedule.course}}</td>
+                {% endif %}
                 <td>{{ schedule.section }}</td>
                 <td>{{ schedule.status }}</td>
                 <td>{{ schedule.capacity }}</td>
@@ -62,37 +74,60 @@
 <nav aria-label="All schedules pagination">
     <ul class="pagination justify-content-end">
 
-        {% if page.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">Previous</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Previous</a></li>
-        {% endif %}
-
-        {% for p in page.paginator.page_range %}
-
-            {% if p == page.number %}
-                <li class="page-item active" aria-current="page"><a class="page-link" href="?page={{ p }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">{{ p }}</a></li>
+        {% if not subject %}
+            {% if page.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">Previous</a></li>
             {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{ p }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">{{ p }}</a></li>
+                <li class="page-item disabled"><a class="page-link">Previous</a></li>
             {% endif %}
 
-        {% endfor %}
+            {% for p in page.paginator.page_range %}
 
-        {% if page.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">Next</a></li>
-        {% else %}
-            <li class="page-item disabled"><a class="page-link">Next</a></li>
+                {% if p == page.number %}
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="?page={{ p }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">{{ p }}</a></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ p }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">{{ p }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}&term={{term_pk}}&course={{course_pk}}&section={{section}}">Next</a></li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link">Next</a></li>
+            {% endif %}
+        {% else %} {# this is for subject #}
+            {% if page.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}&term={{term_pk}}&subject={{subject}}">Previous</a></li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link">Previous</a></li>
+            {% endif %}
+
+            {% for p in page.paginator.page_range %}
+                {% if p == page.number %}
+                    <li class="page-item active" aria-current="page"><a class="page-link" href="?page={{ p }}&term={{term_pk}}&subject={{subject}}">{{ p }}</a></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ p }}&term={{term_pk}}&subject={{subject}}">{{ p }}</a></li>
+                {% endif %}
+
+            {% endfor %}
+
+            {% if page.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}&term={{term_pk}}&subject={{subject}}">Next</a></li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link">Next</a></li>
+            {% endif %}
         {% endif %}
-
 
 
     </ul>
 </nav>
 
-<div class="text-center mt-2">
-    <form method="GET" action="{% url 'add_new_schedule' term.id course.id %}">
-        <button class="btn btn-dark btn-lg" role="button">Add New Section</button>
-    </form>
-</div>
+{% if not hide_add_button %}
+    <div class="text-center mt-2">
+        <form method="GET" action="{% url 'add_new_schedule' term.id course.id %}">
+            <button class="btn btn-dark btn-lg" role="button">Add New Section</button>
+        </form>
+    </div>
+{% endif %}
 
 {% endblock content %}
