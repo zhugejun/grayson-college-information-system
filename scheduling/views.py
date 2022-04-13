@@ -388,7 +388,7 @@ def search(request):
     context["hide_add_button"] = hide_add_button
     context["show_course"] = show_course
 
-    paginator = Paginator(schedule_list, 5)
+    paginator = Paginator(schedule_list, 25)
     page_number = request.GET.get("page")
 
     if not page_number and schedule_list:
