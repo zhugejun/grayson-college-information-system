@@ -369,7 +369,9 @@ def search(request):
         context["term"] = term
         hide_add_button = True
         show_course = True
-        schedule_list = Schedule.objects.filter(course__subject=subject)
+        schedule_list = Schedule.objects.filter(
+            term=term, course__subject=subject
+        ).order_by("course", "section")
     else:
         course_pk = request.GET.get("course")
         course = get_object_or_404(Course, pk=course_pk)
