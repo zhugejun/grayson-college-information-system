@@ -13,11 +13,11 @@
 
     {% if user.is_authenticated %}
       <span class="nav-bar text">
-          <a href="/logout" role="button" class="btn btn-dark">Logout</a>
+          <a href="/logout" role="button" class="btn btn-primary">Logout</a>
       </span>
     {% else %}
       <span class="nav-bar text">
-          <a href="/login" role="button" class="btn btn-dark mr-1">Login</a>
+          <a href="/login" role="button" class="btn btn-primary mr-1">Login</a>
           <a href="/signup" role="button" class="btn btn-light ml-1 my-sm-0">Sign Up</a>
       </span>
     {% endif %}
