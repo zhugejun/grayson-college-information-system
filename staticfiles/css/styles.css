@@ -1,3 +1,7 @@
+.btn:hover {
+  background-color: #525252;
+}
+
 #courseTable_filter,
 #instructorTable_filter,
 #scheduleTable_filter,
@@ -44,7 +48,7 @@
   display: none;
 }
 
-#id_days div {
+#id_days li {
   display: inline-block;
   list-style: none;
   padding-right: 8px;
@@ -215,4 +219,46 @@
 .form-control-dark:focus {
   border-color: transparent;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
+}
+
+/* 
+* homepage forms
+*/
+
+#id_term_1 {
+  width: 250px;
+}
+
+.divider {
+    text-align: center;
+    width: 50%;
+    margin: 32px 0;
+    display: -ms-flexbox;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center
+}
+.divider:after, .divider:before {
+    content: "";
+    height: 1px;
+    background: #d8d9dc;
+    flex: 1
+}
+.divider-text {
+    display: -ms-flexbox;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-basis: 33px;
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    margin: 0;
+    border: 1px solid #d8d9dc;
+    color: #84888e;
+    font-size: 11px;
+    line-height: 11px;
+    font-weight: 400
 }

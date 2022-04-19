@@ -5,7 +5,7 @@
 
 <div class="container mt-3 pt-5">
   <div class="row justify-content-center">
-    <h4 class="text-center mb-3">Search by <span class="text-info">Department</span> or <span class="text-info">Course</span></h4>
+    <h4 class="text-center mb-3">Search by <span class="text-info">Department</span></h4>
     <div class="col-5 d-flex justify-content-center">
       <form class="" action="{% url 'search' %}" method="GET">
             <div class="form-group">
@@ -24,11 +24,15 @@
       </form>
     </div>
 
-    <div class="col-1 d-flex justify-content-center">
-      <div class="v-divider"></div>
-    </div>
+  </div>
 
-    <div class="col-5 d-flex justify-content-center">
+  <div class="col d-flex justify-content-center">
+    <div class="divider"><span class="divider-text">OR</span></div>
+  </div>
+
+  <div class="row justify-content-center">
+      <h4 class="text-center mb-3">Search by <span class="text-info">Course</span></h4>
+      <div class="col-5 d-flex justify-content-center">
       <form  action="{% url 'search' %}" method="GET">
             <div class="form-group">
               <div class="mb-3">
@@ -50,146 +54,6 @@
     </div>
   </div>
 </div>
-
-<div
-  class="col-md-9 col-lg-10"
-  style="position: absolute; bottom: 5%; padding-right: 3%"
->
-  {% if latest_edited %}
-  <p><span class="fs-4 fw-bold">Recently Edited</span></p>
-  <div class="table-responsive">
-    <table class="table table-sm table-striped compact">
-      <thead class="table-dark">
-        <tr>
-          <th scope="col">Term</th>
-          <th scope="col">Course</th>
-          <th scope="col">Section</th>
-          <th scope="col">Status</th>
-          <th scope="col">Capacity</th>
-          <th scope="col">Instructor</th>
-          <th scope="col">Campus</th>
-          <th scope="col">Location</th>
-          <th scope="col">Days</th>
-          <th scope="col">Start</th>
-          <th scope="col">Stop</th>
-          <th scope="col">Note</th>
-          <th scope="col">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for schedule in latest_edited %}
-        <tr>
-          <td>{{ schedule.term }}</td>
-          <td>{{ schedule.course }}</td>
-          <td>{{ schedule.section }}</td>
-          <td>{{ schedule.status }}</td>
-          <td>{{ schedule.capacity }}</td>
-          <td>{{ schedule.instructor }}</td>
-          <td>{{ schedule.campus }}</td>
-          <td>{{ schedule.location }}</td>
-          <td>{{ schedule.days }}</td>
-          <td>{{ schedule.start_time }}</td>
-          <td>{{ schedule.stop_time }}</td>
-          <td>{{ schedule.notes }}</td>
-          <td>
-            <a
-              href="{% url 'edit_schedule' schedule.id %}"
-              style="padding-right: 10%"
-              ><i class="fa-solid fa-pen-to-square"></i
-            ></a>
-            <a
-              href="{% url 'duplicate_schedule' schedule.id %}"
-              style="padding-right: 10%"
-              ><i class="fa-solid fa-copy"></i
-            ></a>
-            <a href="{% url 'delete_schedule' schedule.id %}"
-              ><i class="fa-solid fa-trash-can"></i
-            ></a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      {% endif %}
-    </table>
-  </div>
-  {% if latest_added %}
-  <p><span class="fs-4 fw-bold">Recently Added</span></p>
-  <div class="table-responsive">
-    <table class="table table-sm table-striped compact">
-      <thead class="table-dark">
-        <tr>
-          <th scope="col">Term</th>
-          <th scope="col">Course</th>
-          <th scope="col">Section</th>
-          <th scope="col">Status</th>
-          <th scope="col">Capacity</th>
-          <th scope="col">Instructor</th>
-          <th scope="col">Campus</th>
-          <th scope="col">Location</th>
-          <th scope="col">Days</th>
-          <th scope="col">Start</th>
-          <th scope="col">Stop</th>
-          <!-- make the note hoverable -->
-          <th scope="col">Note</th>
-          <th scope="col">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for schedule in latest_added %}
-        <tr>
-          <td>{{ schedule.term }}</td>
-          <td>{{ schedule.course }}</td>
-          <td>{{ schedule.section }}</td>
-          <td>{{ schedule.status }}</td>
-          <td>{{ schedule.capacity }}</td>
-          <td>{{ schedule.instructor }}</td>
-          <td>{{ schedule.campus }}</td>
-          <td>{{ schedule.location }}</td>
-          <td>{{ schedule.days }}</td>
-          <td>{{ schedule.start_time }}</td>
-          <td>{{ schedule.stop_time }}</td>
-          <td>{{ schedule.notes }}</td>
-          <td>
-            <a
-              href="{% url 'edit_schedule' schedule.id %}"
-              style="padding-right: 10%"
-              ><i class="fa-solid fa-pen-to-square"></i
-            ></a>
-            <a
-              href="{% url 'duplicate_schedule' schedule.id %}"
-              style="padding-right: 10%"
-              ><i class="fa-solid fa-copy"></i
-            ></a>
-            <a href="{% url 'delete_schedule' schedule.id %}"
-              ><i class="fa-solid fa-trash-can"></i
-            ></a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      {% endif %}
-    </table>
-  </div>
-</div>
-
-
-
-
-<style>
-#id_term_1 {
-  width: 250px;
-}
-
-
-.v-divider{
-  margin-top: 5px;
-  margin-left: 5px;
-  margin-right: 5px;
-  width: 1px;
-  height: 100%;
-  border-left: 2px solid gray;
-}
-</style>
 
 <script>
     $(document).ready(function() {

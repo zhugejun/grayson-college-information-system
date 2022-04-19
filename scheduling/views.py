@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -601,28 +602,6 @@ def delete_schedule(request, pk):
 
 
 @login_required
-def schedules_by_term(request, term):
-
-    context = {}
-
-    profile = get_object_or_404(Profile, user=request.user)
-    if profile.subjects:
-        subject_list = profile.subjects.split(",")
-    else:
-        subject_list = []
-    course_list = Course.objects.filter(subject__in=subject_list)
-
-    year = int(term[-4:])
-    semester = term[:-4].upper()
-    term = get_object_or_404(Term, year__exact=year, semester__exact=semester)
-    context["term"] = term
-
-    schedule_list = Schedule.objects.filter(term=term, course__in=course_list)
-    context["schedule_list"] = schedule_list
-    return render(request, "scheduling/schedules.html", context)
-
-
-@login_required
 def schedule_summary(request):
 
     # TODO: add dashboard or summary statistics or weekly view
@@ -634,11 +613,52 @@ def schedule_summary(request):
         subject_list = []
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    # selected subjects
-    # by Term
-    # return a schedule list too
+    schedules = Schedule.objects.filter(course__in=course_list)
+    df = pd.DataFrame.from_records(schedules.values().all())
+
+    schedules_by_term = defaultdict(list)
+    schedules_by_instructor = defaultdict(list)
+    for schedule in schedules:
+        schedules_by_term[schedule.term].append(schedule)
+        schedules_by_instructor[schedule.instructor].append(schedule)
+    print(
+        [
+            (instructor, len(course_list))
+            for instructor, course_list in schedules_by_instructor.items()
+        ]
+    )
 
     return render(request, "scheduling/schedule_summary.html")
+
+
+@login_required
+def history(request):
+    context = {}
+
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.subjects:
+        subject_list = profile.subjects.split(",")
+    else:
+        subject_list = []
+
+    course_list = Course.objects.filter(subject__in=subject_list)
+
+    latest_edited = Schedule.objects.filter(
+        update_by=request.user, course__in=course_list
+    )
+
+    n_edited = min(len(latest_edited), 10)
+    latest_edited = latest_edited.order_by("-update_date")[:n_edited]
+    context["latest_edited"] = latest_edited
+
+    latest_added = Schedule.objects.filter(
+        insert_by=request.user, course__in=course_list
+    )
+    n_added = min(len(latest_added), 10)
+    latest_added = latest_added.order_by("-insert_date")[:n_added]
+    context["latest_added"] = latest_added
+
+    return render(request, "scheduling/history.html", context)
 
 
 @login_required

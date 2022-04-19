@@ -16,6 +16,7 @@ urlpatterns = [
     ),
     path("schedules/<int:pk>/edit/", views.edit_schedule, name="edit_schedule"),
     path("schedules/<int:pk>/delete/", views.delete_schedule, name="delete_schedule",),
+    path("schedules/history/", views.history, name="history",),
     path("change-summary/", views.change_summary, name="change_summary"),
     path(
         "change-summary/<term>",
