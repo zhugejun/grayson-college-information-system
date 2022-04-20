@@ -3,7 +3,7 @@
 <h3>Welcome to the Course Scheduling App!</h3>
 <hr class="mb-3" />
 
-<div class="container mt-3 pt-5">
+<div class="container mt-3">
   <div class="row justify-content-center">
     <h4 class="text-center mb-3">Search by <span class="text-info">Department</span></h4>
     <div class="col-5 d-flex justify-content-center">
@@ -57,10 +57,12 @@
 
 <script>
     $(document).ready(function() {
-        $("#id_term").select2({theme: 'bootstrap-5'});
-        $("#id_term_1").select2({theme: 'bootstrap-5'});
-        $("#id_course").select2({theme: 'bootstrap-5'});
+        // department
+        $("#id_term_d").select2({theme: 'bootstrap-5'});
         $("#id_subject").select2({theme: 'bootstrap-5'});
+        // course
+        $("#id_term_c").select2({theme: 'bootstrap-5'});
+        $("#id_course_c").select2({theme: 'bootstrap-5'});
     })
 </script>
 

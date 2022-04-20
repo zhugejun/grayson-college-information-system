@@ -51,12 +51,12 @@
                 <td>
                 <a
                     href="{% url 'edit_schedule' schedule.id %}"
-                        style="padding-right: 10%"
+                        style="padding-right: 5%"
                     ><i class="fa-solid fa-pen-to-square"></i
                 ></a>
                 <a
                     href="{% url 'duplicate_schedule' schedule.id %}"
-                        style="padding-right: 10%"
+                        style="padding-right: 5%"
                     ><i class="fa-solid fa-copy"></i
                 ></a>
                 <a href="{% url 'delete_schedule' schedule.id %}" 
@@ -125,7 +125,7 @@
 {% if not hide_add_button %}
     <div class="text-center mt-2">
         <form method="GET" action="{% url 'add_new_schedule' term.id course.id %}">
-            <button class="btn btn-primary btn-lg" role="button">Add New Section</button>
+            <button class="btn btn-primary" role="button">Add New Section</button>
         </form>
     </div>
 {% endif %}

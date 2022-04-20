@@ -225,7 +225,7 @@
 * homepage forms
 */
 
-#id_term_1 {
+#id_term_c, #id_course_c, #id_section_c, #id_term_d{
   width: 250px;
 }
 

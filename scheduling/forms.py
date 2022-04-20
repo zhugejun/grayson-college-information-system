@@ -321,6 +321,9 @@ class SearchForm(forms.ModelForm):
         super(SearchForm, self).__init__(*args, **kwargs)
         self.fields["section"].required = False
         self.fields["section"].widget.attrs["placeholder"] = "<Optional>"
+        self.fields["term"].widget.attrs["id"] = "id_term_c"
+        self.fields["course"].widget.attrs["id"] = "id_course_c"
+        self.fields["section"].widget.attrs["id"] = "id_section_c"
 
         for _, field in self.fields.items():
             if field.widget.attrs.get("class"):
@@ -337,7 +340,7 @@ class SearchBySubjectForm(forms.ModelForm):
     def __init__(self, choices, *args, **kwargs):
         super(SearchBySubjectForm, self).__init__(*args, **kwargs)
         self.fields["subject"] = forms.ChoiceField(choices=choices, required=True)
-        self.fields["term"].widget.attrs["id"] = "id_term_1"
+        self.fields["term"].widget.attrs["id"] = "id_term_d"
 
         for _, field in self.fields.items():
             if field.widget.attrs.get("class"):
