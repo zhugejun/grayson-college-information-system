@@ -1,0 +1,59 @@
+{% extends "scheduling/base.html" %}
+
+{% block content %}
+<h1>Summary & Conflicts for 
+    <span class="text-info">{{ term.semester }} {{ term.year }}</span>
+</h1>
+<hr />
+
+
+<h2 class="text-info">Summaries</h2>
+<h4>By Course</h4>
+{% if count_by_course %}
+    <ul>
+        {% for course in count_by_course %}
+            <li>{{ course }}: <a href="{% url 'search' %}?term={{term.pk}}&course={{course.pk}}&section=" >{{ course.num_sections }}</a></li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<h4>By Instructor</h4>
+{% if count_by_instructor %}
+    <ul>
+        {% for instructor in count_by_instructor %}
+            <li>{{ instructor }}: <a href="{% url 'search' %}?term={{term.pk}}&instructor={{instructor.pk}}">{{ instructor.num_sections }}</a></li>
+        {% endfor %}
+        <li><span class="bg-danger text-white">NOT ASSIGNED</span>: <a href="{% url 'search' %}?term={{term.pk}}&instructor=0">{{ instructor_not_assigned_count }}</a></li>
+    </ul>
+{% endif %}
+
+
+<h2 class="text-info">Conflicts</h2>
+<h4>By Instructor</h4> 
+{% if count_by_instructor_start %}
+    <ul>
+        {% for e in count_by_instructor_start %}
+                <li>{{ e.0.0 }} | {{ e.0.1 }} | {{ e.0.2 }} </li>
+                <ul>
+                    {% for s in e.1 %}
+                        <li><a href="{% url 'edit_schedule' s.id %}">{{ s }}</a></li>
+                    {% endfor %}
+                </ul>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<h4>By Room</h4>
+{% if count_by_location_start %}
+    <ul>
+        {% for e in count_by_location_start %}
+                <li>{{ e.0.0 }} | {{ e.0.1 }} | {{ e.0.2 }} </li>
+                <ul>
+                    {% for s in e.1 %}
+                        <li><a href="{% url 'edit_schedule' s.id %}">{{ s }}</a></li>
+                    {% endfor %}
+                </ul>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock content %}
