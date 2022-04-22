@@ -1,13 +1,17 @@
 {% extends "scheduling/base.html" %}
 
 {% block content %}
-<h1>Schedules Summary</h1>
+<h1>Summary of Schedules</h1>
 <hr />
 
-
-<h3>By Course</h3>
-
-
-<h3>By Instructor</h3>
-
+{% if curr_terms %}
+    <ul>
+        {% for term in curr_terms %}
+            <li> 
+                <a href="{% url 'schedule_summary_by_term' term %}">
+                    {{ term.semester }} {{ term.year }}
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 {% endblock content %}

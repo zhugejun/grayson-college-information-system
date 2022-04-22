@@ -4,8 +4,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse
-from django.core.paginator import Paginator
 from django.urls import reverse
+from django.db.models import Count
 
 import pandas as pd
 import numpy as np
@@ -363,18 +363,21 @@ def search(request):
     term_pk = request.GET.get("term")
     term = get_object_or_404(Term, pk=term_pk)
     context["term_pk"] = term_pk
+    context["term"] = term
 
     subject = request.GET.get("subject")
+    course_pk = request.GET.get("course")
+    instructor_pk = request.GET.get("instructor")
+
     if subject:
         context["subject"] = subject
-        context["term"] = term
         hide_add_button = True
         show_course = True
         schedule_list = Schedule.objects.filter(
             term=term, course__subject=subject
         ).order_by("course", "section")
-    else:
-        course_pk = request.GET.get("course")
+    
+    if course_pk:
         course = get_object_or_404(Course, pk=course_pk)
         context["course_pk"] = course_pk
 
@@ -386,18 +389,30 @@ def search(request):
         if section:
             schedule_list = schedule_list.filter(section__startswith=section)
 
-    context["term"] = term
+    if instructor_pk:
+        context["instructor_pk"] = instructor_pk
+        try:
+            instructor = Instructor.objects.get(pk=instructor_pk)
+            schedule_list = Schedule.objects.filter(
+                term=term, instructor=instructor
+            ).order_by("course", "section")
+        except Instructor.DoesNotExist:
+            schedule_list = Schedule.objects.filter(
+                term=term, instructor__isnull=True
+            ).order_by("course", "section")
+        hide_add_button = True
+        show_course = True
     context["hide_add_button"] = hide_add_button
     context["show_course"] = show_course
 
-    paginator = Paginator(schedule_list, 25)
-    page_number = request.GET.get("page")
+    # paginator = Paginator(schedule_list, 25)
+    # page_number = request.GET.get("page")
 
-    if not page_number and schedule_list:
-        page_number = 1
+    # if not page_number and schedule_list:
+    #     page_number = 1
 
-    page = paginator.get_page(page_number)
-    context["page"] = page
+    # page = paginator.get_page(page_number)
+    # context["page"] = page
 
     context["schedule_list"] = schedule_list
 
@@ -479,8 +494,8 @@ def duplicate_schedule(request, pk):
             term_pk = schedule.term.id
             schedule.save()
             messages.success(request, f"{schedule}-{schedule.term} added.")
-            return redirect(
-                search_url + f"?page=1&term={term_pk}&course={course_pk}&section="
+            return redirect("scheduling_home"
+                # search_url + f"?term={term_pk}&course={course_pk}&section="
             )
         else:
             for field_name, _ in form.errors.items():
@@ -516,7 +531,8 @@ def add_new_schedule(request, term_pk, crs_pk):
             schedule.save()
             messages.success(request, f"{schedule}-{schedule.term} added.")
             return redirect(
-                search_url + f"?page=1&term={term_pk}&course={crs_pk}&section="
+                "scheduling_home"
+                # search_url + f"?term={term_pk}&course={crs_pk}&section="
             )
         else:
             for field_name, _ in form.errors.items():
@@ -533,7 +549,6 @@ def add_new_schedule(request, term_pk, crs_pk):
 def edit_schedule(request, pk):
 
     schedule = get_object_or_404(Schedule, pk=pk)
-    # context["schedule"] = schedule
     term_pk = schedule.term.id
     course_pk = schedule.course.id
 
@@ -555,7 +570,8 @@ def edit_schedule(request, pk):
             schedule.save()
             messages.success(request, f"{schedule}-{schedule.term} updated.")
             return redirect(
-                search_url + f"?page=1&term={term_pk}&course={course_pk}&section="
+                "scheduling_home"
+                # search_url + f"?term={term_pk}&course={course_pk}&section="
             )
         else:
             for field_name, _ in form.errors.items():
@@ -596,7 +612,8 @@ def delete_schedule(request, pk):
             schedule.delete()
             messages.success(request, f"{schedule}-{schedule.term} deleted.")
             return redirect(
-                search_url + f"?page=1&term={term_pk}&course={course_pk}&section="
+                "scheduling_home"
+                # search_url + f"?term={term_pk}&course={course_pk}&section="
             )
     return render(request, "scheduling/delete_schedule.html", context)
 
@@ -604,7 +621,16 @@ def delete_schedule(request, pk):
 @login_required
 def schedule_summary(request):
 
-    # TODO: add dashboard or summary statistics or weekly view
+    curr_terms = Term.objects.filter(active__exact="T").order_by("-year", "semester")
+    return render(request, "scheduling/schedule_summary.html", {"curr_terms": curr_terms})
+
+
+@login_required
+def schedule_summary_by_term(request, term):
+
+    context = {}
+    search_url = reverse("search")
+    context['search_url'] = search_url
 
     profile = get_object_or_404(Profile, user=request.user)
     if profile.subjects:
@@ -613,22 +639,60 @@ def schedule_summary(request):
         subject_list = []
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    schedules = Schedule.objects.filter(course__in=course_list)
-    df = pd.DataFrame.from_records(schedules.values().all())
 
-    schedules_by_term = defaultdict(list)
-    schedules_by_instructor = defaultdict(list)
-    for schedule in schedules:
-        schedules_by_term[schedule.term].append(schedule)
-        schedules_by_instructor[schedule.instructor].append(schedule)
-    print(
-        [
-            (instructor, len(course_list))
-            for instructor, course_list in schedules_by_instructor.items()
-        ]
-    )
+    year = int(term[-4:])
+    semester = term[:-4].upper()
+    term = get_object_or_404(Term, year__exact=year, semester__exact=semester)
+    schedules = Schedule.objects.filter(term=term, course__in=course_list)
+    context["term"] = term
 
-    return render(request, "scheduling/schedule_summary.html")
+    count_by_course = Course.objects.filter(schedule__term=term).annotate(num_sections=Count("schedule"))
+    count_by_instructor = Instructor.objects.filter(schedule__term=term).annotate(num_sections=Count("schedule"))
+    instructor_not_assigned_count = schedules.filter(instructor__isnull=True).count()
+    context['count_by_course'] = count_by_course
+    context['count_by_instructor'] = count_by_instructor
+    context['instructor_not_assigned_count'] = instructor_not_assigned_count
+
+    # schedules grouped by instructor and start time
+    schedules_by_instructor_start = defaultdict(set)
+    # schedules grouped by location and start time
+    schedules_by_location_start = defaultdict(set)
+    for s in schedules:
+        if "M" in s.days:
+            schedules_by_instructor_start[(s.instructor, "M", s.start_time)].add(s)
+            if "NT" not in s.section:
+                schedules_by_location_start[(s.location, "M", s.start_time)].add(s)
+        elif "T" in s.days:
+            schedules_by_instructor_start[(s.instructor, "T", s.start_time)].add(s)
+            if "NT" not in s.section:
+                schedules_by_location_start[(s.location, "T", s.start_time)].add(s)
+        elif "W" in s.days:
+            schedules_by_instructor_start[(s.instructor, "W", s.start_time)].add(s)
+            if "NT" not in s.section:
+                schedules_by_location_start[(s.location, "W", s.start_time)].add(s)
+        elif "R" in s.days:
+            schedules_by_instructor_start[(s.instructor, "R", s.start_time)].add(s)
+            if "NT" not in s.section:
+                schedules_by_location_start[(s.location, "R", s.start_time)].add(s)
+        elif "F" in s.days:
+            schedules_by_instructor_start[(s.instructor, "F", s.start_time)].add(s)
+            if "NT" not in s.section:
+                schedules_by_location_start[(s.location, "F", s.start_time)].add(s)
+        elif "S" in s.days:
+            schedules_by_instructor_start[(s.instructor, "S", s.start_time)].add(s)
+            if "NT" not in s.section:
+                schedules_by_location_start[(s.location, "S", s.start_time)].add(s)
+        elif "U" in s.days:
+            schedules_by_instructor_start[(s.instructor, "U", s.start_time)].add(s)
+            if "NT" not in s.section:
+                schedules_by_location_start[(s.location, "U", s.start_time)].add(s)   
+
+    count_by_instructor_start = [(key, sections) for key, sections in schedules_by_instructor_start.items() if len(sections) > 1 and all(key)]
+    count_by_location_start = [(key, sections) for key, sections in schedules_by_location_start.items() if len(sections) > 1 and all(key)]
+    context['count_by_instructor_start'] = count_by_instructor_start
+    context['count_by_location_start'] = count_by_location_start
+
+    return render(request, "scheduling/schedule_summary_by_term.html", context)
 
 
 @login_required
