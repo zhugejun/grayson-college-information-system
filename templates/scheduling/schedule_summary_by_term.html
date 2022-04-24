@@ -15,6 +15,10 @@
             <li>{{ course }}: <a href="{% url 'search' %}?term={{term.pk}}&course={{course.pk}}&section=" >{{ course.num_sections }}</a></li>
         {% endfor %}
     </ul>
+{% else %}
+    <ul>
+        <li>There is nothing to show here.</li>
+    </ul>
 {% endif %}
 
 <h4>By Instructor</h4>
@@ -24,6 +28,10 @@
             <li>{{ instructor }}: <a href="{% url 'search' %}?term={{term.pk}}&instructor={{instructor.pk}}">{{ instructor.num_sections }}</a></li>
         {% endfor %}
         <li><span class="bg-danger text-white">NOT ASSIGNED</span>: <a href="{% url 'search' %}?term={{term.pk}}&instructor=0">{{ instructor_not_assigned_count }}</a></li>
+    </ul>
+{% else %}
+    <ul>
+        <li>There is nothing to show here.</li>
     </ul>
 {% endif %}
 
