@@ -41,6 +41,10 @@
                 </ul>
         {% endfor %}
     </ul>
+{% else %}
+    <ul>
+        <li>Everything looks good!</li>
+    </ul>
 {% endif %}
 
 <h4>By Room</h4>
@@ -54,6 +58,10 @@
                     {% endfor %}
                 </ul>
         {% endfor %}
+    </ul>
+{% else %}
+    <ul>
+        <li>Everything looks good!</li>
     </ul>
 {% endif %}
 {% endblock content %}
