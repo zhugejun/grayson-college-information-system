@@ -658,34 +658,11 @@ def schedule_summary_by_term(request, term):
     # schedules grouped by location and start time
     schedules_by_location_start = defaultdict(set)
     for s in schedules:
-        if "M" in s.days:
-            schedules_by_instructor_start[(s.instructor, "M", s.start_time)].add(s)
-            if "NT" not in s.section:
-                schedules_by_location_start[(s.location, "M", s.start_time)].add(s)
-        elif "T" in s.days:
-            schedules_by_instructor_start[(s.instructor, "T", s.start_time)].add(s)
-            if "NT" not in s.section:
-                schedules_by_location_start[(s.location, "T", s.start_time)].add(s)
-        elif "W" in s.days:
-            schedules_by_instructor_start[(s.instructor, "W", s.start_time)].add(s)
-            if "NT" not in s.section:
-                schedules_by_location_start[(s.location, "W", s.start_time)].add(s)
-        elif "R" in s.days:
-            schedules_by_instructor_start[(s.instructor, "R", s.start_time)].add(s)
-            if "NT" not in s.section:
-                schedules_by_location_start[(s.location, "R", s.start_time)].add(s)
-        elif "F" in s.days:
-            schedules_by_instructor_start[(s.instructor, "F", s.start_time)].add(s)
-            if "NT" not in s.section:
-                schedules_by_location_start[(s.location, "F", s.start_time)].add(s)
-        elif "S" in s.days:
-            schedules_by_instructor_start[(s.instructor, "S", s.start_time)].add(s)
-            if "NT" not in s.section:
-                schedules_by_location_start[(s.location, "S", s.start_time)].add(s)
-        elif "U" in s.days:
-            schedules_by_instructor_start[(s.instructor, "U", s.start_time)].add(s)
-            if "NT" not in s.section:
-                schedules_by_location_start[(s.location, "U", s.start_time)].add(s)   
+        for d in "MTWRFSU":
+            if s.days and d in list(s.days):
+                schedules_by_instructor_start[(s.instructor, d, s.start_time)].add(s)
+                if "NT" not in s.section:
+                    schedules_by_location_start[(s.location, d, s.start_time)].add(s)
 
     count_by_instructor_start = [(key, sections) for key, sections in schedules_by_instructor_start.items() if len(sections) > 1 and all(key)]
     count_by_location_start = [(key, sections) for key, sections in schedules_by_location_start.items() if len(sections) > 1 and all(key)]
