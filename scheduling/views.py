@@ -646,7 +646,7 @@ def schedule_summary_by_term(request, term):
     schedules = Schedule.objects.filter(term=term, course__in=course_list)
     context["term"] = term
 
-    count_by_course = Course.objects.filter(schedule__term=term).annotate(num_sections=Count("schedule"))
+    count_by_course = Course.objects.filter(schedule__term=term, subject__in=subject_list).annotate(num_sections=Count("schedule"))
     count_by_instructor = Instructor.objects.filter(schedule__term=term).annotate(num_sections=Count("schedule"))
     instructor_not_assigned_count = schedules.filter(instructor__isnull=True).count()
     context['count_by_course'] = count_by_course
