@@ -44,10 +44,6 @@
   width: 600px;
 }
 
-.dataTables_filter {
-  display: none;
-}
-
 #id_days li {
   display: inline-block;
   list-style: none;
