@@ -105,20 +105,6 @@ def get_diff_gcis_cams(term, course_list):
 
     if course_list:
 
-        unique_cols = [
-            "term_id",
-            "course_id",
-            "section",
-            "capacity",
-            "instructor_id",
-            "status",
-            "campus_id",
-            "location_id",
-            "days",
-            "start_time",
-            "stop_time",
-        ]
-
         schedules_gcis = pd.DataFrame.from_records(
             Schedule.objects.filter(course__in=course_list, term=term)
             .all()
@@ -142,6 +128,8 @@ def get_diff_gcis_cams(term, course_list):
             )
         )
         schedules_gcis.replace("", np.nan, inplace=True)
+        # days cannot be float type
+        schedules_gcis.days.replace(np.nan, None, inplace=True)
 
         schedules_cams = pd.DataFrame.from_records(
             Cams.objects.filter(course__in=course_list, term=term)
