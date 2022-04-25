@@ -356,6 +356,12 @@ def home(request):
 def search(request):
     # scheduling/schedules/search/?term=1&course=1&section=A01&page=1
 
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.subjects:
+        subject_list = profile.subjects.split(",")
+    else:
+        subject_list = []
+
     hide_add_button = False
     show_course = False
     context = {}
@@ -394,11 +400,11 @@ def search(request):
         try:
             instructor = Instructor.objects.get(pk=instructor_pk)
             schedule_list = Schedule.objects.filter(
-                term=term, instructor=instructor
+                term=term, instructor=instructor, course__subject__in=subject_list
             ).order_by("course", "section")
         except Instructor.DoesNotExist:
             schedule_list = Schedule.objects.filter(
-                term=term, instructor__isnull=True
+                term=term, instructor__isnull=True, course__subject__in=subject_list
             ).order_by("course", "section")
         hide_add_button = True
         show_course = True
