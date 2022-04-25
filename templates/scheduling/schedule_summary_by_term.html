@@ -27,7 +27,9 @@
         {% for instructor in count_by_instructor %}
             <li>{{ instructor }}: <a href="{% url 'search' %}?term={{term.pk}}&instructor={{instructor.pk}}">{{ instructor.num_sections }}</a></li>
         {% endfor %}
-        <li><span class="bg-danger text-white">NOT ASSIGNED</span>: <a href="{% url 'search' %}?term={{term.pk}}&instructor=0">{{ instructor_not_assigned_count }}</a></li>
+        {% if instructor_not_assigned_count > 0 %}
+            <li><span class="bg-danger text-white">NOT ASSIGNED</span>: <a href="{% url 'search' %}?term={{term.pk}}&instructor=0">{{ instructor_not_assigned_count }}</a></li>
+        {% endif %}
     </ul>
 {% else %}
     <ul>
