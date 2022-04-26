@@ -8,7 +8,7 @@
 
 
 <h2 class="text-info">Summaries</h2>
-<h4>By Course</h4>
+<h3>By Course</h3>
 {% if count_by_course_list %}
 <div class="row">
     {% for course_list in count_by_course_list %}
@@ -27,7 +27,7 @@
     </ul>
 {% endif %}
 
-<h4>By Instructor</h4>
+<h3>By Instructor</h3>
 {% if count_by_instructor_list %}
 <div class="row">
     {% for instructor_list in count_by_instructor_list %}
@@ -53,7 +53,7 @@
 
 
 <h2 class="text-info">Conflicts</h2>
-<h4>By Instructor</h4> 
+<h3>By Instructor</h3> 
 {% if count_by_instructor_start_list %}
     <div class="row">
         {% for instructor_list in count_by_instructor_start_list %}
@@ -77,7 +77,7 @@
     </ul>
 {% endif %}
 
-<h4>By Room</h4>
+<h3>By Room</h3>
 {% if count_by_location_start_list %}
     <div class="row">
         {% for location_list in count_by_location_start_list %}
