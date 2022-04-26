@@ -9,12 +9,18 @@
 
 <h2 class="text-info">Summaries</h2>
 <h4>By Course</h4>
-{% if count_by_course %}
-    <ul>
-        {% for course in count_by_course %}
-            <li>{{ course }}: <a href="{% url 'search' %}?term={{term.pk}}&course={{course.pk}}&section=" >{{ course.num_sections }}</a></li>
-        {% endfor %}
-    </ul>
+{% if count_by_course_list %}
+<div class="row">
+    {% for course_list in count_by_course_list %}
+    <div class="col-lg-2">
+        <ul>
+            {% for course in course_list %}
+                <li>{{ course }}: <a href="{% url 'search' %}?term={{term.pk}}&course={{course.pk}}&section=" >{{ course.num_sections }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
 {% else %}
     <ul>
         <li>There is nothing to show here.</li>
@@ -22,15 +28,23 @@
 {% endif %}
 
 <h4>By Instructor</h4>
-{% if count_by_instructor %}
-    <ul>
-        {% for instructor in count_by_instructor %}
-            <li>{{ instructor }}: <a href="{% url 'search' %}?term={{term.pk}}&instructor={{instructor.pk}}">{{ instructor.num_sections }}</a></li>
-        {% endfor %}
+{% if count_by_instructor_list %}
+<div class="row">
+    {% for instructor_list in count_by_instructor_list %}
+    <div class="col-lg-2">
+        <ul>
+            {% for instructor in instructor_list %}
+                <li>{{ instructor }}: <a href="{% url 'search' %}?term={{term.pk}}&instructor={{instructor.pk}}">{{ instructor.num_sections }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+    <div class="col-lg-2">
         {% if instructor_not_assigned_count > 0 %}
             <li><span class="bg-danger text-white">NOT ASSIGNED</span>: <a href="{% url 'search' %}?term={{term.pk}}&instructor=0">{{ instructor_not_assigned_count }}</a></li>
         {% endif %}
-    </ul>
+    </div>
+</div>
 {% else %}
     <ul>
         <li>There is nothing to show here.</li>
