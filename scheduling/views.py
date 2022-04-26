@@ -700,7 +700,7 @@ def history(request):
     context["latest_edited"] = latest_edited
 
     latest_added = Schedule.objects.filter(
-        insert_by=request.user, course__in=course_list
+        insert_by=request.user, course__in=course_list, update_by__isnull=True
     )
     n_added = min(len(latest_added), 10)
     latest_added = latest_added.order_by("-insert_date")[:n_added]
