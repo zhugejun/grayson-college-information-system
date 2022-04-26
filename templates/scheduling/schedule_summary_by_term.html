@@ -54,17 +54,23 @@
 
 <h2 class="text-info">Conflicts</h2>
 <h4>By Instructor</h4> 
-{% if count_by_instructor_start %}
-    <ul>
-        {% for e in count_by_instructor_start %}
+{% if count_by_instructor_start_list %}
+    <div class="row">
+        {% for instructor_list in count_by_instructor_start_list %}
+        <div class="col-lg-3">
+        <ul>
+            {% for e in instructor_list %}
                 <li>{{ e.0.0 }} | {{ e.0.1 }} | {{ e.0.2 }} </li>
                 <ul>
                     {% for s in e.1 %}
                         <li><a href="{% url 'edit_schedule' s.id %}">{{ s }}</a></li>
                     {% endfor %}
                 </ul>
+            {% endfor %}
+        </ul>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
 {% else %}
     <ul>
         <li>Everything looks good!</li>
@@ -72,17 +78,23 @@
 {% endif %}
 
 <h4>By Room</h4>
-{% if count_by_location_start %}
-    <ul>
-        {% for e in count_by_location_start %}
+{% if count_by_location_start_list %}
+    <div class="row">
+        {% for location_list in count_by_location_start_list %}
+        <div class="col-lg-3">
+        <ul>
+            {% for e in location_list %}
                 <li>{{ e.0.0 }} | {{ e.0.1 }} | {{ e.0.2 }} </li>
                 <ul>
                     {% for s in e.1 %}
                         <li><a href="{% url 'edit_schedule' s.id %}">{{ s }}</a></li>
                     {% endfor %}
                 </ul>
+            {% endfor %}
+        </ul>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
 {% else %}
     <ul>
         <li>Everything looks good!</li>

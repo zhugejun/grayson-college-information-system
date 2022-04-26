@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import count
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -16,6 +17,12 @@ from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
 from main.models import Profile
 
 ITEMS_PER_COLUMN = 10
+
+def list_to_lol(items, items_per_list=10):
+    """convert list to a list of list, with items_per_list for each"""
+    if len(items) <= items_per_list: 
+        return [items]
+    return [items[(i*items_per_list):min(len(items), (i+1)*items_per_list)] for i in range(len(items)//items_per_list+1)]
 
 def df_to_obj_list(df):
 
@@ -641,16 +648,10 @@ def schedule_summary_by_term(request, term):
     context["term"] = term
 
     count_by_course = Course.objects.filter(schedule__term=term, schedule__course__in=course_list).annotate(num_sections=Count("schedule")).order_by("-num_sections")
-    if count_by_course.count() <= ITEMS_PER_COLUMN:
-        context['count_by_course_list'] = [count_by_course]
-    else:
-        context['count_by_course_list'] = [count_by_course[(i*ITEMS_PER_COLUMN):min(len(count_by_course), (i+1)*ITEMS_PER_COLUMN)] for i in range(count_by_course.count()//ITEMS_PER_COLUMN+1)]
+    context['count_by_course_list'] = list_to_lol(count_by_course, ITEMS_PER_COLUMN)
 
     count_by_instructor = Instructor.objects.filter(schedule__term=term, schedule__course__in=course_list).annotate(num_sections=Count("schedule")).order_by("-num_sections")
-    if count_by_instructor.count() <= ITEMS_PER_COLUMN:
-        context['count_by_instructor_list'] = [count_by_instructor]
-    else:
-        context['count_by_instructor_list'] = [count_by_instructor[(i*ITEMS_PER_COLUMN):min(len(count_by_instructor), (i+1)*ITEMS_PER_COLUMN)] for i in range(count_by_instructor.count()//ITEMS_PER_COLUMN+1)]
+    context['count_by_instructor_list'] = list_to_lol(count_by_instructor, ITEMS_PER_COLUMN)
 
     instructor_not_assigned_count = schedules.filter(instructor__isnull=True).count()
     context['instructor_not_assigned_count'] = instructor_not_assigned_count
@@ -667,9 +668,13 @@ def schedule_summary_by_term(request, term):
                     schedules_by_location_start[(s.location, d, s.start_time)].add(s)
 
     count_by_instructor_start = [(key, sections) for key, sections in schedules_by_instructor_start.items() if len(sections) > 1 and all(key)]
+    count_by_instructor_start_list = list_to_lol(count_by_instructor_start, ITEMS_PER_COLUMN)
+
     count_by_location_start = [(key, sections) for key, sections in schedules_by_location_start.items() if len(sections) > 1 and all(key)]
-    context['count_by_instructor_start'] = count_by_instructor_start
-    context['count_by_location_start'] = count_by_location_start
+    count_by_location_start_list = list_to_lol(count_by_location_start, ITEMS_PER_COLUMN)
+
+    context['count_by_instructor_start_list'] = count_by_instructor_start_list
+    context['count_by_location_start_list'] = count_by_location_start_list
 
     return render(request, "scheduling/schedule_summary_by_term.html", context)
 
