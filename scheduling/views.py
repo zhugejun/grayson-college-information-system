@@ -15,6 +15,7 @@ from .forms import ScheduleForm, SubjectForm, SearchForm, SearchBySubjectForm
 from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
 from main.models import Profile
 
+ITEMS_PER_COLUMN = 10
 
 def df_to_obj_list(df):
 
@@ -640,16 +641,16 @@ def schedule_summary_by_term(request, term):
     context["term"] = term
 
     count_by_course = Course.objects.filter(schedule__term=term, schedule__course__in=course_list).annotate(num_sections=Count("schedule")).order_by("-num_sections")
-    if count_by_course.count() <= 10:
+    if count_by_course.count() <= ITEMS_PER_COLUMN:
         context['count_by_course_list'] = [count_by_course]
     else:
-        context['count_by_course_list'] = [count_by_course[(i*10):min(len(count_by_course), (i+1)*10)] for i in range(count_by_course.count()//10+1)]
+        context['count_by_course_list'] = [count_by_course[(i*ITEMS_PER_COLUMN):min(len(count_by_course), (i+1)*ITEMS_PER_COLUMN)] for i in range(count_by_course.count()//ITEMS_PER_COLUMN+1)]
 
     count_by_instructor = Instructor.objects.filter(schedule__term=term, schedule__course__in=course_list).annotate(num_sections=Count("schedule")).order_by("-num_sections")
-    if count_by_instructor.count() <= 10:
+    if count_by_instructor.count() <= ITEMS_PER_COLUMN:
         context['count_by_instructor_list'] = [count_by_instructor]
     else:
-        context['count_by_instructor_list'] = [count_by_instructor[(i*10):min(len(count_by_instructor), (i+1)*10)] for i in range(count_by_instructor.count()//10+1)]
+        context['count_by_instructor_list'] = [count_by_instructor[(i*ITEMS_PER_COLUMN):min(len(count_by_instructor), (i+1)*ITEMS_PER_COLUMN)] for i in range(count_by_instructor.count()//ITEMS_PER_COLUMN+1)]
 
     instructor_not_assigned_count = schedules.filter(instructor__isnull=True).count()
     context['instructor_not_assigned_count'] = instructor_not_assigned_count
