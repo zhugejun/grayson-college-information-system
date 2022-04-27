@@ -10,7 +10,6 @@
 
 <div>
     <h2>Recently Edited</h2>
-  {% if latest_edited %}
   <div class="table-responsive">
     <table class="table table-sm table-striped compact">
       <thead class="table-dark">
@@ -30,6 +29,8 @@
           <th scope="col">Action</th>
         </tr>
       </thead>
+
+      {% if latest_edited %}
       <tbody>
         {% for schedule in latest_edited %}
         <tr>
@@ -63,12 +64,11 @@
         </tr>
         {% endfor %}
         </tbody>
+        {% endif %}
         </table>
     </div>
-    {% endif %}
 
   <h2>Recently Added</h2>
-  {% if latest_added %}
     <div class="table-responsive">
     <table class="table table-sm table-striped compact">
       <thead class="table-dark">
@@ -89,6 +89,7 @@
           <th scope="col">Action</th>
         </tr>
       </thead>
+      {% if latest_added %}
       <tbody>
         {% for schedule in latest_added %}
         <tr>
