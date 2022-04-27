@@ -40,9 +40,11 @@
     </div>
     {% endfor %}
     <div class="col-lg-2">
-        {% if instructor_not_assigned_count > 0 %}
-            <li><span class="bg-danger text-white">NOT ASSIGNED</span>: <a href="{% url 'search' %}?term={{term.pk}}&instructor=0">{{ instructor_not_assigned_count }}</a></li>
-        {% endif %}
+        <ul>
+            {% if instructor_not_assigned_count > 0 %}
+                <li><span class="bg-danger text-white">NOT ASSIGNED</span>: <a href="{% url 'search' %}?term={{term.pk}}&instructor=0">{{ instructor_not_assigned_count }}</a></li>
+            {% endif %}
+        </ul>
     </div>
 </div>
 {% else %}
