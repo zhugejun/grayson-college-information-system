@@ -469,8 +469,6 @@ def courses_with_term(request, term):
 @login_required
 def duplicate_schedule(request, pk):
 
-    search_url = reverse("search")
-
     schedule = get_object_or_404(Schedule, pk=pk)
     new_schedule = schedule
     new_schedule.pk = None
@@ -480,9 +478,6 @@ def duplicate_schedule(request, pk):
         schedule.days = []
 
     schedule = new_schedule
-
-    term_pk = schedule.term.id
-    course_pk = schedule.course.id
 
     form = ScheduleForm(instance=new_schedule)
 
@@ -496,9 +491,8 @@ def duplicate_schedule(request, pk):
             term_pk = schedule.term.id
             schedule.save()
             messages.success(request, f"{schedule}-{schedule.term} added.")
-            return redirect("scheduling_home"
-                # search_url + f"?term={term_pk}&course={course_pk}&section="
-            )
+            prev_url = request.POST.get("next")
+            return HttpResponseRedirect(prev_url)
         else:
             for field_name, _ in form.errors.items():
                 form.fields[field_name].widget.attrs["class"] += " is-invalid"
@@ -512,8 +506,6 @@ def duplicate_schedule(request, pk):
 
 @login_required
 def add_new_schedule(request, term_pk, crs_pk):
-
-    search_url = reverse("search")
 
     term = get_object_or_404(Term, pk=term_pk)
     course = get_object_or_404(Course, pk=crs_pk)
@@ -532,10 +524,8 @@ def add_new_schedule(request, term_pk, crs_pk):
             schedule.insert_by = request.user
             schedule.save()
             messages.success(request, f"{schedule}-{schedule.term} added.")
-            return redirect(
-                "scheduling_home"
-                # search_url + f"?term={term_pk}&course={crs_pk}&section="
-            )
+            prev_url = request.POST.get("next")
+            return HttpResponseRedirect(prev_url)
         else:
             for field_name, _ in form.errors.items():
                 form.fields[field_name].widget.attrs["class"] += " is-invalid"
@@ -590,10 +580,6 @@ def delete_schedule(request, pk):
     else:
         schedule.days = []
     context["schedule"] = schedule
-    term_pk = schedule.term.id
-    course_pk = schedule.course.id
-
-    search_url = reverse("search")
 
     form = ScheduleForm(instance=schedule)
     context["form"] = form
@@ -607,10 +593,8 @@ def delete_schedule(request, pk):
         if form.is_valid():
             schedule.delete()
             messages.success(request, f"{schedule}-{schedule.term} deleted.")
-            return redirect(
-                "scheduling_home"
-                # search_url + f"?term={term_pk}&course={course_pk}&section="
-            )
+            prev_url = request.POST.get("next")
+            return HttpResponseRedirect(prev_url)
     return render(request, "scheduling/delete_schedule.html", context)
 
 

@@ -46,7 +46,7 @@
     <div class="text-center mt-2">
         <button type="submit" class="btn btn-danger ml-5">Yes, Delete</button>
     </div>
-
+    <input type="hidden" name="next" value="{{ request.META.HTTP_REFERER }}">
 </form>
 
 {% endblock content %}
