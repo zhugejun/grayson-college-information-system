@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Count
 
@@ -551,10 +551,6 @@ def add_new_schedule(request, term_pk, crs_pk):
 def edit_schedule(request, pk):
 
     schedule = get_object_or_404(Schedule, pk=pk)
-    term_pk = schedule.term.id
-    course_pk = schedule.course.id
-
-    search_url = reverse("search")
 
     if schedule.days:
         schedule.days = list(schedule.days)
@@ -571,10 +567,8 @@ def edit_schedule(request, pk):
             schedule.update_by = request.user
             schedule.save()
             messages.success(request, f"{schedule}-{schedule.term} updated.")
-            return redirect(
-                "scheduling_home"
-                # search_url + f"?term={term_pk}&course={course_pk}&section="
-            )
+            prev_url = request.POST.get("next")
+            return HttpResponseRedirect(prev_url)
         else:
             for field_name, _ in form.errors.items():
                 form.fields[field_name].widget.attrs["class"] += " is-invalid"
