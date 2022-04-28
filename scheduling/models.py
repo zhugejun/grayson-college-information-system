@@ -75,8 +75,22 @@ class Campus(models.Model):
     def __str__(self):
         return self.name
 
+class SoftDeleteModel(models.Model):
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
-class Schedule(models.Model):
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
+
+    def restore(self):
+        self.is_deleted = False
+        self.save()
+
+    class Meta:
+        abstract = True
+
+class Schedule(SoftDeleteModel):
 
     STATUS_CHOICES = [("OPEN", "Open"), ("CLOSED", "Closed"), ("CANCELED", "Canceled")]
 
