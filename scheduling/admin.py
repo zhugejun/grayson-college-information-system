@@ -23,6 +23,9 @@ class ScheduleAdmin(admin.ModelAdmin):
         "insert_by",
         "update_date",
         "update_by",
+        "is_deleted",
+        "deleted_at",
+        "deleted_by"
     )
     list_filter = (
         "update_date",

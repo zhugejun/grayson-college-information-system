@@ -15,8 +15,9 @@ urlpatterns = [
         "schedules/<int:pk>/add/", views.duplicate_schedule, name="duplicate_schedule"
     ),
     path("schedules/<int:pk>/edit/", views.edit_schedule, name="edit_schedule"),
-    path("schedules/<int:pk>/delete/", views.delete_schedule, name="delete_schedule",),
-    path("schedules/history/", views.history, name="history",),
+    path("schedules/<int:pk>/delete/", views.delete_schedule, name="delete_schedule"),
+    path("schedules/<int:pk>/restore/", views.restore_schedule, name="restore_schedule"),
+    path("schedules/recent/", views.history, name="recent"),
     path("change-summary/", views.change_summary, name="change_summary"),
     path(
         "change-summary/<term>/",

@@ -1,3 +1,4 @@
+from datetime import datetime
 from collections import defaultdict
 from itertools import count
 from django.contrib.auth.models import User
@@ -17,6 +18,7 @@ from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
 from main.models import Profile
 
 ITEMS_PER_COLUMN = 10
+MAX_NUMBER_OF_DELETED_ITEMS = 8
 
 def list_to_lol(items, items_per_list=10):
     """convert list to a list of list, with items_per_list for each"""
@@ -35,6 +37,7 @@ def df_to_obj_list(df):
     source_list = []
 
     if len(df) > 0:
+        # TODO: use itertuples instead
         for _, row in df.iterrows():
             term = Term.objects.get(pk=row["term_id"])
             course = Course.objects.get(pk=row["course_id"])
@@ -132,12 +135,12 @@ def get_diff_gcis_cams(term, course_list):
                 "insert_date",
                 "update_by",
                 "update_date",
+                "is_deleted",
+                "deleted_at",
+                "deleted_by",
                 "notes",
             )
         )
-        schedules_gcis.replace("", np.nan, inplace=True)
-        # days cannot be float type
-        schedules_gcis.days.replace(np.nan, None, inplace=True)
 
         schedules_cams = pd.DataFrame.from_records(
             Cams.objects.filter(course__in=course_list, term=term)
@@ -160,6 +163,12 @@ def get_diff_gcis_cams(term, course_list):
         if schedules_gcis.empty and schedules_cams.empty:
             return changed, added, deleted, total_changes
 
+        # clean up and get ready to merge
+        schedules_gcis.replace("", np.nan, inplace=True)
+        # days cannot be float type
+        schedules_gcis.days.replace(np.nan, None, inplace=True)
+
+        # change null to None, replace values where condition is False
         schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
         schedules_cams = schedules_cams.where(pd.notnull(schedules_cams), None)
 
@@ -175,8 +184,11 @@ def get_diff_gcis_cams(term, course_list):
             schedules_cams[col] = schedules_cams[col].astype("Int64")
             schedules_gcis[col] = schedules_gcis[col].astype("Int64")
 
-        for col in ["update_by", "insert_by"]:
+        for col in ["update_by", "insert_by", "deleted_by"]:
             schedules_gcis[col] = schedules_gcis[col].astype("Int64")
+        
+        print(schedules_gcis)
+        print(schedules_cams)
 
         # merge two schedules
         schedules = schedules_gcis.merge(
@@ -591,11 +603,43 @@ def delete_schedule(request, pk):
         for field_name, _ in form.fields.items():
             form.fields[field_name].disabled = True
         if form.is_valid():
-            schedule.delete()
+            schedule.deleted_by = request.user
+            schedule.soft_delete()
             messages.success(request, f"{schedule}-{schedule.term} deleted.")
             prev_url = request.POST.get("next")
             return HttpResponseRedirect(prev_url)
     return render(request, "scheduling/delete_schedule.html", context)
+
+
+@login_required
+def restore_schedule(request, pk):
+
+    context = {}
+    schedule = get_object_or_404(Schedule, pk=pk)
+
+    if schedule.days:
+        schedule.days = list(schedule.days)
+    else:
+        schedule.days = []
+    context["schedule"] = schedule
+
+    form = ScheduleForm(instance=schedule)
+    context["form"] = form
+    for field_name, _ in form.fields.items():
+        form.fields[field_name].disabled = True
+
+    if request.method == "POST":
+        form = ScheduleForm(request.POST, instance=schedule)
+        for field_name, _ in form.fields.items():
+            form.fields[field_name].disabled = True
+        if form.is_valid():
+            schedule.update_by = request.user
+            schedule.update_date = datetime.now()
+            schedule.restore()
+            messages.success(request, f"{schedule}-{schedule.term} restored.")
+            prev_url = request.POST.get("next")
+            return HttpResponseRedirect(prev_url)
+    return render(request, "scheduling/restore_schedule.html", context)
 
 
 @login_required
@@ -672,17 +716,23 @@ def history(request):
     latest_edited = Schedule.objects.filter(
         update_by=request.user, course__in=course_list
     )
-
-    n_edited = min(len(latest_edited), 10)
+    n_edited = min(len(latest_edited), MAX_NUMBER_OF_DELETED_ITEMS)
     latest_edited = latest_edited.order_by("-update_date")[:n_edited]
     context["latest_edited"] = latest_edited
 
     latest_added = Schedule.objects.filter(
         insert_by=request.user, course__in=course_list
     ).exclude(update_by=request.user)
-    n_added = min(len(latest_added), 10)
+    n_added = min(len(latest_added), MAX_NUMBER_OF_DELETED_ITEMS)
     latest_added = latest_added.order_by("-insert_date")[:n_added]
     context["latest_added"] = latest_added
+
+    latest_deleted = Schedule.objects.filter(
+        is_deleted=True, deleted_by=request.user, course__in=course_list
+    )
+    n_deleted = min(len(latest_deleted), MAX_NUMBER_OF_DELETED_ITEMS)
+    latest_deleted = latest_deleted.order_by("-deleted_at")[:n_deleted]
+    context["latest_deleted"] = latest_deleted
 
     return render(request, "scheduling/history.html", context)
 
