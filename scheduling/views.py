@@ -1,6 +1,5 @@
 from datetime import datetime
 from collections import defaultdict
-from itertools import count
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -12,6 +11,7 @@ from django.db.models import Count
 import pandas as pd
 import numpy as np
 import csv
+from zoneinfo import ZoneInfo
 
 from .forms import ScheduleForm, SubjectForm, SearchForm, SearchBySubjectForm
 from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
@@ -25,297 +25,6 @@ def list_to_lol(items, items_per_list=10):
     if len(items) <= items_per_list: 
         return [items]
     return [items[(i*items_per_list):min(len(items), (i+1)*items_per_list)] for i in range(len(items)//items_per_list+1)]
-
-def df_to_obj_list(df):
-
-    obj_list = []
-    insert_by_list = []
-    insert_date_list = []
-    updated_by_list = []
-    updated_date_list = []
-    notes_list = []
-    source_list = []
-
-    if len(df) > 0:
-        # TODO: use itertuples instead
-        for _, row in df.iterrows():
-            term = Term.objects.get(pk=row["term_id"])
-            course = Course.objects.get(pk=row["course_id"])
-            section = row["section"]
-            capacity = row["capacity"]
-            instructor = (
-                Instructor.objects.get(pk=row["instructor_id"])
-                if pd.notnull(row["instructor_id"])
-                else None
-            )
-            status = row["status"]
-            campus = (
-                Campus.objects.get(pk=row["campus_id"])
-                if pd.notnull(row["campus_id"])
-                else None
-            )
-            location = (
-                Location.objects.get(pk=row["location_id"])
-                if pd.notnull(row["location_id"])
-                else None
-            )
-            days = row["days"] if row["days"] else None
-            start_time = row["start_time"]
-            stop_time = row["stop_time"]
-
-            user_id = row["insert_by"]
-            insert_by = User.objects.get(pk=user_id) if not pd.isna(user_id) else ""
-            insert_by_list.append(insert_by)
-            insert_date_list.append(row["insert_date"])
-
-            user_id = row["update_by"]
-            updated_by = User.objects.get(pk=user_id) if not pd.isna(user_id) else ""
-            updated_by_list.append(updated_by)
-            updated_date_list.append(row["update_date"])
-
-            notes = row["notes"]
-            notes_list.append(notes)
-
-            source = "GCIS" if row["_merge"] == "left_only" else "CAMS"
-            source_list.append(source)
-
-            obj_list.append(
-                Cams(
-                    term=term,
-                    course=course,
-                    section=section,
-                    capacity=capacity,
-                    instructor=instructor,
-                    status=status,
-                    campus=campus,
-                    location=location,
-                    days=days,
-                    start_time=start_time,
-                    stop_time=stop_time,
-                )
-            )
-
-    return (
-        obj_list,
-        notes_list,
-        source_list,
-        insert_by_list,
-        insert_date_list,
-        updated_by_list,
-        updated_date_list,
-    )
-
-
-def get_diff_gcis_cams(term, course_list):
-
-    changed = zip([], [], [])
-    added = zip([], [], [])
-    deleted = zip([], [], [])
-
-    total_changes = 0
-
-    if course_list:
-
-        schedules_gcis = pd.DataFrame.from_records(
-            Schedule.objects.filter(course__in=course_list, term=term)
-            .all()
-            .values(
-                "term_id",
-                "course_id",
-                "section",
-                "capacity",
-                "instructor_id",
-                "status",
-                "campus_id",
-                "location_id",
-                "days",
-                "start_time",
-                "stop_time",
-                "insert_by",
-                "insert_date",
-                "update_by",
-                "update_date",
-                "is_deleted",
-                "deleted_at",
-                "deleted_by",
-                "notes",
-            )
-        )
-
-        schedules_cams = pd.DataFrame.from_records(
-            Cams.objects.filter(course__in=course_list, term=term)
-            .all()
-            .values(
-                "term_id",
-                "course_id",
-                "section",
-                "capacity",
-                "instructor_id",
-                "status",
-                "campus_id",
-                "location_id",
-                "days",
-                "start_time",
-                "stop_time",
-            )
-        )
-
-        if schedules_gcis.empty and schedules_cams.empty:
-            return changed, added, deleted, total_changes
-
-        # clean up and get ready to merge
-        schedules_gcis.replace("", np.nan, inplace=True)
-        # days cannot be float type
-        schedules_gcis.days.replace(np.nan, None, inplace=True)
-
-        # change null to None, replace values where condition is False
-        schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
-        schedules_cams = schedules_cams.where(pd.notnull(schedules_cams), None)
-
-        # fix the error casused by N/A in a character column
-        for col in [
-            "term_id",
-            "course_id",
-            "capacity",
-            "instructor_id",
-            "campus_id",
-            "location_id",
-        ]:
-            schedules_cams[col] = schedules_cams[col].astype("Int64")
-            schedules_gcis[col] = schedules_gcis[col].astype("Int64")
-
-        for col in ["update_by", "insert_by", "deleted_by"]:
-            schedules_gcis[col] = schedules_gcis[col].astype("Int64")
-        
-        print(schedules_gcis)
-        print(schedules_cams)
-
-        # merge two schedules
-        schedules = schedules_gcis.merge(
-            schedules_cams,
-            how="outer",
-            on=[
-                "term_id",
-                "course_id",
-                "section",
-                "capacity",
-                "instructor_id",
-                "status",
-                "campus_id",
-                "location_id",
-                "days",
-                "start_time",
-                "stop_time",
-            ],
-            indicator=True,
-        )
-
-        not_in_both = schedules.loc[schedules["_merge"] != "both"]
-        not_in_both.reset_index(drop=True, inplace=True)
-
-        # change nan to None
-        not_in_both = not_in_both.where(pd.notnull(not_in_both), None)
-
-        # left is GCIS, right is CAMS
-        grouped = not_in_both.groupby(["term_id", "course_id", "section"])
-
-        _changed = grouped.filter(lambda x: x["_merge"].count() == 2)
-
-        # if both canceled, these is no need to compare the rest
-        _both_canceled = (
-            _changed.loc[_changed["status"] == "CANCELED"]
-            .groupby(["term_id", "course_id", "section"])
-            .filter(lambda x: x["section"].count() == 2)
-        )
-        _both_closed = (
-            _changed.loc[_changed["status"] == "CLOSED"]
-            .groupby(["term_id", "course_id", "section"])
-            .filter(lambda x: x["section"].count() == 2)
-        )
-        _changed = _changed[~_changed.index.isin(list(_both_canceled.index))]
-        _changed = _changed[~_changed.index.isin(list(_both_closed.index))]
-
-        (
-            changed_schedules,
-            changed_notes,
-            changed_sources,
-            insert_by_list,
-            insert_date_list,
-            updated_by_list,
-            updated_date_list,
-        ) = df_to_obj_list(_changed)
-        changed = zip(
-            changed_schedules,
-            changed_notes,
-            changed_sources,
-            insert_by_list,
-            insert_date_list,
-            updated_by_list,
-            updated_date_list,
-        )
-
-        # added
-        added = not_in_both.loc[not_in_both["_merge"] == "left_only"]
-        added = added[
-            ~added.index.isin(
-                list(_changed.index)
-                + list(_both_canceled.index)
-                + list(_both_closed.index)
-            )
-        ]
-        # if a course is canceled in the added section, then it was deleted in CAMS
-        # it is safe to hide them, but better to reset the database
-        # added = added.loc[added['status'] not in ['CANCELED', 'CLOSED']]
-        (
-            added_schedules,
-            added_notes,
-            added_sources,
-            insert_by_list,
-            insert_date_list,
-            updated_by_list,
-            updated_date_list,
-        ) = df_to_obj_list(added)
-        added = zip(
-            added_schedules,
-            added_notes,
-            added_sources,
-            insert_by_list,
-            insert_date_list,
-            updated_by_list,
-            updated_date_list,
-        )
-
-        # deleted
-        deleted = not_in_both.loc[not_in_both["_merge"] == "right_only"]
-        deleted = deleted[
-            ~deleted.index.isin(
-                list(_changed.index)
-                + list(_both_canceled.index)
-                + list(_both_closed.index)
-            )
-        ]
-        (
-            deleted_schedules,
-            deleted_notes,
-            deleted_sources,
-            insert_by_list,
-            insert_date_list,
-            updated_by_list,
-            updated_date_list,
-        ) = df_to_obj_list(deleted)
-        deleted = zip(
-            deleted_schedules,
-            deleted_notes,
-            deleted_sources,
-            insert_by_list,
-            insert_date_list,
-            updated_by_list,
-            updated_date_list,
-        )
-
-        total_changes = len(not_in_both)
-
-    return changed, added, deleted, total_changes
 
 
 # ------------------------ Home --------------------------#
@@ -418,15 +127,6 @@ def search(request):
         show_course = True
     context["hide_add_button"] = hide_add_button
     context["show_course"] = show_course
-
-    # paginator = Paginator(schedule_list, 25)
-    # page_number = request.GET.get("page")
-
-    # if not page_number and schedule_list:
-    #     page_number = 1
-
-    # page = paginator.get_page(page_number)
-    # context["page"] = page
 
     context["schedule_list"] = schedule_list
 
@@ -765,8 +465,9 @@ def change_summary_by_term(request, term):
     context["term"] = term
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    changed, added, deleted, total_changes = get_diff_gcis_cams(term, course_list)
-    context["changed"] = changed
+    gcis_changed, cams_changed, added, deleted, total_changes = get_diff_gcis_cams(term, course_list)
+    context["gcis_changed"] = gcis_changed
+    context["cams_changed"] = cams_changed
     context["added"] = added
     context["deleted"] = deleted
     context["total_changes"] = total_changes
@@ -774,11 +475,187 @@ def change_summary_by_term(request, term):
     return render(request, "scheduling/change_summary_by_term.html", context)
 
 
+def get_diff_gcis_cams(term, course_list):
+
+    total_changes = 0
+    
+    if term and course_list:
+
+        schedules_gcis = pd.DataFrame.from_records(
+            Schedule.objects.filter(course__in=course_list, term=term, is_deleted=False)
+            .all()
+            .values(
+                "id",
+                "term_id",
+                "course_id",
+                "section",
+                "capacity",
+                "instructor_id",
+                "status",
+                "campus_id",
+                "location_id",
+                "days",
+                "start_time",
+                "stop_time",
+            )
+        )
+        schedules_gcis.rename(columns={"id": "gcis_id"}, inplace=True)
+
+        schedules_cams = pd.DataFrame.from_records(
+            Cams.objects.filter(course__in=course_list, term=term)
+            .all()
+            .values(
+                "id",
+                "term_id",
+                "course_id",
+                "section",
+                "capacity",
+                "instructor_id",
+                "status",
+                "campus_id",
+                "location_id",
+                "days",
+                "start_time",
+                "stop_time",
+            )
+        )
+        schedules_cams.rename(columns={"id": "cams_id"}, inplace=True)
+
+        if schedules_gcis.empty and schedules_cams.empty:
+            return [], [], [], [], total_changes
+
+        # clean up and get ready to merge
+        schedules_gcis.replace("", np.nan, inplace=True)
+        # days cannot be float type
+        schedules_gcis.days.replace(np.nan, None, inplace=True)
+
+        # change null to None, replace values where condition is False
+        schedules_gcis = schedules_gcis.where(pd.notnull(schedules_gcis), None)
+        schedules_cams = schedules_cams.where(pd.notnull(schedules_cams), None)
+
+        # make id an int64
+        schedules_gcis["gcis_id"] = schedules_gcis["gcis_id"].astype("Int64")
+        schedules_cams["cams_id"] = schedules_cams["cams_id"].astype("Int64")
+
+        # fix the error casused by N/A in a character column
+        for col in [
+            "term_id",
+            "course_id",
+            "capacity",
+            "instructor_id",
+            "campus_id",
+            "location_id",
+        ]:
+            schedules_cams[col] = schedules_cams[col].astype("Int64")
+            schedules_gcis[col] = schedules_gcis[col].astype("Int64")
+
+        
+        # merge two schedules
+        merged = schedules_gcis.merge(
+            schedules_cams,
+            how="outer",
+            on=[
+                "term_id",
+                "course_id",
+                "section",
+                "capacity",
+                "instructor_id",
+                "status",
+                "campus_id",
+                "location_id",
+                "days",
+                "start_time",
+                "stop_time",
+            ],
+            indicator=True,
+        )
+
+        print(merged)
+
+        not_in_both = merged.loc[merged["_merge"] != "both"]
+        not_in_both.reset_index(drop=True, inplace=True)
+        total_changes = len(not_in_both)
+
+        # change nan to None
+        not_in_both = not_in_both.where(pd.notnull(not_in_both), None)
+
+        # left is GCIS, right is CAMS
+        grouped = not_in_both.groupby(["term_id", "course_id", "section"])
+
+        # changed, there could be duplicated sections for one schedule
+        _changed = grouped.filter(lambda x: x["_merge"].count() >= 2)
+
+        # if both canceled or closed, these is no need to compare the rest
+        _both_canceled = (
+            _changed.loc[_changed["status"] == "CANCELED"]
+            .groupby(["term_id", "course_id", "section"])
+            .filter(lambda x: x["section"].count() == 2)
+        )
+        _both_closed = (
+            _changed.loc[_changed["status"] == "CLOSED"]
+            .groupby(["term_id", "course_id", "section"])
+            .filter(lambda x: x["section"].count() == 2)
+        )
+        _changed = _changed[~_changed.index.isin(list(_both_canceled.index))]
+        _changed = _changed[~_changed.index.isin(list(_both_closed.index))]
+        gcis_cids = _changed.loc[_changed["_merge"] == "left_only"]["gcis_id"].values
+        cams_cids = _changed.loc[_changed["_merge"] == "right_only"]["cams_id"].values
+        
+        gcis_changed = []
+        cams_changed = []
+        for _id in gcis_cids:
+            gcis_changed.append(Schedule.objects.get(pk=_id))
+        for _id in cams_cids:
+            cams_changed.append(Cams.objects.get(pk=_id))
+
+        # added
+        _added = not_in_both.loc[not_in_both["_merge"] == "left_only"]
+        _added = _added[
+            ~_added.index.isin(
+                list(_changed.index)
+                + list(_both_canceled.index)
+                + list(_both_closed.index)
+            )
+        ]
+
+        added = []
+        for _id in _added["gcis_id"].values:
+            added.append(Schedule.objects.get(pk=_id))
+
+        # if a course is canceled in the added section, then it was deleted in CAMS
+        # it is safe to hide them, but better to reset the database
+        # added = added.loc[added['status'] not in ['CANCELED', 'CLOSED']]
+
+
+        # # deleted
+        # # someone added schedules through cams???
+        # # make sure all changes are through Debbie
+        # _deleted = not_in_both.loc[not_in_both["_merge"] == "right_only"]
+        # _deleted = _deleted[
+        #     ~_deleted.index.isin(
+        #         list(_changed.index)
+        #         + list(_both_canceled.index)
+        #         + list(_both_closed.index)
+        #     )
+        # ]
+        deleted = Schedule.objects.filter(term=term, course__in=course_list, is_deleted=True)
+
+    return gcis_changed, cams_changed, added, deleted, total_changes
+
+
+def reformat_datetime(dt: datetime):
+    if not dt:
+        return ""
+    dt = dt.astimezone(ZoneInfo("America/Chicago"))
+    return dt.strftime("%m/%d/%Y, %H:%M:%S")
+
+
 @login_required
 def download_change_summary_by_term(request, term):
 
+    now = datetime.now().strftime("%m%d%Y")
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="schedule-changes.csv"'
+    response["Content-Disposition"] = f'attachment; filename="{term.lower()}-schedule-changes-{now}.csv"'
 
     profile = get_object_or_404(Profile, user=request.user)
     if profile.subjects:
@@ -792,7 +669,7 @@ def download_change_summary_by_term(request, term):
 
     course_list = Course.objects.filter(subject__in=subject_list)
 
-    changed, added, deleted, _ = get_diff_gcis_cams(term, course_list)
+    gcis_changed, cams_changed, added, deleted, _ = get_diff_gcis_cams(term, course_list)
 
     # write data to csv file so that user can download
     writer = csv.writer(response)
@@ -813,16 +690,16 @@ def download_change_summary_by_term(request, term):
             "Stop",
             "Note",
             "source",
-            "Insert_by",
-            "Insert_date",
+            "Inserted_by",
+            "Inserted_date",
             "Updated_by",
             "Updated_date",
+            "Deleted_by",
+            "Deleted_date",
             "Action",
         ]
     )
-    for s, n, src, inb, ind, udy, udd in added:
-        ind = "" if pd.isnull(ind) else str(ind)[:19]
-        udd = "" if pd.isnull(udd) else str(udd)[:19]
+    for s in gcis_changed:
         writer.writerow(
             [
                 s.term,
@@ -837,19 +714,45 @@ def download_change_summary_by_term(request, term):
                 s.days,
                 s.start_time,
                 s.stop_time,
-                n,
-                src,
-                inb,
-                ind,
-                udy,
-                udd,
-                "ADD",
+                s.notes,
+                "GCIS",
+                s.insert_by,
+                reformat_datetime(s.insert_date),
+                s.update_by,
+                reformat_datetime(s.update_date),
+                s.deleted_by,
+                reformat_datetime(s.deleted_at),
+                "CHANGE"
+            ]
+        )
+    for c in cams_changed:
+        writer.writerow(
+            [
+                c.term,
+                c.course,
+                c.course.name,
+                c.section,
+                c.status,
+                c.capacity,
+                c.instructor,
+                c.campus,
+                c.location,
+                c.days,
+                c.start_time,
+                c.stop_time,
+                "",
+                "CAMS",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "CHANGE"
             ]
         )
 
-    for s, n, src, inb, ind, udy, udd in deleted:
-        ind = "" if pd.isnull(ind) else str(ind)[:19]
-        udd = "" if pd.isnull(udd) else str(udd)[:19]
+    for s in deleted:
         writer.writerow(
             [
                 s.term,
@@ -864,19 +767,19 @@ def download_change_summary_by_term(request, term):
                 s.days,
                 s.start_time,
                 s.stop_time,
-                n,
-                src,
-                inb,
-                ind,
-                udy,
-                udd,
+                s.notes,
+                "GCIS",
+                s.insert_by,
+                reformat_datetime(s.insert_date),
+                s.update_by,
+                reformat_datetime(s.update_date),
+                s.deleted_by,
+                reformat_datetime(s.deleted_at),                
                 "DELETE",
             ]
         )
 
-    for s, n, src, inb, ind, udy, udd in changed:
-        ind = "" if pd.isnull(ind) else str(ind)[:19]
-        udd = "" if pd.isnull(udd) else str(udd)[:19]
+    for s in added:
         writer.writerow(
             [
                 s.term,
@@ -891,12 +794,14 @@ def download_change_summary_by_term(request, term):
                 s.days,
                 s.start_time,
                 s.stop_time,
-                n,
-                src,
-                inb,
-                ind,
-                udy,
-                udd,
+                s.notes,
+                "GCIS",
+                s.insert_by,
+                reformat_datetime(s.insert_date),
+                s.update_by,
+                reformat_datetime(s.update_date),
+                s.deleted_by,
+                reformat_datetime(s.deleted_at),  
                 "CHANGE",
             ]
         )

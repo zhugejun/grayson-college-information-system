@@ -10,7 +10,6 @@
     <table id="scheduleAddTable" class="table table-sm table-striped compact">
         <thead class="table-dark">
             <tr>
-                <th scope="col">Term</th>
                 <th scope="col">Course</th>
                 <th scope="col">Name</th>
                 <th scope="col">Section</th>
@@ -27,9 +26,8 @@
         </thead>
         {% if added %}
         <tbody>
-            {% for schedule, notes, source, _, _, _, _ in added %}
+            {% for schedule in added %}
             <tr>
-                <td>{{ schedule.term }}</td>
                 <td>{{ schedule.course }}</td>
                 <td>{{ schedule.course.name }}</td>
                 <td>{{ schedule.section }}</td>
@@ -53,7 +51,6 @@
     <table id="scheduleDeleteTable" class="table table-striped compact">
         <thead class="table-dark">
             <tr>
-                <th scope="col">Term</th>
                 <th scope="col">Course</th>
                 <th scope="col">Name</th>
                 <th scope="col">Section</th>
@@ -70,9 +67,8 @@
         </thead>
         {% if deleted %}
         <tbody>
-            {% for schedule, notes, source, _, _, _, _ in deleted %}
+            {% for schedule in deleted %}
             <tr>
-                <td>{{ schedule.term }}</td>
                 <td>{{ schedule.course }}</td>
                 <td>{{ schedule.course.name }}</td>
                 <td>{{ schedule.section }}</td>
@@ -96,7 +92,6 @@
     <table id="scheduleChangeTable" class="table table-striped compact">
         <thead class="table-dark">
             <tr>
-                <th scope="col">Term</th>
                 <th scope="col">Course</th>
                 <th scope="col">Name</th>
                 <th scope="col">Section</th>
@@ -113,47 +108,48 @@
 
             </tr>
         </thead>
-        {% if changed %}
-        <tbody>
-            {% for schedule, notes, source, _, _, _, _ in changed %}
-            {% if source == 'CAMS' %}
-            <tr>
-                <td class="text-muted">{{ schedule.term }}</td>
-                <td class="text-muted">{{ schedule.course }}</td>
-                <td class="text-muted">{{ schedule.course.name }}</td>
-                <td class="text-muted">{{ schedule.section }}</td>
-                <td class="text-muted">{{ schedule.status }}</td>
-                <td class="text-muted">{{ schedule.capacity }}</td>
-                <td class="text-muted">{{ schedule.instructor }}</td>
-                <td class="text-muted">{{ schedule.campus }}</td>
-                <td class="text-muted">{{ schedule.location }}</td>
-                <td class="text-muted">{{ schedule.days }}</td>
-                <td class="text-muted">{{ schedule.start_time }}</td>
-                <td class="text-muted">{{ schedule.stop_time }}</td>
-                <td class="text-muted">{{ notes }}</td>
-                <td class="text-muted">{{ source }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td>{{ schedule.term }}</td>
-                <td>{{ schedule.course }}</td>
-                <td>{{ schedule.course.name }}</td>
-                <td>{{ schedule.section }}</td>
-                <td>{{ schedule.status }}</td>
-                <td>{{ schedule.capacity }}</td>
-                <td>{{ schedule.instructor }}</td>
-                <td>{{ schedule.campus }}</td>
-                <td>{{ schedule.location }}</td>
-                <td>{{ schedule.days }}</td>
-                <td>{{ schedule.start_time }}</td>
-                <td>{{ schedule.stop_time }}</td>
-                <td>{{ notes }}</td>
-                <td>{{ source }}</td>
-            </tr>
-            {% endif %}
+        {% if gcis_changed %}
+            <tbody>
+                {% for schedule in gcis_changed %}
+                    <tr>
+                        <td>{{ schedule.course }}</td>
+                        <td>{{ schedule.course.name }}</td>
+                        <td>{{ schedule.section }}</td>
+                        <td>{{ schedule.status }}</td>
+                        <td>{{ schedule.capacity }}</td>
+                        <td>{{ schedule.instructor }}</td>
+                        <td>{{ schedule.campus }}</td>
+                        <td>{{ schedule.location }}</td>
+                        <td>{{ schedule.days }}</td>
+                        <td>{{ schedule.start_time }}</td>
+                        <td>{{ schedule.stop_time }}</td>
+                        <td>{{ notes }}</td>
+                        <td>GCIS</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        {% endif %}
 
-            {% endfor %}
-        </tbody>
+        {% if cams_changed %}
+            <tbody>
+                {% for schedule in cams_changed %}
+                    <tr>
+                        <td class="text-muted">{{ schedule.course }}</td>
+                        <td class="text-muted">{{ schedule.course.name }}</td>
+                        <td class="text-muted">{{ schedule.section }}</td>
+                        <td class="text-muted">{{ schedule.status }}</td>
+                        <td class="text-muted">{{ schedule.capacity }}</td>
+                        <td class="text-muted">{{ schedule.instructor }}</td>
+                        <td class="text-muted">{{ schedule.campus }}</td>
+                        <td class="text-muted">{{ schedule.location }}</td>
+                        <td class="text-muted">{{ schedule.days }}</td>
+                        <td class="text-muted">{{ schedule.start_time }}</td>
+                        <td class="text-muted">{{ schedule.stop_time }}</td>
+                        <td class="text-muted">None</td>
+                        <td class="text-muted">CAMS</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         {% endif %}
     </table>
 
