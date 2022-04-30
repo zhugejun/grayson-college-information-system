@@ -570,7 +570,6 @@ def get_diff_gcis_cams(term, course_list):
             indicator=True,
         )
 
-        print(merged)
 
         not_in_both = merged.loc[merged["_merge"] != "both"]
         not_in_both.reset_index(drop=True, inplace=True)
