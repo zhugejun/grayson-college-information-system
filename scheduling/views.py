@@ -402,7 +402,7 @@ def schedule_summary_by_term(request, term):
 
 
 @login_required
-def history(request):
+def recent(request):
     context = {}
 
     profile = get_object_or_404(Profile, user=request.user)
@@ -434,7 +434,7 @@ def history(request):
     latest_deleted = latest_deleted.order_by("-deleted_at")[:n_deleted]
     context["latest_deleted"] = latest_deleted
 
-    return render(request, "scheduling/history.html", context)
+    return render(request, "scheduling/recent.html", context)
 
 
 @login_required
