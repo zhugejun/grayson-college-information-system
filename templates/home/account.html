@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% block content %}
+
+<h1>Account Information</h1>
+<hr />
+
+<h2>Scheduling App Permissions</h2>
+<ul>
+    {% for perm in curr_user.get_group_permissions %}
+        <li>{{ perm }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock content %}
