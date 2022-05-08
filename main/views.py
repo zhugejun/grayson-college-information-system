@@ -1,13 +1,7 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.forms import AuthenticationForm  # ,UserCreationForm
-from django.contrib.auth.forms import PasswordResetForm
+from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 
 
@@ -76,5 +70,10 @@ def logout_request(request):
 @login_required(login_url='/login')
 def account(request):
     curr_user = request.user
+    # print(dir(curr_user))
+    # print(request.user.get_group_permissions())
+    # print('scheduling.view_schedule' in request.user.get_group_permissions())
+    # print(request.user.has_perm('scheduling.view_schedule'))
+    context = {"curr_user": curr_user}
 
-    return render(request, 'home/profile.html')
+    return render(request, 'home/account.html', context)
