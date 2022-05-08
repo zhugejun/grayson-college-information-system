@@ -478,6 +478,7 @@ def change_summary_by_term(request, term):
 def get_diff_gcis_cams(term, course_list):
 
     total_changes = 0
+    gcis_changed, cams_changed, added, deleted = [], [], [], []
     
     if term and course_list:
 
@@ -522,7 +523,7 @@ def get_diff_gcis_cams(term, course_list):
         schedules_cams.rename(columns={"id": "cams_id"}, inplace=True)
 
         if schedules_gcis.empty and schedules_cams.empty:
-            return [], [], [], [], total_changes
+            return gcis_changed, cams_changed, added, deleted, total_changes
 
         # clean up and get ready to merge
         schedules_gcis.replace("", np.nan, inplace=True)
@@ -600,8 +601,6 @@ def get_diff_gcis_cams(term, course_list):
         gcis_cids = _changed.loc[_changed["_merge"] == "left_only"]["gcis_id"].values
         cams_cids = _changed.loc[_changed["_merge"] == "right_only"]["cams_id"].values
         
-        gcis_changed = []
-        cams_changed = []
         for _id in gcis_cids:
             gcis_changed.append(Schedule.objects.get(pk=_id))
         for _id in cams_cids:
