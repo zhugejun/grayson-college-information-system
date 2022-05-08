@@ -370,10 +370,16 @@ def schedule_summary_by_term(request, term):
     context["term"] = term
 
     count_by_course = Course.objects.filter(schedule__term=term, schedule__course__in=course_list).annotate(num_sections=Count("schedule")).order_by("-num_sections")
-    context['count_by_course_list'] = list_to_lol(count_by_course, ITEMS_PER_COLUMN)
+    if count_by_course.count() < 1:
+        context['count_by_course_list'] = None
+    else:
+        context['count_by_course_list'] = list_to_lol(count_by_course, ITEMS_PER_COLUMN)
 
     count_by_instructor = Instructor.objects.filter(schedule__term=term, schedule__course__in=course_list).annotate(num_sections=Count("schedule")).order_by("-num_sections")
-    context['count_by_instructor_list'] = list_to_lol(count_by_instructor, ITEMS_PER_COLUMN)
+    if count_by_instructor.count() < 1:
+        context['count_by_instructor_list'] = None
+    else:
+        context['count_by_instructor_list'] = list_to_lol(count_by_instructor, ITEMS_PER_COLUMN)
 
     instructor_not_assigned_count = schedules.filter(instructor__isnull=True).count()
     context['instructor_not_assigned_count'] = instructor_not_assigned_count
@@ -390,13 +396,21 @@ def schedule_summary_by_term(request, term):
                     schedules_by_location_start[(s.location, d, s.start_time)].add(s)
 
     count_by_instructor_start = [(key, sections) for key, sections in schedules_by_instructor_start.items() if len(sections) > 1 and all(key)]
-    count_by_instructor_start_list = list_to_lol(count_by_instructor_start, ITEMS_PER_COLUMN)
+    print(count_by_instructor_start)
+    if not count_by_instructor_start:
+        context['count_by_instructor_start_list'] = None
+    else:
+        count_by_instructor_start_list = list_to_lol(count_by_instructor_start, ITEMS_PER_COLUMN)
+        context['count_by_instructor_start_list'] = count_by_instructor_start_list
+        
+
 
     count_by_location_start = [(key, sections) for key, sections in schedules_by_location_start.items() if len(sections) > 1 and all(key)]
-    count_by_location_start_list = list_to_lol(count_by_location_start, ITEMS_PER_COLUMN)
-
-    context['count_by_instructor_start_list'] = count_by_instructor_start_list
-    context['count_by_location_start_list'] = count_by_location_start_list
+    if not count_by_instructor_start:
+        context['count_by_location_start_list'] = None
+    else:
+        count_by_location_start_list = list_to_lol(count_by_location_start, ITEMS_PER_COLUMN)
+        context['count_by_location_start_list'] = count_by_location_start_list
 
     return render(request, "scheduling/schedule_summary_by_term.html", context)
 
