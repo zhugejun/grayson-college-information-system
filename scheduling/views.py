@@ -33,7 +33,6 @@ def home(request):
     """List all schedules if not login.
     """
     context = {}
-    form = SearchForm()
 
     profile = get_object_or_404(Profile, user=request.user)
     if profile.subjects:
@@ -43,9 +42,11 @@ def home(request):
 
     subject_choices = [(subject, subject) for subject in subject_list]
     form1 = SearchBySubjectForm(subject_choices)
+    form1.fields["term"].queryset = Term.objects.filter(active="T")
 
     course_list = Course.objects.filter(subject__in=subject_list)
 
+    form = SearchForm()
     form.fields["term"].queryset = Term.objects.filter(active="T")
     form.fields["course"].queryset = course_list
 
