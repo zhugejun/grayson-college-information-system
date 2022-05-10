@@ -305,7 +305,6 @@ def delete_schedule(request, pk):
             form.fields[field_name].disabled = True
         if form.is_valid():
             schedule.deleted_by = request.user
-            schedule.update_by = None
             schedule.soft_delete()
             messages.success(request, f"{schedule}-{schedule.term} deleted.")
             prev_url = request.POST.get("next")
@@ -337,6 +336,7 @@ def restore_schedule(request, pk):
         if form.is_valid():
             schedule.update_by = request.user
             schedule.update_date = datetime.now()
+            schedule.deleted_by = None
             schedule.restore()
             messages.success(request, f"{schedule}-{schedule.term} restored.")
             prev_url = request.POST.get("next")
@@ -430,14 +430,14 @@ def recent(request):
 
     latest_edited = Schedule.objects.filter(
         update_by=request.user, course__in=course_list
-    )
+    ).exclude(deleted_by=request.user)
     n_edited = min(len(latest_edited), MAX_NUMBER_OF_DELETED_ITEMS)
     latest_edited = latest_edited.order_by("-update_date")[:n_edited]
     context["latest_edited"] = latest_edited
 
     latest_added = Schedule.objects.filter(
         insert_by=request.user, course__in=course_list
-    ).exclude(update_by=request.user)
+    ).exclude(update_by=request.user).exclude(deleted_by=request.user)
     n_added = min(len(latest_added), MAX_NUMBER_OF_DELETED_ITEMS)
     latest_added = latest_added.order_by("-insert_date")[:n_added]
     context["latest_added"] = latest_added
