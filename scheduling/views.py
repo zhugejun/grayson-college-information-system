@@ -304,6 +304,7 @@ def delete_schedule(request, pk):
             form.fields[field_name].disabled = True
         if form.is_valid():
             schedule.deleted_by = request.user
+            schedule.update_by = None
             schedule.soft_delete()
             messages.success(request, f"{schedule}-{schedule.term} deleted.")
             prev_url = request.POST.get("next")
@@ -396,7 +397,6 @@ def schedule_summary_by_term(request, term):
                     schedules_by_location_start[(s.location, d, s.start_time)].add(s)
 
     count_by_instructor_start = [(key, sections) for key, sections in schedules_by_instructor_start.items() if len(sections) > 1 and all(key)]
-    print(count_by_instructor_start)
     if not count_by_instructor_start:
         context['count_by_instructor_start_list'] = None
     else:
