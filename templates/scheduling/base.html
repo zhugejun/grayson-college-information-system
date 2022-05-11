@@ -63,13 +63,9 @@
 
           {% if messages %}
             {% for message in messages %}
-              {% if message.tags == 'success' %}
-                <div class="toast-body bg-primary text-light" style="position: absolute; top: 10; right: 0;">{{message}}</div>
-              {% endif %}
+              <div class="toast-body bg-success text-light" style="position: absolute; top: 10; right: 0;">{{message}}</div>
             {% endfor %}
           {% endif %}
-
-
 
             <!-- content for schedules -->
             {% block content %}
