@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Course, Campus, Instructor, Location, Term, Schedule, Cams
+from .models import Course, Campus, Dates, Instructor, Location, Term, Schedule, Cams
 
 admin.site.register(Term)
 
@@ -47,3 +47,5 @@ admin.site.register(Campus)
 admin.site.register(Cams)
 
 admin.site.register(Location)
+
+admin.site.register(Dates)

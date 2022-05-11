@@ -14,7 +14,7 @@ import csv
 from zoneinfo import ZoneInfo
 
 from .forms import ScheduleForm, SubjectForm, SearchForm, SearchBySubjectForm
-from .models import Course, Schedule, Instructor, Term, Cams, Campus, Location
+from .models import Course, Dates, Schedule, Instructor, Term, Cams
 from main.models import Profile
 
 ITEMS_PER_COLUMN = 10
@@ -33,6 +33,9 @@ def home(request):
     """List all schedules if not login.
     """
     context = {}
+
+    dates = Dates.objects.all()[0]
+    context["dates"] = dates
 
     profile = get_object_or_404(Profile, user=request.user)
     if profile.subjects:

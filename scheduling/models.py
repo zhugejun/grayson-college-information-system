@@ -202,3 +202,14 @@ class Cams(models.Model):
     class Meta:
         verbose_name = "CAMS"
         verbose_name_plural = "CAMS"
+
+
+class Dates(models.Model):
+    cams_update_at = models.DateTimeField()
+
+    def __str__(self):
+        return "Important Dates"
+
+    class Meta:
+        verbose_name = "Dates"
+        verbose_name_plural = "Dates"
