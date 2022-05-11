@@ -34,7 +34,11 @@ def home(request):
     """
     context = {}
 
-    dates = Dates.objects.all()[0]
+    dates_list = Dates.objects.all()
+    if dates_list.count() > 0:
+        dates = dates_list[0]
+    else:
+        dates = None
     context["dates"] = dates
 
     profile = get_object_or_404(Profile, user=request.user)

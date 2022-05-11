@@ -3,11 +3,13 @@
 <h3>Welcome to the Course Scheduling App!</h3>
 <hr class="mb-3" />
 
-<div class="alert alert-info">
-  <ul>
-    <li>CAMS Last Update: {{ dates.cams_update_at }}</li>
-  </ul>
-</div>
+{% if dates %}
+  <div class="alert alert-info">
+    <ul>
+      <li>CAMS Last Update: {{ dates.cams_update_at }}</li>
+    </ul>
+  </div>
+{% endif %}
 
 <div class="container mt-3">
   <div class="row justify-content-center">
