@@ -45,7 +45,6 @@ class NewUserForm(UserCreationForm):
         email = self.cleaned_data['email']
         if '@grayson.edu' not in email:
             msg = 'Please use your Grayson email to signup.'
-            # self._errors['email'] = msg
             raise forms.ValidationError(msg)
 
         # clean passwords
@@ -53,7 +52,6 @@ class NewUserForm(UserCreationForm):
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             msg = "Passwords don't match"
-            # self._errors['password'] = msg
             raise forms.ValidationError(msg)
 
         # check duplicates before continue
@@ -65,7 +63,6 @@ class NewUserForm(UserCreationForm):
                 pk=self.instance.pk)
         if matching_users:
             msg = f'User {username} already exists.'
-            # self._errors['duplicate'] = msg
             raise forms.ValidationError(msg)
         else:
             return cleaned_data
@@ -85,3 +82,11 @@ class LoginForm(AuthenticationForm):
                 field.widget.attrs['placeholder'] = 'Enter your grayson username'
             if field_name == 'password':
                 field.widget.attrs['placeholder'] = 'Enter your password'
+    
+    def clean(self):
+        try:
+            cleaned_data = super(LoginForm, self).clean()
+            return cleaned_data
+        except:
+            self.add_error("username", "Invalid username or password.")
+            self.add_error("password", "Invalid username or password.")

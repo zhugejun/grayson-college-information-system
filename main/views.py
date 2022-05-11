@@ -26,10 +26,8 @@ def signup(request):
             login(request, user)
             return redirect("/")
         else:
-            for code, error in form._errors.items():
+            for _, error in form._errors.items():
                 messages.error(request, error)
-                # if code in ('email', 'password', 'duplicate'):
-                #     messages.error(request, error)
             return render(request, 'home/signup.html', {'form': form})
 
     return render(request, 'home/signup.html', {'form': form})
@@ -54,9 +52,11 @@ def login_request(request):
                     return HttpResponseRedirect(next_url)
                 return redirect('/')
             else:
-                messages.error(request, "Invalid username or passord.")
+                for field_name, _ in form.errors.items():
+                    form.fields[field_name].widget.attrs["class"] += " is-invalid"
         else:
-            messages.error(request, "Invalid username or passord.")
+            for field_name, _ in form.errors.items():
+                form.fields[field_name].widget.attrs["class"] += " is-invalid"
 
     return render(request, "home/login.html", {'form': form})
 

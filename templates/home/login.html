@@ -8,10 +8,16 @@
 
     <div class="form-group">
         {{ form.username.label }} {{ form.username }}
+        <div class="invalid-feedback">
+            Invalid username or password.
+        </div>
     </div>
 
     <div class="form-group">
         {{ form.password.label }} {{ form.password }}
+        <div class="invalid-feedback">
+            Invalid username or password.
+        </div>
     </div>
 
 
