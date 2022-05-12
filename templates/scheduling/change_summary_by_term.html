@@ -108,8 +108,8 @@
 
             </tr>
         </thead>
-        {% if gcis_changed %}
             <tbody>
+            {% if gcis_changed %}
                 {% for schedule in gcis_changed %}
                     <tr>
                         <td>{{ schedule.course }}</td>
@@ -127,11 +127,9 @@
                         <td>GCIS</td>
                     </tr>
                 {% endfor %}
-            </tbody>
-        {% endif %}
+            {% endif %}
 
-        {% if cams_changed %}
-            <tbody>
+            {% if cams_changed %}
                 {% for schedule in cams_changed %}
                     <tr>
                         <td class="text-muted">{{ schedule.course }}</td>
@@ -149,8 +147,8 @@
                         <td class="text-muted">CAMS</td>
                     </tr>
                 {% endfor %}
+            {% endif %}
             </tbody>
-        {% endif %}
     </table>
 
     <div class="text-center mt-5 mb-5">
