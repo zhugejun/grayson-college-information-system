@@ -9,7 +9,11 @@
     <div class="container">
         {% if messages %}
           {% for message in messages %}
-            <div class="toast-body bg-success text-light" style="position: absolute; top: 10; right: 0;">{{message}}</div>
+            {% if message.tags == "error" %}
+              <div class="toast-body bg-danger text-light" style="position: absolute; top: 10; right: 0;">{{message}}</div>
+            {% else %}
+              <div class="toast-body bg-success text-light" style="position: absolute; top: 10; right: 0;">{{message}}</div>
+            {% endif %}
           {% endfor %}
         {% endif %}
 

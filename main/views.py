@@ -26,7 +26,7 @@ def signup(request):
             login(request, user)
             return redirect("/")
         else:
-            for _, error in form._errors.items():
+            for _, error in form.errors.items():
                 messages.error(request, error)
             return render(request, 'home/signup.html', {'form': form})
 
