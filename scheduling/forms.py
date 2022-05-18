@@ -231,6 +231,10 @@ class ScheduleForm(forms.ModelForm):
         days = "".join(self.cleaned_data.get("days"))
         return days
 
+    def clean_section(self):
+        section = self.cleaned_data.get("section").upper()
+        return section
+
     def clean(self):
         cleaned_data = super(ScheduleForm, self).clean()
 
