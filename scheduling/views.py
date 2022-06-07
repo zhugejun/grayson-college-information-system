@@ -659,6 +659,17 @@ def get_diff_gcis_cams(term, course_list):
         #     )
         # ]
         deleted = Schedule.objects.filter(term=term, course__in=course_list, is_deleted=True)
+        schedule_ids_deleted_in_CAMS = []
+        for schedule in deleted:
+            term = schedule.term
+            course = schedule.course
+            section = schedule.section
+            try:
+                _ = Cams.objects.get(term=term, course=course, section=section)
+            except Cams.DoesNotExist:
+                schedule_ids_deleted_in_CAMS.append(schedule.pk)
+        deleted = deleted.exclude(pk__in=schedule_ids_deleted_in_CAMS)
+            
 
     return gcis_changed, cams_changed, added, deleted, total_changes
 
