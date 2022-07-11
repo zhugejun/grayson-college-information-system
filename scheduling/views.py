@@ -833,7 +833,7 @@ def download_change_summary_by_term(request, term):
                 reformat_datetime(s.update_date),
                 s.deleted_by,
                 reformat_datetime(s.deleted_at),  
-                "CHANGE",
+                "ADD",
             ]
         )
 
