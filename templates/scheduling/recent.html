@@ -64,6 +64,10 @@
         </tr>
         {% endfor %}
         </tbody>
+        {% else %}
+            <tr>
+                <td colspan="13" class="text-center">No data available in table.</td>
+            </tr>
         {% endif %}
         </table>
     </div>
@@ -122,7 +126,11 @@
           </td>
         </tr>
         {% endfor %}
-      </tbody>
+        </tbody>
+        {% else %}
+            <tr>
+                <td colspan="13" class="text-center">No data available in table.</td>
+            </tr>
       {% endif %}
     </table>
     </div>
@@ -173,6 +181,10 @@
         </tr>
         {% endfor %}
       </tbody>
+      {% else %}
+            <tr>
+                <td colspan="13" class="text-center">No data available in table.</td>
+            </tr>
       {% endif %}
     </table>
     </div>
