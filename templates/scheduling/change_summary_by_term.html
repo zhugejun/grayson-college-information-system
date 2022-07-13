@@ -1,13 +1,16 @@
 {% extends "scheduling/base.html" %}
 
 {% block content %}
-<h1>Changes for 
-    <span class="text-info">{{ term.semester }} {{ term.year }}</span>
-</h1>
+<div class="d-flex justify-content-between">
+    <h1>Changes for 
+    <span class="text-info">{{ term.semester }} {{ term.year }}</span> 
+    </h1>
+    <button type="button" class="btn btn-outline-primary" onclick="window.print()">Print this page</button>
+</div>
 <hr />
 
 <h2>Added</h2>
-    <table id="scheduleAddTable" class="table table-sm table-striped compact">
+    <table id="scheduleAddTable" class="table table-sm compact">
         <thead class="table-dark">
             <tr>
                 <th scope="col">Course</th>
@@ -43,12 +46,16 @@
             </tr>
             {% endfor %}
         </tbody>
+        {% else %}
+            <tr>
+                <td colspan="12" class="text-center">No data available in table.</td>
+            </tr>
         {% endif %}
     </table>
 
 
 <h2 class="mt-3">Deleted</h2>
-    <table id="scheduleDeleteTable" class="table table-striped compact">
+    <table id="scheduleDeleteTable" class="table compact">
         <thead class="table-dark">
             <tr>
                 <th scope="col">Course</th>
@@ -84,12 +91,16 @@
             </tr>
             {% endfor %}
         </tbody>
+        {% else %}
+            <tr>
+                <td colspan="12" class="text-center">No data available in table.</td>
+            </tr>
         {% endif %}
     </table>
 
 
 <h2 class="mt-3">Changed</h2>
-    <table id="scheduleChangeTable" class="table table-striped compact">
+    <table id="scheduleChangeTable" class="table compact">
         <thead class="table-dark">
             <tr>
                 <th scope="col">Course</th>
@@ -109,45 +120,50 @@
             </tr>
         </thead>
             <tbody>
-            {% if gcis_changed %}
-                {% for schedule in gcis_changed %}
-                    <tr>
-                        <td>{{ schedule.course }}</td>
-                        <td>{{ schedule.course.name }}</td>
-                        <td>{{ schedule.section }}</td>
-                        <td>{{ schedule.status }}</td>
-                        <td>{{ schedule.capacity }}</td>
-                        <td>{{ schedule.instructor }}</td>
-                        <td>{{ schedule.campus }}</td>
-                        <td>{{ schedule.location }}</td>
-                        <td>{{ schedule.days }}</td>
-                        <td>{{ schedule.start_time }}</td>
-                        <td>{{ schedule.stop_time }}</td>
-                        <td>{{ schedule.notes }}</td>
-                        <td>GCIS</td>
-                    </tr>
+            {% if changed_combined %}
+                {% for _, s_dict in changed_combined.items %}
+                    {% for schedule in s_dict.gcis %}
+                        <tr>
+                            <td>{{ schedule.course }}</td>
+                            <td>{{ schedule.course.name }}</td>
+                            <td>{{ schedule.section }}</td>
+                            <td {% if schedule.id in gcis_changed_cols.status %} class="mark" {% endif %}>{{ schedule.status }}</td>
+                            <td {% if schedule.id in gcis_changed_cols.capacity %} class="mark" {% endif %}>{{ schedule.capacity }}</td>
+                            <td {% if schedule.id in gcis_changed_cols.instructor %} class="mark" {% endif %}>{{ schedule.instructor }}</td>
+                            <td {% if schedule.id in gcis_changed_cols.campus %} class="mark" {% endif %}>{{ schedule.campus }}</td>
+                            <td {% if schedule.id in gcis_changed_cols.location %} class="mark" {% endif %}>{{ schedule.location }}</td>
+                            <td {% if schedule.id in gcis_changed_cols.days %} class="mark" {% endif %}>{{ schedule.days }}</td>
+                            <td {% if schedule.id in gcis_changed_cols.start_time %} class="mark" {% endif %}>{{ schedule.start_time }}</td>
+                            <td {% if schedule.id in gcis_changed_cols.stop_time %} class="mark" {% endif %}>{{ schedule.stop_time }}</td>
+                            <td>{{ schedule.notes }}</td>
+                            <td>GCIS</td>
+                        </tr>
+                    {% endfor %}
+                    {% for schedule in s_dict.cams %}
+                        <tr>
+                            <td class="text-muted ">{{ schedule.course }}</td>
+                            <td class="text-muted">{{ schedule.course.name }}</td>
+                            <td class="text-muted">{{ schedule.section }}</td>
+                            <td class="text-muted {% if schedule.id in cams_changed_cols.status %} strike {% endif %}">{{ schedule.status }}</td>
+                            <td class="text-muted {% if schedule.id in cams_changed_cols.capacity %} strike {% endif %}">{{ schedule.capacity }}</td>
+                            <td class="text-muted {% if schedule.id in cams_changed_cols.instructor %} strike {% endif %}">{{ schedule.instructor }}</td>
+                            <td class="text-muted {% if schedule.id in cams_changed_cols.campus %} strike {% endif %}">{{ schedule.campus }}</td>
+                            <td class="text-muted {% if schedule.id in cams_changed_cols.location %} strike {% endif %}">{{ schedule.location }}</td>
+                            <td class="text-muted {% if schedule.id in cams_changed_cols.days %} strike {% endif %}">{{ schedule.days }}</td>
+                            <td class="text-muted {% if schedule.id in cams_changed_cols.start_time %} strike {% endif %}">{{ schedule.start_time }}</td>
+                            <td class="text-muted {% if schedule.id in cams_changed_cols.stop_time %} strike {% endif %}">{{ schedule.stop_time }}</td>
+                            <td class="text-muted">None</td>
+                            <td class="text-muted">CAMS</td>
+                        </tr>
+                    {% endfor %}
                 {% endfor %}
+
+            {% else %}
+            <tr>
+                <td colspan="12" class="text-center">No data available in table.</td>
+            </tr>
             {% endif %}
 
-            {% if cams_changed %}
-                {% for schedule in cams_changed %}
-                    <tr>
-                        <td class="text-muted">{{ schedule.course }}</td>
-                        <td class="text-muted">{{ schedule.course.name }}</td>
-                        <td class="text-muted">{{ schedule.section }}</td>
-                        <td class="text-muted">{{ schedule.status }}</td>
-                        <td class="text-muted">{{ schedule.capacity }}</td>
-                        <td class="text-muted">{{ schedule.instructor }}</td>
-                        <td class="text-muted">{{ schedule.campus }}</td>
-                        <td class="text-muted">{{ schedule.location }}</td>
-                        <td class="text-muted">{{ schedule.days }}</td>
-                        <td class="text-muted">{{ schedule.start_time }}</td>
-                        <td class="text-muted">{{ schedule.stop_time }}</td>
-                        <td class="text-muted">None</td>
-                        <td class="text-muted">CAMS</td>
-                    </tr>
-                {% endfor %}
-            {% endif %}
             </tbody>
     </table>
 
@@ -162,4 +178,22 @@
         </form>
     </div>
 
-    {% endblock content %}
+
+    <style>
+        td.mark {
+            background-color: yellow !important;
+            print-color-adjust: exact;
+        }
+        td.strike {
+            text-decoration: line-through;
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+            }
+        }
+
+    </style>
+
+{% endblock content %}

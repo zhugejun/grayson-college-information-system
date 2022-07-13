@@ -116,9 +116,9 @@ def search(request):
         context["course"] = course
         context["section"] = section
 
-        schedule_list = Schedule.objects.filter(term=term, course=course)
+        schedule_list = Schedule.objects.filter(term=term, course=course, is_deleted=False)
         if section:
-            schedule_list = schedule_list.filter(section__startswith=section)
+            schedule_list = schedule_list.filter(section=section)
 
     if instructor_pk:
         context["instructor_pk"] = instructor_pk
@@ -488,8 +488,56 @@ def change_summary_by_term(request, term):
     course_list = Course.objects.filter(subject__in=subject_list)
 
     gcis_changed, cams_changed, added, deleted, total_changes = get_diff_gcis_cams(term, course_list)
-    context["gcis_changed"] = gcis_changed
-    context["cams_changed"] = cams_changed
+    if added:
+        added.sort(key=lambda s: (s.course.__str__(), s.course.name, s.section))
+    if deleted:
+        deleted.sort(key=lambda s: (s.course.__str__(), s.course.name, s.section))
+
+
+    changed_combined = {}
+    for s in gcis_changed:
+        if (s.course, s.section) not in changed_combined:
+            changed_combined[(s.course, s.section)] = defaultdict(list)
+        changed_combined[(s.course, s.section)]["gcis"].append(s)
+
+    for s in cams_changed:
+        changed_combined[(s.course, s.section)]["cams"].append(s)
+
+    
+    gcis_changed_cols = defaultdict(list) 
+    cams_changed_cols = defaultdict(list)
+
+    for _, val_dict in changed_combined.items():
+        for gcis in val_dict["gcis"]:
+            for cams in val_dict["cams"]:
+                if gcis.status != cams.status:
+                    gcis_changed_cols['status'].append(gcis.id)
+                    cams_changed_cols['status'].append(cams.id)
+                if gcis.capacity != cams.capacity:
+                    gcis_changed_cols['capacity'].append(gcis.id)
+                    cams_changed_cols['capacity'].append(cams.id)
+                if gcis.instructor != cams.instructor:
+                    gcis_changed_cols['instructor'].append(gcis.id)
+                    cams_changed_cols['instructor'].append(cams.id)
+                if gcis.campus != cams.campus:
+                    gcis_changed_cols['campus'].append(gcis.id)
+                    cams_changed_cols['campus'].append(cams.id)
+                if gcis.location != cams.location:
+                    gcis_changed_cols['location'].append(gcis.id)
+                    cams_changed_cols['location'].append(cams.id)
+                if gcis.days != cams.days:
+                    gcis_changed_cols['days'].append(gcis.id)
+                    cams_changed_cols['days'].append(cams.id)
+                if gcis.start_time != cams.start_time:
+                    gcis_changed_cols['start_time'].append(gcis.id)
+                    cams_changed_cols['start_time'].append(cams.id)
+                if gcis.stop_time != cams.stop_time:
+                    gcis_changed_cols['stop_time'].append(gcis.id)
+                    cams_changed_cols['stop_time'].append(cams.id)
+
+    context['gcis_changed_cols'] = gcis_changed_cols 
+    context['cams_changed_cols'] = cams_changed_cols 
+    context["changed_combined"] = changed_combined
     context["added"] = added
     context["deleted"] = deleted
     context["total_changes"] = total_changes
@@ -664,9 +712,8 @@ def get_diff_gcis_cams(term, course_list):
             term = schedule.term
             course = schedule.course
             section = schedule.section
-            try:
-                _ = Cams.objects.get(term=term, course=course, section=section)
-            except Cams.DoesNotExist:
+            in_cams = Cams.objects.filter(term=term, course=course, section=section)
+            if in_cams:
                 schedule_ids_deleted_in_CAMS.append(schedule.pk)
         deleted = deleted.exclude(pk__in=schedule_ids_deleted_in_CAMS)
             
