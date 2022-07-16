@@ -470,8 +470,6 @@ def change_summary(request):
 @login_required
 def change_summary_by_term(request, term):
 
-    # TODO: set changes as as todo list
-
     context = {}
 
     profile = get_object_or_404(Profile, user=request.user)
@@ -488,10 +486,12 @@ def change_summary_by_term(request, term):
     course_list = Course.objects.filter(subject__in=subject_list)
 
     gcis_changed, cams_changed, added, deleted, total_changes = get_diff_gcis_cams(term, course_list)
+    
     if added:
         added.sort(key=lambda s: (s.course.__str__(), s.course.name, s.section))
     if deleted:
         deleted.sort(key=lambda s: (s.course.__str__(), s.course.name, s.section))
+    
 
 
     changed_combined = {}
@@ -513,27 +513,28 @@ def change_summary_by_term(request, term):
                 if gcis.status != cams.status:
                     gcis_changed_cols['status'].append(gcis.id)
                     cams_changed_cols['status'].append(cams.id)
-                if gcis.capacity != cams.capacity:
-                    gcis_changed_cols['capacity'].append(gcis.id)
-                    cams_changed_cols['capacity'].append(cams.id)
-                if gcis.instructor != cams.instructor:
-                    gcis_changed_cols['instructor'].append(gcis.id)
-                    cams_changed_cols['instructor'].append(cams.id)
-                if gcis.campus != cams.campus:
-                    gcis_changed_cols['campus'].append(gcis.id)
-                    cams_changed_cols['campus'].append(cams.id)
-                if gcis.location != cams.location:
-                    gcis_changed_cols['location'].append(gcis.id)
-                    cams_changed_cols['location'].append(cams.id)
-                if gcis.days != cams.days:
-                    gcis_changed_cols['days'].append(gcis.id)
-                    cams_changed_cols['days'].append(cams.id)
-                if gcis.start_time != cams.start_time:
-                    gcis_changed_cols['start_time'].append(gcis.id)
-                    cams_changed_cols['start_time'].append(cams.id)
-                if gcis.stop_time != cams.stop_time:
-                    gcis_changed_cols['stop_time'].append(gcis.id)
-                    cams_changed_cols['stop_time'].append(cams.id)
+                if gcis.status not in ["CANCELED", "CLOSED"]:
+                    if gcis.capacity != cams.capacity:
+                        gcis_changed_cols['capacity'].append(gcis.id)
+                        cams_changed_cols['capacity'].append(cams.id)
+                    if gcis.instructor != cams.instructor:
+                        gcis_changed_cols['instructor'].append(gcis.id)
+                        cams_changed_cols['instructor'].append(cams.id)
+                    if gcis.campus != cams.campus:
+                        gcis_changed_cols['campus'].append(gcis.id)
+                        cams_changed_cols['campus'].append(cams.id)
+                    if gcis.location != cams.location:
+                        gcis_changed_cols['location'].append(gcis.id)
+                        cams_changed_cols['location'].append(cams.id)
+                    if cams.days and cams.days and gcis.days != cams.days:
+                        gcis_changed_cols['days'].append(gcis.id)
+                        cams_changed_cols['days'].append(cams.id)
+                    if gcis.start_time != cams.start_time:
+                        gcis_changed_cols['start_time'].append(gcis.id)
+                        cams_changed_cols['start_time'].append(cams.id)
+                    if gcis.stop_time != cams.stop_time:
+                        gcis_changed_cols['stop_time'].append(gcis.id)
+                        cams_changed_cols['stop_time'].append(cams.id)
 
     context['gcis_changed_cols'] = gcis_changed_cols 
     context['cams_changed_cols'] = cams_changed_cols 
@@ -707,15 +708,15 @@ def get_diff_gcis_cams(term, course_list):
         #     )
         # ]
         deleted = Schedule.objects.filter(term=term, course__in=course_list, is_deleted=True)
-        schedule_ids_deleted_in_CAMS = []
+        schedule_not_existing_in_CAMS = []
         for schedule in deleted:
             term = schedule.term
             course = schedule.course
             section = schedule.section
             in_cams = Cams.objects.filter(term=term, course=course, section=section)
-            if in_cams:
-                schedule_ids_deleted_in_CAMS.append(schedule.pk)
-        deleted = list(deleted.exclude(pk__in=schedule_ids_deleted_in_CAMS))
+            if not in_cams:
+                schedule_not_existing_in_CAMS.append(schedule.pk)
+        deleted = list(deleted.exclude(pk__in=schedule_not_existing_in_CAMS))
             
 
     return gcis_changed, cams_changed, added, deleted, total_changes
