@@ -4,7 +4,7 @@
 {% block content %}
 <p><span class="fs-4">Search results for </span> <span class="text-info fs-1"> {{ term }} </span> 
     {% if subject %}
-        <span class="text-primary fs-1">{{ subject }}</span>
+        <span class="text-primary fs-1">{{ subject }}</span> 
     {% else %}
         <span class="text-primary fs-1">{{ course }} {{ section }}</span>
     {% endif %}
@@ -67,6 +67,10 @@
         </tbody>
     </table>
 </div>
+
+{% if subject_only %}
+    <p class="text-danger fst-bold">*Note: These are existing sections. If the course is not listed in here, please go back and search by course instead.</p>
+{% endif %}
 
 {% if not hide_add_button %}
     <div class="text-center mt-2">

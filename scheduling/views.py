@@ -75,6 +75,7 @@ def search(request):
 
     hide_add_button = False
     show_course = False
+    subject_only = False
     context = {}
 
     term_pk = request.GET.get("term")
@@ -90,6 +91,7 @@ def search(request):
         context["subject"] = subject
         hide_add_button = True
         show_course = True
+        subject_only = True
         schedule_list = Schedule.objects.filter(
             term=term, course__subject=subject
         ).order_by("course", "section")
@@ -121,7 +123,7 @@ def search(request):
         show_course = True
     context["hide_add_button"] = hide_add_button
     context["show_course"] = show_course
-
+    context["subject_only"] = subject_only
     context["schedule_list"] = schedule_list
 
     return render(request, "scheduling/search.html", context)
