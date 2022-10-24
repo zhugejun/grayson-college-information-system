@@ -51,7 +51,7 @@ def home(request):
     form1 = SearchBySubjectForm(subject_choices)
     form1.fields["term"].queryset = Term.objects.filter(active="T")
 
-    course_list = Course.objects.filter(subject__in=subject_list).order_by("subject")
+    course_list = Course.objects.filter(subject__in=subject_list).order_by("subject", "number")
 
     form = SearchForm()
     form.fields["term"].queryset = Term.objects.filter(active="T")
