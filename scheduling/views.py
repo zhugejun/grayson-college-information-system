@@ -51,7 +51,7 @@ def home(request):
     form1 = SearchBySubjectForm(subject_choices)
     form1.fields["term"].queryset = Term.objects.filter(active="T")
 
-    course_list = Course.objects.filter(subject__in=subject_list)
+    course_list = Course.objects.filter(subject__in=subject_list).order_by("subject")
 
     form = SearchForm()
     form.fields["term"].queryset = Term.objects.filter(active="T")
@@ -59,20 +59,6 @@ def home(request):
 
     context["form"] = form
     context["form1"] = form1
-    latest_edited = Schedule.objects.filter(
-        update_by=request.user, course__in=course_list
-    )
-
-    n_edited = min(len(latest_edited), 5)
-    latest_edited = latest_edited.order_by("-update_date")[:n_edited]
-    context["latest_edited"] = latest_edited
-
-    latest_added = Schedule.objects.filter(
-        insert_by=request.user, course__in=course_list
-    )
-    n_added = min(len(latest_added), 5)
-    latest_added = latest_added.order_by("-insert_date")[:n_added]
-    context["latest_added"] = latest_added
 
     return render(request, "scheduling/home.html", context)
 
