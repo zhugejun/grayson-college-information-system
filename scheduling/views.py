@@ -745,8 +745,8 @@ def download_change_summary_by_term(request, term):
         [
             "Term",
             "Course",
-            "Name",
             "Section",
+            "Name",
             "Status",
             "Capacity",
             "Instructor",
@@ -771,8 +771,8 @@ def download_change_summary_by_term(request, term):
             [
                 s.term,
                 s.course,
-                s.course.name,
                 s.section,
+                s.course.name,
                 s.status,
                 s.capacity,
                 s.instructor,
@@ -797,8 +797,8 @@ def download_change_summary_by_term(request, term):
             [
                 c.term,
                 c.course,
-                c.course.name,
                 c.section,
+                c.course.name,
                 c.status,
                 c.capacity,
                 c.instructor,
@@ -824,8 +824,8 @@ def download_change_summary_by_term(request, term):
             [
                 s.term,
                 s.course,
-                s.course.name,
                 s.section,
+                s.course.name,
                 s.status,
                 s.capacity,
                 s.instructor,
@@ -851,8 +851,8 @@ def download_change_summary_by_term(request, term):
             [
                 s.term,
                 s.course,
-                s.course.name,
                 s.section,
+                s.course.name,
                 s.status,
                 s.capacity,
                 s.instructor,
