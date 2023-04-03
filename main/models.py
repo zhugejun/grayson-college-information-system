@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    subjects = models.CharField(max_length=1024, null=True, blank=True)
+    subjects = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'Profile<{self.user.username}>'
