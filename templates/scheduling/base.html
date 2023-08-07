@@ -75,7 +75,25 @@
     <script>
       $(".toast-body").delay(2000).fadeOut('slow');
 
+
+      $(document).ready(function() {
+      // Get the current URL path and remove the trailing slash (if any)
+      var currentPath = window.location.pathname.replace(/\/$/, "");
+
+      // Loop through each nav link and check if it matches the current URL path
+      $("#sidebarMenu .nav-link").each(function() {
+        var linkPath = $(this).attr("href").replace(/\/$/, "");
+
+        if (linkPath === currentPath) {
+          $(this).addClass("active"); // Add the 'active' class to the matched link
+        } else {
+          $(this).removeClass("active"); // Remove the 'active' class from other links
+        }
+      });
+    });
+
     </script>
+
 </body>
 {% include "includes/footer.html" %}
 
