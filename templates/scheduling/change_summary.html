@@ -8,18 +8,25 @@
     <strong>Warning!</strong> Please click <i class="fa fa-download" aria-hidden="true"></i> to download the summary of changes if the term link takes long time to load.
 </div>
 
-{% if curr_terms %}
-    <ul>
-        {% for term in curr_terms %}
-            <li> 
-                <a href="{% url 'change_summary_by_term' term %}">
-                    {{ term.semester }} {{ term.year }}
-                </a> &nbsp;
-                [<a href="{% url 'download_change_summary_by_term' term %}">
-                    <i class="fa fa-download" aria-hidden="true"></i>
-                </a>]
-            </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+{% if academic_years %}
+    {% for ay, terms in academic_years.items %}
+        <h3>{{ ay }}</h3>
+        <ul>
+            {% for term in terms %}
+                <li> 
+                    <a href="{% url 'change_summary_by_term' term %}">
+                        {{ term.semester }} {{ term.year }}
+                    </a> &nbsp;
+                    [<a href="{% url 'download_change_summary_by_term' term %}">
+                        <i class="fa fa-download" aria-hidden="true"></i>
+                    </a>]
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% else %}
+    <p>No changes yet.</p>
+{% endif %}
+
+
 {% endblock content %}

@@ -452,7 +452,21 @@ def change_summary(request):
 
     curr_terms = Term.objects.filter(active__exact="T").order_by("-year", "semester")
 
-    return render(request, "scheduling/change_summary.html", {"curr_terms": curr_terms})
+    academic_years = defaultdict(list)
+    for term in curr_terms:
+        yr = term.year
+        sm = term.semester
+        if sm == "FALL":
+            academic_year = f"{yr}-{yr+1}"
+            academic_years[academic_year].append(term)
+        else:
+            academic_year = f"{yr-1}-{yr}"
+            academic_years[academic_year].append(term)
+    
+    for ay in academic_years:
+        academic_years[ay].sort(key=lambda t: t.semester)
+
+    return render(request, "scheduling/change_summary.html", {"academic_years": dict(academic_years)})
 
 
 @login_required
