@@ -496,7 +496,7 @@ def change_summary_by_term(request, term):
     
 
 
-    changed_combined = {}
+    changed_combined = defaultdict(lambda: defaultdict(list))
     for s in gcis_changed:
         if (s.course, s.section) not in changed_combined:
             changed_combined[(s.course, s.section)] = defaultdict(list)
@@ -555,6 +555,7 @@ def get_diff_gcis_cams(term, course_list):
     
     if term and course_list:
 
+        # get active schedules from GCIS
         schedules_gcis = pd.DataFrame.from_records(
             Schedule.objects.filter(course__in=course_list, term=term, is_deleted=False)
             .all()
@@ -575,6 +576,7 @@ def get_diff_gcis_cams(term, course_list):
         )
         schedules_gcis.rename(columns={"id": "gcis_id"}, inplace=True)
 
+        # get all schedules from CAMS
         schedules_cams = pd.DataFrame.from_records(
             Cams.objects.filter(course__in=course_list, term=term)
             .all()
@@ -595,8 +597,15 @@ def get_diff_gcis_cams(term, course_list):
         )
         schedules_cams.rename(columns={"id": "cams_id"}, inplace=True)
 
+        # if both empty, no changes
         if schedules_gcis.empty and schedules_cams.empty:
             return gcis_changed, cams_changed, added, deleted, total_changes
+
+        # if gcis is empty, delete all schedules in CAMS
+        if schedules_gcis.empty:
+            for _id in schedules_cams["cams_id"].values:
+                deleted.append(Cams.objects.get(pk=_id))
+            return gcis_changed, cams_changed, added, deleted, total_changes        
 
         # clean up and get ready to merge
         schedules_gcis.replace("", np.nan, inplace=True)
@@ -610,6 +619,7 @@ def get_diff_gcis_cams(term, course_list):
         # make id an int64
         schedules_gcis["gcis_id"] = schedules_gcis["gcis_id"].astype("Int64")
         schedules_cams["cams_id"] = schedules_cams["cams_id"].astype("Int64")
+
 
         # fix the error casused by N/A in a character column
         for col in [
@@ -664,11 +674,13 @@ def get_diff_gcis_cams(term, course_list):
             .groupby(["term_id", "course_id", "section"])
             .filter(lambda x: x["section"].count() == 2)
         )
+
         _both_closed = (
             _changed.loc[_changed["status"] == "CLOSED"]
             .groupby(["term_id", "course_id", "section"])
             .filter(lambda x: x["section"].count() == 2)
         )
+
         _changed = _changed[~_changed.index.isin(list(_both_canceled.index))]
         _changed = _changed[~_changed.index.isin(list(_both_closed.index))]
         gcis_cids = _changed.loc[_changed["_merge"] == "left_only"]["gcis_id"].values
@@ -698,18 +710,19 @@ def get_diff_gcis_cams(term, course_list):
         # added = added.loc[added['status'] not in ['CANCELED', 'CLOSED']]
 
 
-        # # deleted
-        # # someone added schedules through cams???
-        # # make sure all changes are through Debbie
-        # _deleted = not_in_both.loc[not_in_both["_merge"] == "right_only"]
-        # _deleted = _deleted[
-        #     ~_deleted.index.isin(
-        #         list(_changed.index)
-        #         + list(_both_canceled.index)
-        #         + list(_both_closed.index)
-        #     )
-        # ]
-        deleted = Schedule.objects.filter(term=term, course__in=course_list, is_deleted=True)
+        # deleted
+        _deleted = not_in_both.loc[not_in_both["_merge"] == "right_only"]
+        _deleted = _deleted[
+            ~_deleted.index.isin(
+                list(_changed.index)
+                + list(_both_canceled.index)
+                + list(_both_closed.index)
+            )
+        ]
+
+        # marked as deleted in GCIS
+        deleted = Schedule.objects.filter(term=term, course__in=course_list, is_deleted=True, status__in=["OPEN"])
+
         schedule_not_existing_in_CAMS = []
         for schedule in deleted:
             term = schedule.term
@@ -719,7 +732,10 @@ def get_diff_gcis_cams(term, course_list):
             if not in_cams:
                 schedule_not_existing_in_CAMS.append(schedule.pk)
         deleted = list(deleted.exclude(pk__in=schedule_not_existing_in_CAMS))
-            
+
+        for _id in _deleted["cams_id"].values:
+            sch = Cams.objects.get(pk=_id)
+            deleted.append(Cams.objects.get(pk=_id))
 
     return gcis_changed, cams_changed, added, deleted, total_changes
 
