@@ -495,8 +495,8 @@ def change_summary_by_term(request, term):
         deleted.sort(key=lambda s: (s.course.__str__(), s.course.name, s.section))
     
 
-
-    changed_combined = defaultdict(lambda: defaultdict(list))
+    # it has to be a dict for changed_combined, otherwise it will be shown in the template
+    changed_combined = {}
     for s in gcis_changed:
         if (s.course, s.section) not in changed_combined:
             changed_combined[(s.course, s.section)] = defaultdict(list)
