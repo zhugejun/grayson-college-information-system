@@ -734,7 +734,6 @@ def get_diff_gcis_cams(term, course_list):
         deleted = list(deleted.exclude(pk__in=schedule_not_existing_in_CAMS))
 
         for _id in _deleted["cams_id"].values:
-            sch = Cams.objects.get(pk=_id)
             deleted.append(Cams.objects.get(pk=_id))
 
     return gcis_changed, cams_changed, added, deleted, total_changes
@@ -850,31 +849,58 @@ def download_change_summary_by_term(request, term):
         )
 
     for s in deleted:
-        writer.writerow(
-            [
-                s.term,
-                s.course,
-                s.section,
-                s.course.name,
-                s.status,
-                s.capacity,
-                s.instructor,
-                s.campus,
-                s.location,
-                s.days,
-                s.start_time,
-                s.stop_time,
-                s.notes,
-                "GCIS",
-                s.insert_by,
-                reformat_datetime(s.insert_date),
-                s.update_by,
-                reformat_datetime(s.update_date),
-                s.deleted_by,
-                reformat_datetime(s.deleted_at),                
-                "DELETE",
-            ]
-        )
+        if isinstance(s, Cams):
+            writer.writerow(
+                [
+                    s.term,
+                    s.course,
+                    s.section,
+                    s.course.name,
+                    s.status,
+                    s.capacity,
+                    s.instructor,
+                    s.campus,
+                    s.location,
+                    s.days,
+                    s.start_time,
+                    s.stop_time,
+                    "",
+                    "CAMS",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "DELETE (in-cams-only)"
+                ]
+            )
+        else:
+            writer.writerow(
+                [
+                    s.term,
+                    s.course,
+                    s.section,
+                    s.course.name,
+                    s.status,
+                    s.capacity,
+                    s.instructor,
+                    s.campus,
+                    s.location,
+                    s.days,
+                    s.start_time,
+                    s.stop_time,
+                    s.notes,
+                    "GCIS",
+                    s.insert_by,
+                    reformat_datetime(s.insert_date),
+                    s.update_by,
+                    reformat_datetime(s.update_date),
+                    s.deleted_by,
+                    reformat_datetime(s.deleted_at),                
+                    "DELETE",
+                ]
+            )
 
     for s in added:
         writer.writerow(
