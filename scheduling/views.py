@@ -93,7 +93,7 @@ def search(request):
         show_course = True
         subject_only = True
         schedule_list = Schedule.objects.filter(
-            term=term, course__subject=subject
+            term=term, course__subject=subject, is_deleted=False
         ).order_by("course", "section")
     
     if course_pk:
@@ -113,11 +113,11 @@ def search(request):
         try:
             instructor = Instructor.objects.get(pk=instructor_pk)
             schedule_list = Schedule.objects.filter(
-                term=term, instructor=instructor, course__subject__in=subject_list
+                term=term, instructor=instructor, course__subject__in=subject_list, is_deleted=False
             ).order_by("course", "section")
         except Instructor.DoesNotExist:
             schedule_list = Schedule.objects.filter(
-                term=term, instructor__isnull=True, course__subject__in=subject_list
+                term=term, instructor__isnull=True, course__subject__in=subject_list, is_deleted=False
             ).order_by("course", "section")
         hide_add_button = True
         show_course = True
