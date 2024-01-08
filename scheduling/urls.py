@@ -35,4 +35,5 @@ urlpatterns = [
         views.schedule_summary_by_term,
         name="schedule_summary_by_term",
     ),
+    path("deleted-schedules/", views.deleted_schedules, name="deleted_schedules"),
 ]

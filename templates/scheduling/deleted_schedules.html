@@ -1,0 +1,64 @@
+{% extends "scheduling/base.html" %}
+
+{% block content %}
+<h1>Deleted schedules</h1>
+<hr />
+
+
+<div>
+  <div class="table-responsive">
+    <table class="table table-sm table-striped compact">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">Term</th>
+          <th scope="col">Course</th>
+          <th scope="col">Section</th>
+          <th scope="col">Status</th>
+          <th scope="col">Capacity</th>
+          <th scope="col">Instructor</th>
+          <th scope="col">Campus</th>
+          <th scope="col">Location</th>
+          <th scope="col">Days</th>
+          <th scope="col">Start</th>
+          <th scope="col">Stop</th>
+          <th scope="col">Note</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+
+      {% if deleted %}
+      <tbody>
+        {% for schedule in deleted %}
+        <tr>
+          <td>{{ schedule.term }}</td>
+          <td>{{ schedule.course }}</td>
+          <td>{{ schedule.section }}</td>
+          <td>{{ schedule.status }}</td>
+          <td>{{ schedule.capacity }}</td>
+          <td>{{ schedule.instructor }}</td>
+          <td>{{ schedule.campus }}</td>
+          <td>{{ schedule.location }}</td>
+          <td>{{ schedule.days }}</td>
+          <td>{{ schedule.start_time }}</td>
+          <td>{{ schedule.stop_time }}</td>
+          <td>{{ schedule.notes }}</td>
+          <td style="text-align: center;">
+            <a
+              href="{% url 'restore_schedule' schedule.id %}"
+              ><i class="fa-solid fa-clock-rotate-left"></i
+            ></a>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        {% else %}
+            <tr>
+                <td colspan="13" class="text-center">No data available in table.</td>
+            </tr>
+        {% endif %}
+    </table>
+  </div>
+</div>
+
+
+{% endblock content %}

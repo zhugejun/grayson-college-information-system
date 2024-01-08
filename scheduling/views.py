@@ -470,6 +470,28 @@ def change_summary(request):
 
 
 @login_required
+def deleted_schedules(request):
+
+    context = {}
+
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.subjects:
+        subject_list = profile.subjects.split(",")
+    else:
+        subject_list = []
+
+    course_list = Course.objects.filter(subject__in=subject_list)
+
+    deleted = Schedule.objects.filter(
+        is_deleted=True, course__in=course_list
+    ).order_by("-deleted_at")
+    context["deleted"] = deleted
+
+    return render(request, "scheduling/deleted_schedules.html", context)
+
+
+
+@login_required
 def change_summary_by_term(request, term):
 
     context = {}
