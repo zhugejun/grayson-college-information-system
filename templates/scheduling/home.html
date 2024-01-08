@@ -4,12 +4,24 @@
 <hr class="mb-3" />
 
 {% if dates %}
-  <div class="alert alert-info">
+  <div class="alert alert-primary">
     <ul>
-      <li>CAMS Last Update: {{ dates.cams_update_at }}</li>
+      <li>CAMS Last Update: <i>{{ dates.cams_update_at }}</i></li>
     </ul>
   </div>
 {% endif %}
+
+
+<div class="alert alert-info">
+  <h5>Updates (01/08/2024)</h5>
+  <ul>
+    <li>The Summary tab on the left sidebar has been removed. If you use it to check conflicts, please let me know.</li>
+    <li>All the deleted schedules can be found under the Trash tab on the left sidebar.</li>
+    <li>Please send your feedback to zhua@grayson.edu. I want to make the app work better for you.</li>
+  </ul>
+
+</div>
+
 
 <div class="container mt-3">
   <div class="row justify-content-center">
