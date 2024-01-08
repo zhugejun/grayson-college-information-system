@@ -22,6 +22,7 @@
 
     </script>
 
+
     <style>
       .nav-link.active {
         background-color: #0d6efd !important; 
@@ -55,7 +56,7 @@
                     Summary 
                   </a>
                 </li> -->
-                <li class="nav-item">
+                <li class="nav-item" id="changes-sidebar-item">
                   <a class="nav-link" href="{% url 'change_summary' %}">
                     Changes
                   </a>
@@ -90,17 +91,19 @@
 
 
       $(document).ready(function() {
-      // Get the current URL path and remove the trailing slash (if any)
       var currentPath = window.location.pathname.replace(/\/$/, "");
 
-      // Loop through each nav link and check if it matches the current URL path
       $("#sidebarMenu .nav-link").each(function() {
         var linkPath = $(this).attr("href").replace(/\/$/, "");
 
         if (linkPath === currentPath) {
-          $(this).addClass("active"); // Add the 'active' class to the matched link
+          $(this).addClass("active"); 
         } else {
-          $(this).removeClass("active"); // Remove the 'active' class from other links
+          $(this).removeClass("active"); 
+        }
+
+        if (currentPath.includes('change-summary')) {
+          $('#changes-sidebar-item a').addClass('active');
         }
       });
     });
