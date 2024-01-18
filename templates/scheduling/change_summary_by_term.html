@@ -164,9 +164,9 @@
     <div class="text-center mt-5 mb-5">
         <form method="GET" action="{% url 'download_change_summary_by_term' term %}">
             {% if total_changes %}
-                <button class="btn btn-primary" role="button">Download</button>
+                <button class="btn btn-primary" role="button" style="width: 200px;">Download</button>
             {% else %}
-                <button class="btn btn-primary" role="button" disabled>Download</button>
+                <button class="btn btn-primary" role="button" style="width: 200px;" disabled>Download</button>
             {% endif %}
 
         </form>
