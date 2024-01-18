@@ -3,22 +3,57 @@
 {% block content %}
 
 <h1>Department</h1>
-Please select your departments to start scheduling.
+<hr />
+
+<script>
+    function toggleSelectAll(source) {
+        checkboxes = document.getElementsByName('subjects');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;
+        }
+    }
+
+    $(document).ready(function() {
+        $('#id_of_subjects_field').select2({
+            width: '100%'
+        });
+    });
+
+</script>
+
 
 <form class="mt-2" method="POST">
     {% csrf_token %} 
 
-    <div class="form-group">
-        {{ form.subjects}}
+    <label>
+        <input type="checkbox" id="select-all" name="select-all" value="select-all" onchange="toggleSelectAll(this)" > Select All
+    </label>
+
+    <br />
+
+
+    <div class="flex-container">
+        {% for letter, subject in grouped_subjects.items %}
+        <div class="flex-item">
+            <h3 class="text-light bg-dark mt-4">{{ letter }}</h3>
+            {% for s in subject %}
+            <label>
+                <input type="checkbox" name="subjects" value="{{ s }}" {% if s in selected_subjects %} checked {% endif %} > {{ s }}
+            </label>
+            <br />
+            {% endfor %}
+        {% endfor %}
+
     </div>
-    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+
+
+
+    <br />
+    <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary mt-2" style="width: 200px;">Submit</button>
+    </div>
 </form>
 <br />
 
-<script>
-    $(document).ready(function() {
-        $("#id_subjects").select2();
-    })
-</script>
 
 {% endblock content %}

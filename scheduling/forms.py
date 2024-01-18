@@ -479,7 +479,9 @@ class SubjectForm(forms.ModelForm):
         model = Profile
         fields = ["subjects"]
 
-    subjects = forms.MultipleChoiceField(choices=SUBJECT_CHOICES, required=False)
+    subjects = forms.MultipleChoiceField(choices=SUBJECT_CHOICES,
+                                        widget= forms.CheckboxSelectMultiple(attrs={"display": "inline-block"}),
+                                        required=False)
 
     def clean(self):
         cleaned_data = super(SubjectForm, self).clean()

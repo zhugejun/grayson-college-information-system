@@ -13,7 +13,7 @@ import numpy as np
 import csv
 from zoneinfo import ZoneInfo
 
-from .forms import ScheduleForm, SubjectForm, SearchForm, SearchBySubjectForm
+from .forms import ScheduleForm, SubjectForm, SearchForm, SearchBySubjectForm, SUBJECTS
 from .models import Course, Dates, Schedule, Instructor, Term, Cams
 from main.models import Profile
 
@@ -132,12 +132,23 @@ def search(request):
 @login_required
 def update_subjects(request):
 
+    grouped_subjects = {}
+    for subject in SUBJECTS:
+        if subject[0] not in grouped_subjects:
+            grouped_subjects[subject[0]] = []
+        else:
+            grouped_subjects[subject[0]].append(subject)
+    
+    grouped_subjects = {k: v for k, v in grouped_subjects.items() if len(v) >= 1}
+
     profile = get_object_or_404(Profile, user=request.user)
 
     if profile.subjects:
         profile.subjects = profile.subjects.split(",")
     else:
         profile.subjects = []
+
+
 
     # form for GET method
     form = SubjectForm(instance=profile)
@@ -150,7 +161,9 @@ def update_subjects(request):
             form.save()
             messages.success(request, "Subjects updated successfully.")
             return redirect("scheduling_home")
-    return render(request, "scheduling/update_subjects.html", {"form": form})
+    return render(request, "scheduling/update_subjects.html", 
+                {"form": form, "grouped_subjects": grouped_subjects,
+                "selected_subjects": profile.subjects})
 
 
 # ------------------------ Course --------------------------#
