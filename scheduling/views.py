@@ -46,6 +46,8 @@ def home(request):
         subject_list = profile.subjects.split(",")
     else:
         subject_list = []
+    
+    context["subject_list"] = subject_list
 
     subject_choices = [(subject, subject) for subject in subject_list]
     form1 = SearchBySubjectForm(subject_choices)
