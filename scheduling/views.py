@@ -137,7 +137,7 @@ def update_subjects(request):
     grouped_subjects = {}
     for subject in SUBJECTS:
         if subject[0] not in grouped_subjects:
-            grouped_subjects[subject[0]] = []
+            grouped_subjects[subject[0]] = [subject]
         else:
             grouped_subjects[subject[0]].append(subject)
     
