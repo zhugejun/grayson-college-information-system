@@ -34,20 +34,20 @@
 
     <div class="flex-container">
         {% for letter, subject in grouped_subjects.items %}
-        <div class="flex-item">
-            <h3 class="text-light bg-dark mt-4">{{ letter }}</h3>
-            {% for s in subject %}
-            <label>
-                <input type="checkbox" name="subjects" value="{{ s }}" {% if s in selected_subjects %} checked {% endif %} > {{ s }}
-            </label>
-            <br />
-            {% endfor %}
+            <div class="flex-item">
+                <h3 class="text-light bg-dark mt-4" style="position: sticky; top: 0;">{{ letter }}</h3>
+                <div class="row">
+                    {% for s in subject %}
+                        <div class="col-md-2"> <!-- Adjust the column size as needed -->
+                            <label>
+                                <input type="checkbox" name="subjects" value="{{ s }}" {% if s in selected_subjects %} checked {% endif %} > {{ s }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         {% endfor %}
-
     </div>
-
-
-
     <br />
     <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-primary mt-2" style="width: 200px;">Submit</button>
