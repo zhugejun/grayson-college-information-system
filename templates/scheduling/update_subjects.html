@@ -38,7 +38,7 @@
                 <h3 class="text-light bg-dark mt-4" style="position: sticky; top: 0;">{{ letter }}</h3>
                 <div class="row">
                     {% for s in subject %}
-                        <div class="col-md-2"> <!-- Adjust the column size as needed -->
+                        <div class="col-md-2">
                             <label>
                                 <input type="checkbox" name="subjects" value="{{ s }}" {% if s in selected_subjects %} checked {% endif %} > {{ s }}
                             </label>
