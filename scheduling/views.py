@@ -41,9 +41,11 @@ def home(request):
         dates = None
     context["dates"] = dates
 
+    cst = ZoneInfo('America/Chicago')
+
     if context["dates"]:
-        context["cams_updated_date"] = context["dates"].cams_update_at.strftime("%Y-%m-%d")
-    context["today"] = datetime.now().strftime("%Y-%m-%d")
+        context["cams_updated_date"] = context["dates"].cams_update_at.astimezone(cst).strftime("%Y-%m-%d")
+    context["today"] = datetime.now(cst).strftime("%Y-%m-%d")
 
     profile = get_object_or_404(Profile, user=request.user)
     if profile.subjects:
