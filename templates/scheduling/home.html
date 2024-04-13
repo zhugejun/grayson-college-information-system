@@ -15,9 +15,9 @@
 
 
 {% if dates %}
-  <div class="alert {% if cams_updated_date == today %}alert-primary{% else %}alert-warning{% endif %}">
+  <div class="alert {% if cams_updated == 'today' %} alert-primary {% elif cams_updated == 'yesterday' %} alert-warning {% else %} alert-danger {% endif %}">
     <ul>
-      <li>CAMS Last Update: <b>{{ dates.cams_update_at }}</b></li>
+      <li>CAMS Last Update: <b> {{ cams_updated_time }} {{ cams_updated }}</b></li>
     </ul>
   </div>
 {% endif %}

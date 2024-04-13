@@ -47,6 +47,19 @@ def home(request):
         context["cams_updated_date"] = context["dates"].cams_update_at.astimezone(cst).strftime("%Y-%m-%d")
     context["today"] = datetime.now(cst).strftime("%Y-%m-%d")
 
+    cams_updated_date = dates.cams_update_at.astimezone(cst)
+    context["cams_updated_time"] = cams_updated_date.strftime("%H:%M %p")
+
+    today = datetime.now(cst)
+    diff_days = (today - cams_updated_date).days
+    if diff_days == 0:
+        context["cams_updated"] = "today"
+    elif diff_days == 1:
+        context["cams_updated"] = "yesterday"
+    else:
+        context["cams_updated"] = f"{diff_days} days ago"
+
+
     profile = get_object_or_404(Profile, user=request.user)
     if profile.subjects:
         subject_list = profile.subjects.split(",")
