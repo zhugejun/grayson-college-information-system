@@ -48,7 +48,7 @@ def home(request):
     context["today"] = datetime.now(cst).strftime("%Y-%m-%d")
 
     cams_updated_date = dates.cams_update_at.astimezone(cst)
-    context["cams_updated_time"] = cams_updated_date.strftime("%H:%M %p")
+    context["cams_updated_time"] = cams_updated_date.strftime("%I:%M %p")
 
     today = datetime.now(cst)
     diff_days = (today - cams_updated_date).days
