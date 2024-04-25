@@ -6,7 +6,7 @@
     {% if subject %}
         <span class="text-primary fs-1">{{ subject }}</span> 
     {% else %}
-        <span class="text-primary fs-1">{{ course }} {{ section }}</span>
+        <span class="text-primary fs-1">{{ course }} {{ section }}</span> <span class="fs-1 text-secondary"> - {{ course.name | title }}</span>
     {% endif %}
 </p>
 
