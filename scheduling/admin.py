@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django import forms
+from django.db import models
+from django.db.models.functions import Concat
 
 # Register your models here.
 from .models import Course, Campus, Dates, Instructor, Location, Term, Schedule, Cams
@@ -33,6 +36,25 @@ class ScheduleAdmin(admin.ModelAdmin):
     )
     search_fields = ["course__subject", "course__number", "section"]
     ordering = ("-update_date",)
+
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "course":
+            kwargs['widget'] = forms.Select(attrs={
+                'style': 'width: 250px;'
+            })
+            kwargs['queryset'] = Course.objects.annotate(
+                display_name=Concat(
+                    'subject', models.Value(' '),
+                    'number', models.Value(' - '),
+                    'name',
+                    output_field=models.CharField()
+                )
+            )
+            field = super().formfield_for_foreignkey(db_field, request, **kwargs)
+            field.label_from_instance = lambda obj: getattr(obj, 'display_name', str(obj))
+            return field
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Instructor)
