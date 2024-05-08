@@ -253,6 +253,7 @@ SUBJECTS = [
     "SMFT",
     "SMGT",
     "SOCI",
+    "SOCW",
     "SPAN",
     "SPCH",
     "SPCS",
