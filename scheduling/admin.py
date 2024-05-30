@@ -50,7 +50,7 @@ class ScheduleAdmin(admin.ModelAdmin):
                     'name',
                     output_field=models.CharField()
                 )
-            )
+            ).order_by('subject', 'number')
             field = super().formfield_for_foreignkey(db_field, request, **kwargs)
             field.label_from_instance = lambda obj: getattr(obj, 'display_name', str(obj))
             return field
