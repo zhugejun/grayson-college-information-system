@@ -1,9 +1,10 @@
 {% extends "scheduling/base.html" %}
 
 {% block content %}
-<h1>
-    <span class="text-primary"> {{ schedule.course }} </span>
-</h1>
+
+<div>
+    <span class="text-primary fs-1"> {{ schedule.course }} </span> <span class="fs-1 text-secondary"> {{ schedule.course.name | title }}</span>
+</div>
 <hr />
 
 <form method="POST">
