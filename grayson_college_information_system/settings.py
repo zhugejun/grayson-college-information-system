@@ -80,28 +80,28 @@ WSGI_APPLICATION = "grayson_college_information_system.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-if DEBUG:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "grayson",
-            "USER": "zhua",
-            "PASSWORD": "p1234",
-            "HOST": "localhost",
-            "PORT": "5432",
-        }
+# if DEBUG:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.postgresql",
+#             "NAME": "grayson",
+#             "USER": "zhua",
+#             "PASSWORD": "p1234",
+#             "HOST": "localhost",
+#             "PORT": "5432",
+#         }
+#     }
+# else:
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "d4hdbd44mip8rs",
+        "USER": "uad5b4pgen90bu",
+        "PASSWORD": "p1e5bab8291c21f7f9f0ecb76e417c9d397cd5f069d6b03285044b807649ce986",
+        "HOST": "c98cgvoa4cjnvf.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com",
+        "PORT": "5432",
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "dc9sr4cul4immu",
-            "USER": "elegiedzafyxeh",
-            "PASSWORD": "16d004fe995ff7ca60eeed11780457fd1190913e8ea43d65a12a89f54c24abe7",
-            "HOST": "ec2-52-71-23-11.compute-1.amazonaws.com",
-            "PORT": "5432",
-        }
-    }
+}
 
 
 # Password validation
